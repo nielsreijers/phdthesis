@@ -1,4 +1,4 @@
-MAIN=thesis
+MAIN=main
 LATEX=xelatex
 BIBTEX=bibtex
 RM=rm -f
