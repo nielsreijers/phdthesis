@@ -1,18 +1,15 @@
 \chapter{Guaranteeing safety}
 
-With some exceptions \cite{Evers:2010ur}, most current sensor node VMs don't discuss safety, but instead focus on the functionality provided and how this can be implemented on a tiny sensor node. This is unfortunate, because the ability to provide a safety execution environment is both desirable, and easier to implement using a VM than it is using native code.
-
-\section{Native code approaches}
-For desktop applications, Wahbe et al. described software fault isolation \cite{Wahbe:1994cj} techniques that can be used for situations where we want to isolate a piece of code without incurring the overhead of using processes and the CPU's memory protection. For example, for plugin code that frequently needs to interact with an application, the overhead of frequent context switches, but should still be isolated from the rest of the application. Two basic methods are described: we can either rewrite the native code at load time, and insert checks at all potentially unsafe writes, or we can compile the code to a more restricted format with the appropriate checks already in place, and only verify the code adheres to this standard at load time.
-
-On a sensor node, two systems exist that follow each of these two approaches. \emph{t-kernel} \cite{Gu:2006ww} raises the level of system abstraction for the developer by providing three features typically missing on sensor nodes: preemptive scheduling, virtual memory, and memory protection. It does this by extensive rewriting of the binary code at load time. While \emph{t-kernel} is heavily optimised, the price for this is that programmes still run 50-200\% slower, and code size increases by 500-750\%.
-
-The other approach is taken by Harbor \cite{Kumar:2007ge}, which consists of two components. On the desktop a binary rewriter sandboxes an application by inserting run-time checks before it is sent to the node. Then the SOS operating system is then extended with a binary verifier to verify incoming binaries. The correctness only depends on the correctness of this verifier. The increase in code size is more modest than for \emph{t-kernel} at a 30-65\% increase, but performance is 160-1200\% slower, where the authors note the benchmark producing the 13x slowdown is more typical of sensor node code. They also note more complex analysis of the binary code could reduce the number of necessary checks, but that this would significantly increase the complexity of the verifier.
-
-Finally, Safe TinyOS \cite{Cooprider:2007ub} imposes much less overhead, at 17\% slowdown and 27\% code size increase. It achieves this using Deputy \cite{Condit:2007uo}, a source-to-source compiler for ensuring type and memory safety for C code. The host can do more complex analysis of the source code to reduce the necessary run-time checks. While this protects against bugs, it provides a weaker type of safety because it depends on a trusted host and does not provide safety on the node itself.
-
-\section{Safety in virtual machines}
 \input{60-tbl-safety-checks}
+
+
+Copied from introduction
+\begin{enumerate}
+	\item write to memory outside the range assigned by the VM
+	\item perform actions it does not have permission for
+	\item retain control of the CPU indefinitely
+\end{enumerate}
+
 
 The complexity of reducing the necessary run-time checks noted by Harbor, is much lower when using a virtual machine. The JVM instruction set is relatively simple and restricted, compared to native CPU instruction sets, and is much easier to reason about. As we will see, many checks can be done at load time, reducing the need for runtime checks and the corresponding overhead.
 

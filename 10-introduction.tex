@@ -1,6 +1,31 @@
 \chapter{Introduction}
 to do
 
+\section{Performance}
+to do
+
+\section{Safety}
+Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes from one another and the kernel. Instead, the entire address range is accessible from any part of the code running on the device.
+
+At the same time, while small, sensor node code can be complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit more functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects. In such an environment, mistakes are easily made, and  can have catastrophic consequences with full access to the entire address space. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
+
+To guard against both buggy code and malicious attacks, the ability to execute code in a sandboxed manner and isolate untrusted application code from the VM itself is a desirable property. Specifically, we want to guarantee that malicious code cannot:
+\begin{enumerate}
+	\item write to memory outside the range assigned by the VM
+	\item perform actions it does not have permission for
+	\item retain control of the CPU indefinitely
+\end{enumerate}
+
+Note that these guarantees do not say anything about the correctness of the application itself: code may still corrupt it's own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds runtime checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this depends on a trusted and correct host, and doesn't protect against malicious code being sent to the device.
+
+Our approach depends only on the correctness of our VM. It guarantees the VM's own data cannot be corrupted, and that it can always regain control of the node and terminate any buggy or malicious application that attempts an illegal write or other action it is not permitted to do.
+
+\section{Contributions}
+
+\section{Structure of thesis}
+
+\section{List of publications}
+
 \section{Naming}
 
 Define some commonly used names here. Using WSN instead of IoT since it is longer established and more clearly focussed on tiny node, while IoT may contain much more powerful devices.
