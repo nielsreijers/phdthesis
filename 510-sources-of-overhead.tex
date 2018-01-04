@@ -1,0 +1,107 @@
+\section{Sources of overhead}
+The performance of this basic approach is still far behind optimised native C. To improve performance, it is important to identify the causes of this overhead. The main sources of overhead we found are:
+\begin{itemize}
+	\item Lack of optimisations in the Java compiler
+	\item AOT code generation overhead
+	\begin{itemize}
+		\item Push/pop overhead
+		\item Load/store overhead
+		\item JVM instruction set limitations
+	\end{itemize}
+	\item Method call overhead
+\end{itemize}
+
+We will briefly discuss each source of overhead below, before introducing optimisations to reduce it.
+
+\subsection{Lack of optimisation in \mycode{javac}}
+A first source of overhead comes from the fact that the standard \mycode{javac} compiler does almost no optimisations.  Since the JVM is an abstract machine, there is no clear performance model to optimise for. Run-time performance depends greatly on the target platform and the VM implementation running the bytecode, which are unknown when compiling Java source code to JVM bytecode.
+
+The \mycode{javac} compiler simply compiles the code 'as is'. For example, the loop '\mycode{while (a < b*c) \{ a*=2; \}}' will evaluate '\mycode{b*c}' on each iteration, while it is clear that the result will be the same every time.
+
+In most environments this is not a problem because the bytecode is typically compiled to native code before execution, and using knowledge of the target platform and the run-time behaviour, a desktop JIT compiler can make much better decisions than \mycode{javac} could. However, since our AOT compiler simply replaces each instruction with a native equivalent, this leads to significant overhead.
+
+We do use the ProGuard optimiser \cite{proguard}, but this only does very basic optimisations such as method inlining and dead code removal, and does not cover cases such as the example above.
+
+\subsection{AOT translation overhead}
+\label{sec-overhead-aot-translation}
+Assuming we have high quality JVM bytecode, a second source of overhead comes from the way the bytecode is translated to native code. We distinguish three main types of translation overhead, where the first two are a direct result of the JVM's stack-based architecture.
+
+\subsubsection{Type 1: Pushing and popping values} The compilation process initially results in a large number of push and pop instructions. In our simple example in Table \ref{tbl-basic-translation}, the peephole optimiser was able to eliminate some, but two push/pop pairs remain. For more complex expressions this type of overhead is even higher, since more values will be on the stack at the same time. This means more corresponding push and pop instructions will not be consecutive, and the peephole optimiser cannot eliminate these cases.
+
+\subsubsection{Type 2: Loading and storing values} The second type is also due to the JVM's stack-based architecture. Each operation consumes its operands from the stack, but often the same value is needed again soon after. In this case, because the value is no longer on the stack, we need to do another load, which will result in another read from memory.
+
+In Table \ref{tbl-basic-translation}, it is clear that the \mycode{SLOAD\_0} instruction at label 5 is unnecessary since the value is already in R1.
+
+\subsubsection{Type 3: JVM instruction set limitations} A final source of overhead comes from optimisations that are done in native code, but are not possible in JVM bytecode, at least not in our resource-constrained environment.
+
+The JVM instruction set is very simple, which makes it easy to implement, but this also means some things cannot be expressed as efficiently as in native code. Given enough processing power, compilers can do the complex transformations necessary to make the compiled JVM code run almost as fast as native C, but on a sensor node we do not have such resources and must simply execute the instructions as they are.
+
+In Table \ref{tbl-basic-translation} we see that there is no way to express a single bit shift directly. Instead we have to load the constant 1 onto the stack and execute the generic bit shift instruction. Compare this to addition, where the JVM bytecode does have a special INC instruction to add a constant value to a local variable.
+
+A second example is array access. In JVM bytecode each array access will consume the array reference and index from the stack. When looping over an array, this means we that for each iteration we have to load the reference and index back onto the stack again, and redo the address calculation. In contrast, the native C version would typically just slide a pointer over the array.
+
+\subsection{Method call overhead}
+\label{sec-overhead-method-call}
+The final source of overhead comes from method calls. In the JVM, each method has a stack frame (or 'activation frame') which the language specification describes as
+\begin{quotation}
+"containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked and any other bookkeeping information that may be required by the implementation (stack pointer, program counter, reference to previous activation frame, and the like)" \cite{Gosling:2014}
+\end{quotation}
+
+Darjeeling's stack frame layout is shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps Darjeeling goes through to invoke a Java method:
+
+\begin{enumerate}
+  \small
+  \item flush the stack cache so parameters are in memory and clear value tags (see sections \ref{sec-optimisations-simple-stack-caching} and \ref{sec-optimisations-popped-value-caching})
+  \item save int and ref stack pointers (SP and X)
+  \item call the VM's \mycode{callMethod} function, which will:
+  \begin{enumerate}
+    \item allocate memory for the callee's frame
+    \item initialise the callee's frame
+    \item pass parameters: pop them off the caller's stack and copy them into the callee's locals
+    \item activate the callee's frame: set the VM's active frame pointer to the callee
+    \item lookup the address of the AOT compiled code
+    \item do the actual \mycode{CALL}, which will return any return value in registers R22 and higher
+    \item reactivate the old frame: set the VM's active frame pointer back to the caller
+    \item return to the caller's AOT compiled code the return value (if any) in R22 and higher
+  \end{enumerate}
+  \item restore stack pointer and X register
+  \item push the return value onto the stack (using stack caching, so this is free)
+\end{enumerate}
+
+Even after considerable effort optimising this process, this requires roughly 550 cycles for the simplest case: a call to a static method without any parameters or return value. For a virtual method the cost is higher because we need to look up the right implementation. While we may be able to save some more cycles with an even more rigorous refactoring, it is clear that the number of steps involved will always take considerably more time than a native function call.
+
+\subsection{Optimisations}
+\label{sec-optimisations-java-source}
+Having identified these sources of overhead, we will use the next three sections to describe the set of optimisations we use to address them. Table \ref{tbl-optimisations-overview} lists each optimisation, and the source of overhead it aims to reduce. The following sections will discuss each optimisation in detail.
+
+\begin{table*}[hbt]
+\centering
+\caption{List of optimisations per overhead source}
+\label{tbl-optimisations-overview}
+\small
+\begin{tabular}{lll}
+\toprule
+& Source of overhead & Optimisation \\
+\hline
+Section \ref{sec-optimisations-manual-java-source-optimisation} &
+Lack of optimisations in \mycode{javac}        & Manual optimisation of Java source code \\
+
+Section \ref{sec-optimisations-aot-translation-overhead} &
+AOT translation overhead                       & \\
+&\hspace{.5cm} Push/pop overhead                & Improved peephole optimiser \\
+&                                               & Stack caching \\
+&\hspace{.5cm} Load/store overhead              & Popped value caching \\
+&                                               & Mark loops \\
+&\hspace{.5cm} JVM instruction set limitations  & \mycode{SIMUL} instruction \\
+&                                               & \mycode{GET/PUTFIELD\_A\_FIXED} instructions \\
+&                                               & constant shift optimisation \\
+&                                               & 16-bit array indexes \\
+
+Section \ref{sec-optimisations-method-calls} &
+Method call overhead                           & \mycode{INVOKELIGHT} instruction \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+
+

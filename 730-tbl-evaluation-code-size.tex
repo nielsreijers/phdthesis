@@ -1,0 +1,35 @@
+\begin{tabular}{lrrrrrrrrrrrr}
+\toprule
+BENCHMARK                          & b.sort            &  h.sort           & b.srch            & fft               & xxtea             & md5               & rc5               & coremk            & \makebox[0.2mm]{}   & average           \\
+\hline
+\multicolumn{10}{l}{CODE SIZE (BYTES)} \\
+% Take JVM, Native C and AOT original from results_0BASE_R___P__C0_A0_S0_G1
+\xxt JVM                           &                78 &               140 &                91 &               493 &               384 &              2986 &               457 &              5719 &     &                   \\
+\xxt Native C                      &               150 &               416 &               212 &              1214 &              1442 &              9458 &               910 &             10388 &     &                   \\
+\xxt AOT original                  &               520 &              1170 &               616 &              2694 &              3780 &             29362 &              4074 &             33668 &     &                   \\
+% Take AOT optimised from results_4MARK_R11_P7_C1_A1_S1_G1
+\xxt AOT optimised                 &               344 &               738 &               450 &              1460 &              2268 &             14798 &              2140 &             25560 &     &                   \\
+\hline
+\multicolumn{10}{l}{CODE SIZE OVERHEAD BEFORE OPTIMISATIONS (\%)} \\
+% Take this from main-code-size-graph.xlsx 
+\xxt Total                         &             242.1 &             179.9 &             190.6 &             121.9 &             162.1 &             210.4 &             347.7 &             223.8 &     &             209.8 \\
+  \xxxt push/pop                   & \xt          57.9 & \xt          61.2 & \xt          52.8 & \xt          55.7 & \xt         102.6 & \xt         133.1 & \xt         163.1 & \xt          74.5 &     & \xt          87.6 \\
+  \xxxt load/store                 & \xt          89.5 & \xt          64.1 & \xt          69.8 & \xt          31.8 & \xt          28.4 & \xt          56.7 & \xt          67.9 & \xt          53.5 &     & \xt          57.7 \\
+  \xxxt mov(w)                     & \xt           1.3 & \xt           1.4 & \xt           0.9 & \xt           0.3 & \xt           0.7 & \xt          -2.7 & \xt          -1.3 & \xt           1.4 &     & \xt           0.3 \\
+  \xxxt other                      & \xt          93.4 & \xt          53.1 & \xt          67.0 & \xt          34.1 & \xt          30.4 & \xt          23.3 & \xt         118.0 & \xt          94.4 &     & \xt          64.2 \\
+\multicolumn{10}{l}{CODE SIZE OVERHEAD REDUCTION PER OPTIMISATION (\%)} \\
+\xxt Impr. peephole                &             -57.9 &             -41.1 &             -45.3 &             -26.5 &             -38.5 &             -54.3 &             -62.4 &             -30.7 &     &             -44.6 \\
+\xxt Stack caching                 &             -13.1 &             -20.6 &             -24.5 &             -37.1 &             -56.1 &             -78.6 &            -106.4 &             -18.7 &     &             -44.4 \\
+\xxt Pop. val. caching             &             -18.5 &             -27.8 &               0.0 &             -13.8 &              -6.2 &             -18.8 &             -17.8 &             -12.6 &     &             -14.4 \\
+\xxt Mark loops                    &              -2.6 &              +4.8 &              +7.5 &              -5.9 &              +6.0 &              -1.1 &              -3.7 &              -3.8 &     &               0.2 \\
+\xxt Const shift                   &               0.0 &              -2.4 &              -4.7 &              -5.3 &              +1.6 &              +4.0 &              -5.5 &              -1.1 &     &              -1.7 \\
+\xxt 16-bit array index            &             -23.7 &             -16.2 &             -11.3 &             -13.0 &             -11.6 &              -5.1 &             -16.7 &              -8.8 &     &             -13.3 \\
+\xxt SIMUL                         &               0.0 &               0.0 &               0.0 &               0.0 &               0.0 &               0.0 &               0.0 &              -2.3 &     &              -0.3 \\
+\multicolumn{10}{l}{CODE SIZE OVERHEAD AFTER OPTIMISATIONS (\%)} \\
+\xxt Total                         &             126.3 &              76.6 &             112.3 &              20.3 &              57.3 &              56.5 &             135.2 &             145.8 &     &              91.3 \\
+  \xxxt push/pop                   & \xt          21.1 & \xt           5.7 & \xt           7.5 & \xt           0.0 & \xt          13.3 & \xt           0.0 & \xt           4.4 & \xt          19.4 &     & \xt           8.9 \\
+  \xxxt load/store                 & \xt          31.6 & \xt          33.5 & \xt          47.2 & \xt           4.1 & \xt          14.8 & \xt          37.2 & \xt          25.3 & \xt          36.8 &     & \xt          28.8 \\
+  \xxxt mov(w)                     & \xt           0.0 & \xt           3.8 & \xt           4.7 & \xt          -2.6 & \xt           2.5 & \xt          -1.8 & \xt          17.8 & \xt           5.4 &     & \xt           3.7 \\
+  \xxxt other                      & \xt          73.7 & \xt          33.5 & \xt          52.8 & \xt          18.8 & \xt          26.6 & \xt          21.0 & \xt          87.7 & \xt          84.2 &     & \xt          49.8 \\
+\bottomrule
+\end{tabular}   

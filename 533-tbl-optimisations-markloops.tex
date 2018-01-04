@@ -1,0 +1,30 @@
+\begin{table*}[hbt]
+\centering
+\caption{Mark loops}
+\label{tbl-markloop}
+\scriptsize
+\addtolength{\tabcolsep}{-2pt}
+\begin{tabular}{llll|c|c|c}
+\toprule
+JVM                & AOT compiler                                            & AVR                 & cycles & cache state R1                      & cache state R2                      & cache state R3                   \\
+\hline
+0: MARKLOOP(0,1)   & \emph{ << emit markloop prologue:}                      & LDD R1,Y+0          & 4      & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{   }{      } & \stackcacheentry{    }{   }{   } \\
+                   &  \emph{\hspace{.7cm}LS0 and LS1 are live >> }           & LDD R2,Y+2          & 4      & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+1: BRTARGET(0)     & \sccomment{record current addr}                         &                     &        & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } &                                  \\
+2: SLOAD\_0        & \sccomment{skip codegen, just update cache state}       &                     &        & \stackcacheentry{Int1}{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+4: SUSHR\_CONST(1) & operand\_1 = sc\_pop\_destructive()                     & MOV R3,R1           & 1      & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_LSR(operand\_1)                                   & LSR R3              & 2      & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                    &                     &        & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{Int1}{   }{   } \\
+5: SSTORE\_0       & \sccomment{skip codegen, move to pinned reg}            & MOV R1,R3           & 1      & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+6: SLOAD\_0        & \sccomment{skip codegen, just update cache state}       &                     &        & \stackcacheentry{Int1}{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+7: SLOAD\_1        & \sccomment{skip codegen, just update cache state}       &                     &        & \stackcacheentry{Int2}{LS0}{PIN   } & \stackcacheentry{Int1}{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+8: IF\_SCMPGT 0:   & operand\_1 = sc\_pop\_nondestructive()                  &                     &        & \stackcacheentry{Int1}{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+                   & operand\_2 = sc\_pop\_nondestructive()                  &                     &        & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_CP(operand\_1, operand\_2);                       & CP R2,R1            & 2      & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_branchtag(GT, 0);                                 & BRGT 1:             & 2 or 1 & \stackcacheentry{    }{LS0}{PIN   } & \stackcacheentry{    }{LS1}{PIN   } & \stackcacheentry{    }{   }{   } \\
+9: MARKLOOP(end)   & \sccomment{emit markloop epilogue: LS0 is live}         & STD Y+0,R1          & 4      & \stackcacheentry{    }{LS0}{      } & \stackcacheentry{    }{LS1}{      } & \stackcacheentry{    }{   }{   } \\
+\bottomrule
+\end{tabular}
+\addtolength{\tabcolsep}{2pt}
+\end{table*}
+

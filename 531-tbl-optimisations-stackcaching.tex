@@ -1,0 +1,34 @@
+\begin{table*}[hbt]
+\centering
+\caption{Simple stack caching}
+\label{tbl-simplestackcaching}
+\scriptsize
+\addtolength{\tabcolsep}{-2pt}
+\begin{tabular}{llll|c|c|c}
+\toprule
+JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1                   & cache state R2                   & cache state R3                   \\
+\hline
+0: BRTARGET(0)     & \sccomment{record current addr} & & & & & \\
+1: SLOAD\_0        & operand\_1 = sc\_getfreereg()                        &                     &        & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_LDD(operand\_1,Y+0)                            & LDD R1,Y+0          & 4      & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+3: SUSHR\_CONST(1) & operand\_1 = sc\_pop()                               &                     &        & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_LSR(operand\_1)                                & LSR R1              & 2      & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+4: SSTORE\_0       & operand\_1 = sc\_pop()                               &                     &        & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_STD(Y+0,operand\_1)                            & STD Y+0,R1          & 4      & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+5: SLOAD\_0        & operand\_1 = sc\_getfreereg()                        &                     &        & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_LDD(operand\_1,Y+0)                            & LDD R1,Y+0          & 4      & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+6: SLOAD\_1        & operand\_1 = sc\_getfreereg()                        &                     &        & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_LDD(operand\_1,Y+2)                            & LDD R2,Y+2          & 4      & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \stackcacheentry{Int2}{   }{   } & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } \\
+7: IF\_SCMPGT 0:   & operand\_1 = sc\_pop()                               &                     &        & \stackcacheentry{Int1}{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & operand\_2 = sc\_pop()                               &                     &        & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_CP(operand\_1, operand\_2);                    & CP R2,R1            & 2      & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+                   & emit\_branchtag(GT, 0);                              & BRGT 0:             & 2 or 1 & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } & \stackcacheentry{    }{   }{   } \\
+\bottomrule
+\end{tabular}
+\addtolength{\tabcolsep}{2pt}
+\end{table*}
+

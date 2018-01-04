@@ -1,0 +1,41 @@
+\begin{table*}[]
+\begin{minipage}{\textwidth} 
+\centering
+\caption{Effect of manual source optimisation on the CoreMark benchmark}
+\label{tbl-coremark-manual-optimisation}
+\small
+\begin{tabular}{lrrrrrrrr}
+\toprule
+                                                                     & \multicolumn{2}{l}{list}     & \multicolumn{2}{l}{matrix}     &  \multicolumn{2}{l}{state}       & \multicolumn{2}{l}{total}     \\
+                                                                     & \tiny time \footnote{in millions of cycles} & \tiny vs nat. C & \tiny time  & \tiny vs nat. C& \tiny time  & \tiny vs nat. C& \tiny time  & \tiny vs nat. C \\
+
+                                                                     
+\hline
+native C                                                             &        17.9 &                &          49.8 &                &        18.4   &                  &         86.0 &                \\
+baseline                                                             &       122.0 &       (+583\%) &         367.8 &       (+639\%) &       293.7   &       (+1496\%)  &        783.5 &       (+811\%) \\
+optimised, using original source                                     &        52.6 &       (+195\%) &         239.1 &       (+380\%) &        82.8   &        (+350\%)  &        374.4 &       (+335\%) \\
+% ORIGINAL ABSOLUTE DATA
+% \makebox[5mm]{} \tiny manually inline small methods                & \tiny  52.2 & \tiny (+192\%) & \tiny   201.9 & \tiny (+305\%) & \tiny  65.8   & \tiny  (+258\%)  & \tiny  319.9 & \tiny (+272\%) \\
+% \makebox[5mm]{} \tiny use short array index variables              & \tiny  59.0 & \tiny (+231\%) & \tiny    92.5 & \tiny  (+86\%) & \tiny  60.8   & \tiny  (+231\%)  & \tiny  212.3 & \tiny (+147\%) \\
+% \makebox[5mm]{} \tiny avoid recalculating expressions in a loop    & \tiny  59.0 & \tiny (+230\%) & \tiny    84.9 & \tiny  (+71\%) & \tiny  60.8   & \tiny  (+231\%)  & \tiny  204.7 & \tiny (+138\%) \\
+% \makebox[5mm]{} \tiny reduce array and object access               & \tiny  58.8 & \tiny (+229\%) & \tiny    66.8 & \tiny  (+34\%) & \tiny  58.4   & \tiny  (+217\%)  & \tiny  184.0 & \tiny (+114\%) \\
+% \makebox[5mm]{} \tiny reduce branch cost in crcu8                  & \tiny  54.8 & \tiny (+207\%) & \tiny    66.3 & \tiny  (+33\%) & \tiny  54.9   & \tiny  (+198\%)  & \tiny  175.9 & \tiny (+104\%) \\
+% final version                                                      &        54.8 &       (+207\%) &          66.3 &        (+33\%) &        54.9   &        (+198\%)  &        175.9 &       (+104\%) \\
+% \makebox[5mm]{} \tiny (unfair) avoid creating objects and arrays   & \tiny  51.4 & \tiny (+188\%) & \tiny    66.3 & \tiny  (+33\%) & \tiny  43.5   & \tiny  (+137\%)  & \tiny  161.2 & \tiny  (+87\%) \\
+% \makebox[5mm]{} \tiny (unfair) avoid virtual calls                 & \tiny  28.6 & \tiny  (+60\%) & \tiny    66.3 & \tiny  (+33\%) & \tiny  43.5   & \tiny  (+137\%)  & \tiny  138.4 & \tiny  (+61\%) \\
+% with 'unfair' optimisations                                        &        28.6 &        (+60\%) &          66.3 &        (+33\%) &        43.5   &        (+137\%)  &        138.4 &        (+61\%) \\
+% CHANGE COMPARED TO PREVIOUS, SIMILAR TO MAIN TABLES ON PERF/CODE SIZE
+\makebox[5mm]{} \tiny manually inline small methods                  & \tiny  -0.4 & \tiny   (-3\%) & \tiny   -37.2 & \tiny  (-75\%) & \tiny -17.0   & \tiny   (-92\%)  & \tiny  -54.5 & \tiny  (-63\%) \\
+\makebox[5mm]{} \tiny use short array index variables                & \tiny  +6.8 & \tiny  (+39\%) & \tiny  -109.4 & \tiny (-219\%) & \tiny  -5.0   & \tiny   (-27\%)  & \tiny -107.6 & \tiny (-125\%) \\
+\makebox[5mm]{} \tiny avoid recalculating expressions   in  a loop   & \tiny   0.0 & \tiny   (-1\%) & \tiny    -7.6 & \tiny  (-15\%) & \tiny   0.0   & \tiny    ( 0\%)  & \tiny   -7.6 & \tiny   (-9\%) \\
+\makebox[5mm]{} \tiny reduce array and object access                 & \tiny  -0.2 & \tiny   (-1\%) & \tiny   -18.1 & \tiny  (-37\%) & \tiny  -2.4   & \tiny   (-14\%)  & \tiny  -20.7 & \tiny  (-24\%) \\
+\makebox[5mm]{} \tiny reduce branch cost in crcu8                    & \tiny  -4.0 & \tiny  (-22\%) & \tiny    -0.5 & \tiny   (-1\%) & \tiny  -3.5   & \tiny   (-19\%)  & \tiny   -8.1 & \tiny  (-10\%) \\
+using optimised source                                               &        54.8 &       (+207\%) &          66.3 &        (+33\%) &        54.9   &        (+198\%)  &        175.9 &       (+104\%) \\
+\hline
+\makebox[5mm]{} \tiny (unfair) avoid creating objects                & \tiny  -3.4 & \tiny  (-19\%) & \tiny     0.0 & \tiny    (0\%) & \tiny -11.4   & \tiny   (-61\%)  & \tiny  -14.7 & \tiny  (-17\%) \\
+\makebox[5mm]{} \tiny (unfair) avoid virtual calls                   & \tiny -22.8 & \tiny (-128\%) & \tiny     0.0 & \tiny    (0\%) & \tiny   0.0   & \tiny     (0\%)  & \tiny  -22.8 & \tiny  (-26\%) \\
+after 'unfair' optimisations                                         &        28.6 &        (+60\%) &          66.3 &        (+33\%) &        43.5   &        (+137\%)  &        138.4 &        (+61\%) \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{table*}

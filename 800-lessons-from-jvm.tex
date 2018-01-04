@@ -6,7 +6,7 @@ In this chapter we discuss the most pressing issues with current sensor node VMs
     \caption{Point requiring attention in future sensor node VMs}
     \scriptsize
     \label{tbl-issues}
-    \input{80-tbl-issues}
+    \input{800-tbl-issues}
 \end{table*}
 
 
@@ -17,7 +17,7 @@ In this chapter we discuss the most pressing issues with current sensor node VMs
     \caption{Size of Darjeeling VM components}
     \scriptsize
     \label{tab-vm-size}
-    \input{80-tbl-vm-size} 
+    \input{800-tbl-vm-size} 
 \end{table*}
 
 A minimum Java APIs for resource constrained devices was proposed by Sun Microsystems, namely the Connected Limited Device Configuration (CLDC) specification \cite{cldc1.1}.  CLDC was primarily intended for larger devices than typical resource constrained sensor nodes.  Providing support for the full CLDC specification would require a substantial amount of memory and program space for features that are rarely required for sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the Darjeeling VM \cite{brouwers2009darjeeling}.  Below we outline the most notable features of the CLDC specification that are not necessary for most WSN applications.

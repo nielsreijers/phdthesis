@@ -9,11 +9,27 @@
 \usepackage{wallpaper} 
 \usepackage{hyperref}
 \usepackage{booktabs}
+\usepackage{color, colortbl}
 \usepackage{minted}
 \setminted{frame=lines,linenos=true,baselinestretch=1}
 \setmonofont{Courier}
 
+%%%%%%%%%%%% MY COMMANDS
+\newcommand{\sccomment}[1] { \emph{ << #1 >> } }
+\newcommand{\stackcacheentry}[3]{
+\makebox[3.5mm][r]{\scriptsize #1}
+\makebox[3.5mm]{\scriptsize #2}
+\makebox[2.5mm][l]{\tiny #3}
+}
+\newcommand{\myfiguresizeperformance}[0] { 6.7cm }
+\newcommand{\myfiguresizecodesize}[0] { 6.7cm }
+\newcommand{\myfiguresizexxtea}[0] { 6.7cm }
+\newcommand{\xt}[0] { \tiny }
+\newcommand{\xxt}[0] { \makebox[2mm]{} }
+\newcommand{\xxxt}[0] { \makebox[5mm]{} \tiny }
+\newcommand{\tblhighlight}[0] {\cellcolor{yellow!20}}
 \newcommand{\mycode}[1]{\texttt{#1}}
+%%%%%%%%%%%% END MY COMMANDS
 
 % Using the tex-text mapping for ligatures etc.
 \defaultfontfeatures{Mapping=tex-text}
@@ -55,8 +71,8 @@
 
 \makecertification
 
-\input{00-acknowledgements}
-\input{01-abstract}
+\input{000-acknowledgements}
+\input{010-abstract}
 
 \tableofcontents
 \listoffigures
@@ -65,15 +81,25 @@
 \mainmatter
 
 % Your thesis goes here
-\input{10-introduction}
-\input{20-background}
-\input{30-state-of-the-art}
-\input{40-vm-design}
-\input{50-performance-optimisation}
-\input{60-guaranteeing-safety}
-\input{70-evaluation}
-\input{80-lessons-from-jvm}
-\input{90-conclusion}
+\input{100-introduction}
+\input{200-background}
+\input{300-state-of-the-art}
+\input{400-vm-design}
+\input{500-performance-optimisation}
+\input{510-sources-of-overhead}
+\input{520-optimisations-java-source}
+\input{530-optimisations-aot-translation-overhead}
+\input{540-optimisations-method-calls}
+\input{600-guaranteeing-safety}
+\input{700-evaluation}
+\input{710-evaluation-coremark}
+\input{720-evaluation-performance}
+\input{730-evaluation-code-size}
+\input{740-evaluation-benchmark-details}
+\input{750-evaluation-method-calls}
+\input{760-evaluation-the-cost-of-safety}
+\input{800-lessons-from-jvm}
+\input{900-conclusion}
 
 \appendix
 

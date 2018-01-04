@@ -1,0 +1,56 @@
+\begin{table*}[]
+\centering
+\caption{Methods per benchmark and relative performance for normal, lightweight invocation, and inlining. Highlights indicate changes from the versions used to obtain the results in the previous sections.}
+\label{tbl-benchmark-methods}
+\scriptsize
+\begin{tabular}{lllllll}
+\toprule
+                             & \# calls                     & C                 & Java                          & Java                            & Java                            \\
+                             &                              &                   & Base version                  & Alternative version             & Using normal method calls       \\
+\hline
+\\
+CoreMark \\
+ee\_isdigit                  & \multicolumn{1}{r}{3920}     & normal (inlined)  & manually inlined              & \tblhighlight lightweight (JVM) & manually inlined                \\
+core\_state\_transition      & \multicolumn{1}{r}{1024}     & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
+crcu8                        & \multicolumn{1}{r}{584}      & normal (inlined)  & lightweight                   & lightweight                     & \tblhighlight normal            \\
+crcu16                       & \multicolumn{1}{r}{292}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
+calc\_func                   & \multicolumn{1}{r}{220}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
+compare\_idx                 & \multicolumn{1}{r}{209}      & normal (inlined)  & normal (virtual)              & normal (virtual)                & normal (virtual)                \\
+core\_list\_find             & \multicolumn{1}{r}{206}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
+compare\_complex             & \multicolumn{1}{r}{110}      & normal            & normal (virtual)              & normal (virtual)                & normal (virtual)                \\
+crcu32                       & \multicolumn{1}{r}{64}       & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
+matrix\_sum                  & \multicolumn{1}{r}{16}       & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
+others (<16 calls each)      & \multicolumn{1}{r}{39}       & normal            & normal                        & normal                          & normal                          \\
+\\
+% The cycles from the simulation are for 50 iterations. Just divide by 50 here so the cycle count + the number of invokes produces the right overhead. An actual simulation run with 1 iteration is a bit slower, but only a few % so it's not significant enough to worry about here.
+% \emph{cycles}              &                              &                   & \multicolumn{1}{r}{174109269} & \multicolumn{1}{r}{181998386}   & \multicolumn{1}{r}{251511585}   \\
+\emph{cycles}                &                              &                   & \multicolumn{1}{r}{3482185}   & \multicolumn{1}{r}{3639967}     & \multicolumn{1}{r}{5030231}     \\
+% \emph{relative}            &                              &                   & \multicolumn{1}{r}{1.00}      & \multicolumn{1}{r}{1.05}        & \multicolumn{1}{r}{1.44}        \\
+\emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{105.4\%}   & \multicolumn{1}{r}{114.7\%}     & \multicolumn{1}{r}{196.7\%}     \\
+\emph{code size}             &                              &                   & \multicolumn{1}{r}{25560}     & \multicolumn{1}{r}{25576}       & \multicolumn{1}{r}{26282}       \\
+\\
+\hline
+\\
+FFT \\
+FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight (JVM) & \tblhighlight normal            \\
+SIN8                         & \multicolumn{1}{r}{63}       & marked inline     & manually inlined              & \tblhighlight ProGuard inlined  & \tblhighlight ProGuard inlined  \\
+COS8                         & \multicolumn{1}{r}{63}       & marked inline     & manually inlined              & \tblhighlight ProGuard inlined  & \tblhighlight ProGuard inlined  \\
+\\
+\emph{cycles}                &                              &                   & \multicolumn{1}{r}{78241}     & \multicolumn{1}{r}{113611}      & \multicolumn{1}{r}{562650}      \\
+% \emph{relative}            &                              &                   & \multicolumn{1}{r}{1.00}      & \multicolumn{1}{r}{1.45}        & \multicolumn{1}{r}{7.19}        \\
+\emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{97.5\%}    & \multicolumn{1}{r}{186.8\%}     & \multicolumn{1}{r}{1320.4\%}    \\
+\emph{code size}             &                              &                   & \multicolumn{1}{r}{1460}      & \multicolumn{1}{r}{1410}        & \multicolumn{1}{r}{1530}        \\
+\\
+\hline
+\\
+heap sort \\
+SWAP                         & \multicolumn{1}{r}{1642}     & \#define          & manually inlined              & manually inlined                & manually inlined                \\
+siftDown                     & \multicolumn{1}{r}{383}      & normal            & lightweight                   & \tblhighlight manually inlined  & \tblhighlight normal            \\
+\\
+\emph{cycles}                &                              &                   & \multicolumn{1}{r}{289845}    & \multicolumn{1}{r}{286749}      & \multicolumn{1}{r}{563967}      \\
+% \emph{relative}            &                              &                   & \multicolumn{1}{r}{1.00}      & \multicolumn{1}{r}{0.99}        & \multicolumn{1}{r}{1.95}        \\
+\emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{66.5\%}    & \multicolumn{1}{r}{64.7\%}      & \multicolumn{1}{r}{223.9\%}     \\
+\emph{code size}             &                              &                   & \multicolumn{1}{r}{738}       & \multicolumn{1}{r}{926}         & \multicolumn{1}{r}{758}         \\
+\bottomrule
+\end{tabular}
+\end{table*}

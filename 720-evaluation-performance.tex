@@ -1,0 +1,51 @@
+\section{AOT translation overhead}
+\begin{table}[]
+ \centering
+ \caption{Performance data per benchmark}
+ \label{tbl-performance-per-benchmark}
+ \small
+ \scriptsize
+ \setlength{\tabcolsep}{4pt}
+ \input{720-tbl-evaluation-performance}
+ \setlength{\tabcolsep}{6pt}
+\end{table}
+
+Next we will look at the effect of our different optimisations for the baseline AOT translation approach, for all eight of our benchmarks.
+
+The trace data produced by Avrora gives us a detailed view into the run-time performance and the different types of overhead. We count the number of bytes and cycles spent on each native instruction for both the native C and our AOT compiled version, and then group them into 4 categories that roughly match the 3 types of AOT translation overhead discussed in Section \ref{sec-overhead-aot-translation}:
+\begin{itemize}
+	\item \mycode{PUSH},\mycode{POP}: Matches the type 1 push/pop overhead since native code uses almost no push/pop instructions.
+	\item \mycode{LD},\mycode{LDD},\mycode{ST},\mycode{STD}: Matches the type 2 load/store overhead and directly shows the amount of memory traffic.
+	\item \mycode{MOV},\mycode{MOVW}: For moves the picture is less clear since the AOT compiler emits them for various reasons. Before we introduce stack caching, it emits moves to replace push/pop pairs, and after the mark loops to save a pinned value when it is popped destructively.
+	\item others: the total overhead, minus the previous three categories. This roughly matches the type 3 overhead.
+\end{itemize}
+
+We define the overhead from each category as the number of bytes or cycles spent in the AOT version, minus the number spent by the native version for that category, and again normalise this to the \emph{total} number of bytes or cycles spent in the native C version. The detailed results for each benchmark and type of overhead are shown in tables \ref{tbl-performance-per-benchmark} and \ref{tbl-codesize-per-benchmark}.
+
+In Figure \ref{fig-performance-per-opcode-category} we see how our optimisations combine to reduce performance overhead. We take the average of the 8 benchmarks, and show both the total overhead, and the overhead for each instruction category. Figure \ref{fig-performance-per-benchmark} shows the total overhead for each individual benchmark. We start with the original AOT approach with only the simple peephole optimiser, and then incrementally add each of our optimisations. The lightweight method call optimisation is already included in these results. Its effect will be examined in detail in Section \ref{sec-method-invocation}.
+
+\begin{figure}
+ \centering
+ \begin{minipage}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\myfiguresizeperformance]{performance-per-opcode-category.eps}
+  \caption{Perf. overhead per category}
+  \label{fig-performance-per-opcode-category}
+ \end{minipage}\hfill
+ \begin{minipage}{0.45\textwidth}
+  \centering
+  \includegraphics[width=\myfiguresizeperformance]{performance-per-benchmark.eps}
+  \caption{Perf. overhead per benchmark}
+  \label{fig-performance-per-benchmark}
+ \end{minipage}
+\end{figure}
+
+Using the simple optimiser, the types 1, 2 and 3 overhead are all significant, at 150\%,  108\%, and 84\% respectively. The basic approach does not have many reasons to emit a move, so we see that in some cases the AOT version actually spends fewer cycles on move instructions than the C version, resulting in small negative values. When we improve the peephole optimiser to include non-consecutive push/pop pairs, push/pop overhead drops by 98.1\% (of native C performance), but if the push and pop target different registers, they are replaced by a move instruction, and we see an increase of 11.7\% in move overhead. For a 16-bit value this takes 1 cycle (for a MOVW instruction), instead of 8 cycles for two pushes and two pops. The increase in moves shows most of the extra cases that are handled by the improved optimiser are replaced by a move instead of eliminated, since the 11.7\% extra move overhead matches a 93.6\% reduction in push/pop overhead.
+
+Next we introduce stack caching to utilise all available registers and eliminate most of the push/pop instructions that cannot be handled by the improved optimiser. As a result the push/pop overhead drops to nearly 0, and so does the move overhead since most of the moves introduced by the peephole optimiser, are also unnecessary when using stack caching.
+
+Having eliminated the type 1 overhead almost completely, we now add popped value caching to remove a large number of the unnecessary load instructions. This reduces the memory traffic significantly, as is clear from the reduced load/store overhead, while the other types remain stable. Adding the mark loops optimisation further reduces loads, and this time also stores, by pinning common variables to a register. But it uses slightly more move instructions, and the fact that we have fewer registers available for stack caching means we have to spill stack values to memory more often. While we save 46\% on loads and stores, the push/pop and move overhead both increase by 6\%.
+
+Most of the push/pop and load/store overhead has now been eliminated and the type 3 overhead, unaffected by these optimisations, has become the most significant source of overhead. This type has many different causes, but we can eliminate half of it with our three instruction set optimisations. These optimisations, especially the 16-bit array index, also reduce register pressure, so we also see slight decreases in the other overhead types, although this is minimal in comparison. The CoreMark benchmark is the only one to do 16-bit to 32-bit multiplication, so the average performance improvement for \mycode{SIMUL} is small, but Table \ref{tbl-performance-per-benchmark} shows it is very significant for CoreMark.
+
+Combined, these optimisations reduce performance overhead from 345\% to 69\% of native C performance.

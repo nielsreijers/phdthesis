@@ -1,0 +1,56 @@
+\chapter{Introduction}
+Internet-of-Things devices come in a wide range, with vastly different performance characteristics, cost, and power requirements. On one end of the spectrum are devices like the Intel Edison and Raspberry Pi: powerful enough to run Linux, but relatively expensive and power hungry. On the other end are CPUs like the Atmel Atmega or TI MSP430, commonly used in sensor nodes: much less powerful, but also much cheaper and low power enough to potentially last for months or years on a single battery. For the first class normal operating systems, languages, and compilers can be used, but in this paper, we focus specifically on the latter class for which no such clear standards exist. Our experiments were all performed on an ATmega128: a 16MHz 8-bit processor, with 4KB of RAM and 128KB of flash programme memory, but the approach should yield similar results on other CPUs in this category.
+
+There are several advantages to using VMs. One is ease of programming. Many VMs allow the developer to write programmes at a higher level of abstraction than the bare-metal C programming that is still common for these devices. Second, a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device. A third advantage is platform independence. While early wireless sensor network applications often consisted of homogeneous nodes, current Internet-of-Things/Machine-to-Machine  applications are expected to run on a range of different platforms. A VM can significantly ease the deployment of these applications.
+
+\section{Performance}
+While current VMs offer an impressive set of features, almost all sacrifice performance. The VMs for which we have found concrete performance data are all between one and two orders of magnitude slower than native code. In many scenarios this may not be acceptable for two reasons: for many tasks such as periodic sensing there is a hard limit on the amount of time that can be spent on each measurement, and an application may not be able to tolerate a slowdown of this magnitude. Perhaps more importantly, one of the main reasons for using such tiny devices is their extremely low power consumption. Often, the CPU will be in sleep mode most of the time, so little energy is be spent in the CPU compared to communication, or sensors. But if the slowdown incurred by a VM means the CPU has to stay active 10 to 100 times longer, this may suddenly become the dominant factor.
+
+As an example, one of the few applications reporting a detailed breakdown of its power consumption is Mercury \cite{Lorincz:2009kt}, a platform for motion analysis. The greatest energy consumer is the sampling of a gyroscope, at 53.163 mJ. Only 1.664 mJ is spent in the CPU on application code for an activity recognition filter and feature extraction. When multiplied by 10 or 100 however, the CPU becomes a very significant, or even by far the largest energy consumer. A more complex operation such as a 512 point FFT costs 12.920 mJ. For tasks like this, even a slowdown by a much smaller factor will have a significant impact on the total energy consumption.
+
+A better performing VM is needed, preferably one that performs as close to native performance as possible. Translating bytecode to native code is a common technique to improve performance in desktop VMs. Translation can occur at three moments: offline, ahead-of-time (AOT), or just-in-time (JIT). JIT compilers translate only the necessary parts of bytecode at run-time, just before they are executed. They are common on desktops and on more powerful mobile environments, but are impractical on sensor node platforms that can often only execute code from flash memory. This means a JIT compiler would have to write to flash memory at run-time, which would cause unacceptable delays. Translating to native code offline, before it is sent to the node, has the advantage that more resources are available for the compilation process. We do not have a JVM to AVR compiler to test the resulting performance, but we would expect it would be similar to compiled C code. However, doing so, even if only for small, performance critical sections of code, sacrifices two of the key advantages of using a VM: The host now needs knowledge of the target platform, and needs to prepare a different binary for each type of CPU used in the network, and for the node it will be difficult to provide a safe execution environment when it receives binary code.
+
+Therefore, we focus on the middle option: translating the bytecode to native code on the device itself, at load time. The main research questions to answer are: how close an AOT compiling sensor node VM can come to native C performance, what optimisations are necessary to achieve this, what tradeoffs are involved and what the impact is of the JVM's design decisions for AOT compilation on a sensor node.
+
+\section{Safety}
+Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes from one another and the kernel. Instead, the entire address range is accessible from any part of the code running on the device.
+
+At the same time, while small, sensor node code can be complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit more functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects. In such an environment, mistakes are easily made, and  can have catastrophic consequences with full access to the entire address space. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
+
+To guard against both buggy code and malicious attacks, the ability to execute code in a sandboxed manner and isolate untrusted application code from the VM itself is a desirable property. Specifically, we want to guarantee that malicious code cannot:
+\begin{enumerate}
+	\item write to memory outside the range assigned by the VM
+	\item perform actions it does not have permission for
+	\item retain control of the CPU indefinitely
+\end{enumerate}
+
+Note that these guarantees do not say anything about the correctness of the application itself: code may still corrupt it's own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds runtime checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this depends on a trusted and correct host, and doesn't protect against malicious code being sent to the device.
+
+Our approach depends only on the correctness of our VM. It guarantees the VM's own data cannot be corrupted, and that it can always regain control of the node and terminate any buggy or malicious application that attempts an illegal write or other action it is not permitted to do.
+
+\section{Scope}
+todo
+%TODO: Explain we focus on the AOT translation process, and not on infuser. Instead we only consider some simple optimisations that a better infuser could easily do, and manually do these to the Java source to determine the performance that could be achieved.
+
+\section{Contributions}
+This thesis makes the following contributions:
+\begin{itemize}
+	\item We identify the major sources of overhead when using the baseline approach as described by Ellul and Martinez.
+	\item Using the results of this analysis, we propose a set of optimisations to address each source of overhead, including a lightweight alternative to Java method invocation to reduce method call overhead.
+	\item These optimisations reduce the code size overhead by 56\%, and show that the increase in VM size is quickly compensated for, thus mitigating a drawback of the previous AOT approach.
+	\item They also eliminate most of the performance overhead caused by the JVM's stack-based architecture, and over 80\% of performance overhead overall.
+	\item We show that besides these improvements to the AOT technique, better optimisation in the Java to JVM bytecode compiler is critical to achieving good performance.
+	\item We provide a comprehensive evaluation to analyse the overhead and the impact of each optimisation, and to show these results hold for a set of benchmarks with very different characteristics, including the commonly used CoreMark benchmark \cite{coremark}.
+\end{itemize}
+
+\section{Structure of thesis}
+
+\section{List of publications}
+
+\section{Naming}
+
+Define some commonly used names here. Using WSN instead of IoT since it is longer established and more clearly focussed on tiny node, while IoT may contain much more powerful devices.
+
+Host: the PC compiling the code before it is sent to the node.
+
+(Leon has a good section on this. have another look at it)
