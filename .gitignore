@@ -8,3 +8,7 @@ main\.lot
 main\.out
 main\.pdf
 main\.toc
+
+_minted-main/
+
+main\.synctex\.gz
