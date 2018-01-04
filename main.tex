@@ -1,18 +1,64 @@
-\documentclass[a4paper,12pt]{report}
+\documentclass{ntuthesis}
 
+\usepackage{times}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{wallpaper} 
+\usepackage{hyperref}
+
+% Using the tex-text mapping for ligatures etc.
+\defaultfontfeatures{Mapping=tex-text}
+
+% Set the default fonts
+\setmainfont{Times New Roman}
+% \setCJKmainfont{標楷體}
+
+\ifdefined\withwatermark
+  \CenterWallPaper{0.174}{watermark.pdf}
+  \setlength{\wpXoffset}{6.1725cm}
+  \setlength{\wpYoffset}{10.5225cm}
+\fi
+
+% digital object identifier
+\ifdefined\withdoi
+  \insertdoi
+\fi
+
+\makeatletter
+\AtBeginDocument{
+  \hypersetup{
+    pdftitle={\@titleen},
+    pdfauthor={\@authoren},
+    pdfsubject={\@typeen{} \@classen},
+    pdfkeywords={\@keywordsen}
+  }
+}
+\makeatother
+
+% Your information goes here
+\input{ntuvars}
 
 \begin{document}
 
-\pagenumbering{roman}
+\frontmatter
 
-\input{01-abstract} 
+\makecover
+
+\makecertification
+
+\input{00-acknowledgements}
+\input{01-abstract}
 
 \tableofcontents
 \listoffigures
 \listoftables
 
-\pagenumbering{arabic}
+\mainmatter
 
+% Your thesis goes here
 \input{10-introduction}
 \input{20-background}
 \input{30-related-work}
@@ -23,7 +69,14 @@
 \input{80-lessons-from-jvm}
 \input{90-conclusion}
 
-\bibliographystyle{abbrvnat}
-\bibliography{bibliography}
+\appendix
+
+\backmatter
+
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliographystyle{abbrv}
+
+% Your bibliography goes here
+\bibliography{references}
 
 \end{document}
