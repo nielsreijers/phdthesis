@@ -1,2 +1,185 @@
 \chapter{Lessons from JVM}
-to do
+In this chapter we discuss the most pressing issues with current sensor node VMs, summarised in Table \ref{tbl-issues}. We primarily focus on Java, since most of our practical experience is with Java VMs and simplicity of the JVM make it well suited as a basis for sensor node VMs. However, most of the issues we describe also apply to Python, .NET, and other high-level languages.
+
+\begin{table*}
+    \centering
+    \caption{Point requiring attention in future sensor node VMs}
+    \scriptsize
+    \label{tbl-issues}
+    \input{80-tbl-issues}
+\end{table*}
+
+
+\section{A tailored standard library}
+\label{sec-std-lib}
+\begin{table*}
+    \centering
+    \caption{Size of Darjeeling VM components}
+    \scriptsize
+    \label{tab-vm-size}
+    \input{80-tbl-vm-size} 
+\end{table*}
+
+A minimum Java APIs for resource constrained devices was proposed by Sun Microsystems, namely the Connected Limited Device Configuration (CLDC) specification \cite{cldc1.1}.  CLDC was primarily intended for larger devices than typical resource constrained sensor nodes.  Providing support for the full CLDC specification would require a substantial amount of memory and program space for features that are rarely required for sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the Darjeeling VM \cite{brouwers2009darjeeling}.  Below we outline the most notable features of the CLDC specification that are not necessary for most WSN applications.
+
+String support, which requires a substantial amount of program space, is rarely required within sensor node applications. Although strings may be beneficial during debugging they provide little benefit to application execution. Communication with peripheral hardware is often by means of a stream of bytes. To facilitate such code it would be of benefit to support constant strings at the programming language level (which could be converted to byte arrays under the hood).
+
+A CLDC \mycode{Stream} abstraction is intended to facilitate file, network and memory operations. The abstraction is not well suited for communication protocols required by WSN applications such as I$^{2}$C and SPI. In CLDC, connections between devices can be initiated by specifying URI-like strings. On the other hand, WSN nodes identify other nodes using radio transceiver IDs, typically a 16 or 32-bit identifier.
+
+Other CLDC features that are not required within WSN applications include dynamic class loading, calendar and timezone support.
+
+Other CLDC features that are not required within WSN applications include dynamic class loading, calendar and timezone support. It is clear from the specification that resource constrained WSN applications were not the intended target devices. We argue that a tailored library should be designed from the ground-up specifically for sensor node applications. Such a library would include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
+
+\section{Support for constant data}
+\label{sec-const-data}
+While Java allows us to declare variables as \mycode{final}, this is only a language level feature, and the VM has no concept of constant data. This is not surprising, since most physical CPUs do not make the distinction either. However, this is different on a sensor node's Harvard architecture where code and data memory are split. The amount of flash memory is usually several times larger than the available RAM, so constant data should be kept in flash instead of wasting precious RAM on data that will never change.
+
+This is especially important for arrays of constant data, which are common in WSN applications. (constant primitive variables are inlined by the compiler, and constant objects are rare) For example our FFT benchmark contains an array of 256 precalculated sine wave values that would be too expensive for the node to calculate at run-time.
+
+When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a Java array object, and then uses the normal array access instructions to initialise each element individually:
+\begin{minted}{java}
+sspush(256);newarray;       // create the array
+adup;sconst_0;sconst_0;bastore;  // set index 0
+adup;sconst_1;sconst_3;bastore;  // set index 1
+adup;sconst_2;bspush(6);bastore; // set index 2
+etc...
+\end{minted}
+
+
+There are two problems with this: (i) the array will occupy scarce RAM; and (ii) initialising array elements using JVM instructions requires 4 instructions per element, resulting in 1669 bytes of code to initialise a 256 byte array.
+
+% 
+% ####################################### RTC INFUSION bm_fft
+%    0     177509286  [avrora.rtc] 3 Start method javax.rtcbench.RTCBenchmark.<clinit> ()V at 0x12e12:    0     201454660  [avrora.rtc] 4  ends at 0x1569a, AOT size: 10376, JVM size: 1669
+
+\textbf{Possible solutions}
+Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{AALOAD} and \mycode{IALOAD}) to read from them.
+
+
+
+\section{Better language support for shorts and bytes}
+\label{sec-small-datatypes}
+Because RAM is scarce, 16-bit short and single byte data types are commonly used in WSN code. The standard JVM only has 32 and 64-bit operations, and variables (instance, local or static) and stack values are stored as 32-bit, even if the actual type is shorter. On a sensor node this wastes memory, and causes a performance overhead since most nodes have 8 or 16-bit architectures, so many sensor node JVMs introduce 16-bit operations and store values in 16-bit slots \cite{brouwers2009darjeeling}.
+
+However, redesigning the VM is only half of the solution. At the language level, Java defines that an expression evaluates to 32-bits, or 64-bits if at least one operand is long. Attempting to store this in a 16-bit variable will result in a `lossy conversion' error at compile time.
+
+As an example, if we have 3 short variables, a, b, and c, and want to do 
+\mintinline{java}{a=b+c;}, we need to insert a cast to avoid errors from the Java compiler: \mintinline{java}{a=(short)(b+c);}
+% \begin{minted}[fontsize=\footnotesize]{java}
+%     a=(short)(b+c);
+% \end{minted}
+
+Also, passing literal integer values to a method call treats them as ints, even if they are short enough to fit in a smaller type, which means we end up with calls like: \mintinline{java}{f((byte)1);}
+In more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read.
+
+% Another example from binsrch benchmark:
+% mid = (short)((short)(low + high) >>> 1);
+% Here we need two cast, the first to avoid compile time error, the second to make sure the infuser uses 16-bit operations instead of 32-bit. But maybe this could be fixed in the infuser, so this is not really a problem with Java
+
+% In C
+%   printf("%d\n", 65*4==4);         // => 0
+%   printf("%d\n", 1073741825*4==4); // => 1
+%   printf("%lu\n", sizeof(1*1));    // => 4
+
+
+\textbf{Possible solutions}
+We suggest that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: Declaring variable \mintinline{java}{a} as \mintinline{java}{unchecked short} would implictly narrow to short when needed, so \mintinline{java}{a=b+c;} would not need an explicit cast anymore, while declaring it as a normal \mintinline{java}{short} would.
+
+In addition, the server-side component of the split VM should keep intermediate results as shorts where possible. In the example, there's no need to calculate \mintinline{java}{b+c} in 32-bits since the high bits will be truncated anyway.
+
+
+% If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.
+% Java defines that an expression evaluates to the type of its largest operand, or 32-bits, whichever is larger. This automatic expansion to 32-bits could be removed, which means adding two shorts should result in a short value. If we want the result to be 32-bit, we can achieve this by casting one of the operands. Storing a value in a smaller variable should still result in a compile time error, but for the \mycode{a=b+c;} example this would not be necessary anymore, since the result is already a short. In addition, the compiler should treat literal values as the smallest integer type large enough to store it.
+
+
+
+\section{Simple type definitions}
+\label{sec-typedef}
+When developing code for a sensor node, the limited resources force us to adopt different design patterns compared to desktop software. In normal Java code we usually rely on objects for type safety and keeping code readable and easy to maintain. But on sensor nodes, objects are expensive and we frequently make use of shorts and ints for a multitude of different tasks for which we would traditionally use objects.
+
+In these cases we often found that our code would be much easier to maintain if we had a way to name new integer types to explicitly indicate their meaning, instead of using lots of \mycode{int} or \mycode{short} variables. Having type checking on these types would also add a welcome layer of extra safety.
+
+\textbf{Possible solutions}
+At a minimum, we should have a way to define simple aliases for primitive types, similar to C's \mycode{typedef}. A more advanced option that fits more naturally with Java, would be to have a strict \mycode{typedef} which also does type checking, so that a value of one user defined integer type cannot be accidentally assigned to a variable of another type, without an explicit cast.
+
+
+
+\section{Explicit and efficient inlining}
+\label{sec-inlining}
+Java method calls are inherently more expensive than C functions. On the desktop, JIT compilers can remove much of this overhead, but on a sensor node we do not have the resources for this. We found this often is a problem for small helper functions that are frequently called. As an example, a C version of the xxtea cipher \cite{wheeler1998xxtea} contains this macro: 
+\begin{minted}[fontsize=\footnotesize]{c}
+  #define MX (((z>>5^y<<2) + (y>>3^z<<4)) \\
+             ^ ((sum^y) + (key[(p&3)^e] ^ z)))
+\end{minted}
+
+This macro is called in four places, and is very performance critical. Tools like Proguard \cite{proguard} can be used to inline small methods, but in this case it is larger than Proguard's size threshold. This leaves developers with two unattractive options: either leaving it as a method and accepting the performance penalty, or manually copy-pasting the code, which is error-prone and leads to code that is harder to maintain.
+
+\textbf{Possible solutions}
+The simplest solution would be to have a preprocessor similar to C's. However, such a low level text-based solution may not be the most user friendly solution for developers without a C background.
+Another option is to give the developer more control over inlining, which could easily be achieved by adding an \mycode{inline} keyword or annotation to force the compiler to inline important methods. These annotations are usually placed at the method level, but since not all calls may be equally important for performance, we may allow the developer to save code space by only inlining certain calls.
+
+
+
+\section{An optimising compiler}
+\label{sec-optimising-javac}
+Java compilers typically do not optimise the bytecode and translate the source more or less as-is. Without a clear performance model it is not always clear which option is faster, and the bytecode is expected to be run by a JIT compiler, which can make better optimisation decisions knowing the target platform and runtime behaviour. However, a sensor node does not have the resources for this and must execute the code as it is received. This leads to significant overhead, for example by repeatedly reevaluating a constant expression in a loop.
+
+\textbf{Possible solutions}
+Even without a clear performance model, some basic optimisations can be done. In the experiments described in \cite{reijers2017aot-journal}, some very conservative optimisations already result in code twice as fast as the original.
+
+
+\section{Allocating objects on stack}
+\label{sec-no-gc}
+While memory management is too big a topic to cover completely, we do want to mention one relevant observation. In Java anything larger than a primitive value has to be allocated on the heap. This introduces a performance overhead, both for allocating the objects, and the occasional garbage collection run, which may take several thousand cycles.
+
+As an example, one function in the CoreMark \cite{coremark} benchmark uses two small local arrays of 8 ints, which are on the stack in C, but need to be on the heap in Java. In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's case this adds up to a performance overhead of about 60\% relative to C \cite{reijers2017aot-journal}.
+
+\textbf{Possible solutions}
+We suspect it may be possible to avoid this cost in many cases by extending the VM's memory model to allow us to allocate objects and arrays on the stack under certain conditions. We know from TakaTuka's experience that there are many cases where we can determine at compile time that an object can be garbage collected at a certain point \cite{aslam2010optimized}.
+
+If the compiler can determine an object can be freed at the end of the method in which it was created, we can allocate space for it in the method's stack frame. This avoids the overhead of allocating on the heap, and the occasional garbage collection run triggered by this.
+
+
+
+\section{Reconsidering advanced language features}
+\label{sec-advanced-features}
+Finally, we conclude with some discussion on more fundamental language design choices. Many tiny VMs implement some of Java's more advanced features, but we are not convinced these are a good choice on a sensor node.
+
+While features like threads and garbage collection are all useful, they come at a cost. The trade-off when writing sensor node code is significantly different: many of these features are vital to large-scale software development, but the size of sensor nodes programmes is much smaller. And while VM size is not an issue on the desktop, these features are relatively expensive to implement on a sensor node.
+
+In Table \ref{tab-vm-size} we show the code size for some features we discuss below. These were determined by counting the size of functions related to specific features. The actual cost is higher since some, especially garbage collection, also add complexity to other functions throughout the VM. Combined, the features below and the string functions mentioned in Section \ref{sec-std-lib} make up about half the VM.
+
+These features also cause a performance penalty, which is significant when Ahead-of-Time (AOT) compilation is used, and features such as threads and exceptions are much harder in an AOT compiler where we can't implement them in the interpreter loop. This means that if we care about performance and the corresponding reduction in CPU energy consumption, we either have to give them up, or spend considerably more in terms of VM complexity and size.
+
+\subsection{Threads}
+As shown in Table \ref{tab-vm-size}, support for threads costs about 10\% of the VM size, if we exclude the string library. In addition, there is the question of allocating a stack for each thread. If we allocate a fixed block, it must be large enough to avoid stack overflows, but too large a block wastes precious RAM. Darjeeling allocates each stack as a linked list of frames on the heap. This is memory efficient, but allocating on the heap is slower and occasionally triggers the GC.
+
+We therefore argue a more cooperative concurrency model is more appropriate where lightweight threads voluntarily yield the CPU and share a single stack.
+
+\subsection{Exceptions}
+In terms of code size, exceptions are not very expensive to implement in an interpreter, but again, they are harder to implement in an AOT compiler. We also feel the advantage of having exceptions is much lower than the other features mentioned in this section. They could be easily replaced with return values to signal errors.
+
+\subsection{Virtual methods}
+It is hard to quantify the overhead of implementing virtual methods since the code for handling them is integrated into several functions. In terms of size it is most likely less than 2KB, but the overhead for resolving a virtual method call is considerable, and an AOT compiler can generate much more efficient code for static calls.
+
+In practice we seldom used virtual methods in sensor node code, but some form of indirect calls is necessary for things like signal handling. It should be possible to develop a more lightweight form of function pointers that can be implemented efficiently. However, the details will require more careful study.
+
+\subsection{Garbage collection}
+Finally, garbage collection is clearly the most intrusive one to change. While the first three features could be changed with minor modifications to Java, the managed heap is at its very core.
+
+Still, there are good reasons for considering alternatives. Table \ref{tab-vm-size} shows the GC methods in Darjeeling add up to about 3.5KB, but the actual cost is much higher as many other parts of Darjeeling are influenced by the garbage collector.
+
+Specifically, it is the reason Darjeeling uses a `split-stack' architecture: the operand stack and variables are split into a reference and integer part. This makes it easy for the GC to find live references, but leads to significant code duplication and complexity. When using AOT compilation, the split stack adds overhead to maintain this state, and the extra register we have to reserve as a second stack pointer.
+
+
+
+\section{Conclusion and future work}
+In this paper we described a number of issues we encountered over the years while using and developing sensor node VMs. They may not apply to every scenario, but the wide range of the issues we present suggests many applications will be affected by at least some.
+
+Most sensor node VMs already modify the instruction set of the original VM and usually support only a subset of the original language. The issues described here indicate these changes do not go far enough, and we still need to refine our VMs further to make them truly useful in real-world projects.
+
+There are two possible paths to follow: a number of issues can be solved by improving existing Java-based VMs. Staying close to Java also has the advantage of being able to reuse existing knowledge and infrastructure.
+
+However the issues discussed in the last few sections require more invasive changes to both the source language and VM. If the goal is to run platform independent code safely and efficiently, rather than running Java, we should start from the specific requirements and constraints of sensor node software development. We suspect this would lead us to more lightweight features and more predictable memory models.
+
+For either path, we hope the points presented in this chapter can help in the development better future sensor node VMs.
