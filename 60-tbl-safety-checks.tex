@@ -20,28 +20,28 @@
 	& For each method header, the number of own local variable slots <= the number of total variable slots, the number of (int/ref) arguments <= the number of (int/ref) variables, static methods are not abstract. \\
 
 \tcheck{chk-return-or-goto-at-end-of-method}
-	& The last instruction of each method is a RETURN or GOTO. \\
+	& The last instruction of each method is a \mycode{RETURN} or \mycode{GOTO}. \\
 
 \tcheck{chk-brtarget-exists}
-	& Branch instructions branch to an index < the number of BRTARGETs announced in the method header. \\
+	& Branch instructions branch to an index < the number of \mycode{BRTARGET}s announced in the method header. \\
 
 \tcheck{chk-all-brtargets-found}
-	& At the end of each method, we have seen the number of BRTARGET instructions announced in the method header. \\
+	& At the end of each method, we have seen the exact number of \mycode{BRTARGET} instructions announced in the method header. \\
 
 \tcheck{chk-invokelight-target-found}
-	& The target for an INVOKELIGHT call is already translated, so the target address is known. \\
+	& The target for an \mycode{INVOKELIGHT} call is already translated, so the target address is known. \\
 
 \tcheck{chk-invokestatic-target-header-found}
-	& The target method header for an INVOKESTATIC/INVOKESPECIAL exists. \\
+	& The target method header for an \mycode{INVOKESTATIC}/\mycode{INVOKESPECIAL} exists. \\
 
 \tcheck{chk-stack-is-empty-after-return}
-	& After popping the return value the stack should be empty. \\
+	& After popping the return value the stack is empty. \\
 
 \tcheck{chk-sufficient-stack-space-at-invokelight}
-	& At the point of an INVOKELIGHT instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee. \\
+	& At the point of an \mycode{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee. \\
 
 \tcheck{chk-sufficient-locals-at-invokelight}
-	& For each INVOKELIGHT, the total number of slots - the number of own variable slots for the caller >= the total variable slots for the callee. \\
+	& For each \mycode{INVOKELIGHT}, the total number of slots - the number of own variable slots for the caller >= the total variable slots for the callee. \\
 
 \tcheck{chk-stack-is-empty-at-branches}
 	& The stack is empty at branches and branch targets. \\
@@ -53,25 +53,25 @@
 	& After each instruction, the stack depth <= the max stack depth announced in the header. \\
 
 \tcheck{chk-local-variable-slot-exists}
-	& The index of the local variable <= the number of own variable slots for the current method. \\
+	& The index of the local variable < the number of own variable slots for the current method. \\
 
 \tcheck{chk-static-variable-infusion-exists}
 	& The target infusion of a static variable exists. \\
 
 \tcheck{chk-static-variable-slot-exists}
-	& The index of the static variable <= the number of static variable slots for the target infusion. \\
+	& The index of the static variable < the number of static variable slots for the target infusion. \\
 
 \midrule
 & Run-time checks \\
 
 \rcheck{chk-invokevirtual-target-found}
-	& The target implementation for an INVOKEVIRTUAL/INVOKEINTERFACE is found. \\
+	& The target implementation for an \mycode{INVOKEVIRTUAL}/\mycode{INVOKEINTERFACE} is found. \\
 
 \rcheck{chk-no-nativestack-overflow}
 	& Whenever a new stack frame is allocated the frame+max stack depth+some safety margin > the end of the heap. \\
 
 \rcheck{chk-invokevirtual-stack-effects-match}
-	& The target implementation for an INVOKEVIRTUAL/INVOKEINTERFACE matches the stack effects used to verify the caller’s stack at translation time. \\
+	& The target implementation for an \mycode{INVOKEVIRTUAL}/\mycode{INVOKEINTERFACE} matches the stack effects used to verify the caller’s stack at translation time. \\
 
 \rcheck{chk-memory-access-within-heap}
 	& The target address of an array element or object field is within the heap. \\
