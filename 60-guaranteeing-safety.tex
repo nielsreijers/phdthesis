@@ -2,14 +2,16 @@
 
 With some exceptions \cite{Evers:2010ur}, most current sensor node VMs don't discuss safety, but instead focus on the functionality provided and how this can be implemented on a tiny sensor node. This is unfortunate, because the ability to provide a safety execution environment is both desirable, and easier to implement using a VM than it is using native code.
 
-\subsection{Native code approaches}
+\section{Native code approaches}
 For desktop applications, Wahbe et al. described software fault isolation \cite{Wahbe:1994cj} techniques that can be used for situations where we want to isolate a piece of code without incurring the overhead of using processes and the CPU's memory protection. For example, for plugin code that frequently needs to interact with an application, the overhead of frequent context switches, but should still be isolated from the rest of the application. Two basic methods are described: we can either rewrite the native code at load time, and insert checks at all potentially unsafe writes, or we can compile the code to a more restricted format with the appropriate checks already in place, and only verify the code adheres to this standard at load time.
 
-On a sensor node, two systems exist that follow each of these two approaches. \emph{t-kernel} raises the level of system abstraction for the developer by providing three features typically missing on sensor nodes: preemptive scheduling, virtual memory, and memory protection. It does this by extensive rewriting of the binary code at load time. While \emph{t-kernel} is heavily optimised, the price for this is that programmes still run 50-200\% slower, and code size increases by 500-750\%.
+On a sensor node, two systems exist that follow each of these two approaches. \emph{t-kernel} \cite{Gu:2006ww} raises the level of system abstraction for the developer by providing three features typically missing on sensor nodes: preemptive scheduling, virtual memory, and memory protection. It does this by extensive rewriting of the binary code at load time. While \emph{t-kernel} is heavily optimised, the price for this is that programmes still run 50-200\% slower, and code size increases by 500-750\%.
 
 The other approach is taken by Harbor \cite{Kumar:2007ge}, which consists of two components. On the desktop a binary rewriter sandboxes an application by inserting run-time checks before it is sent to the node. Then the SOS operating system is then extended with a binary verifier to verify incoming binaries. The correctness only depends on the correctness of this verifier. The increase in code size is more modest than for \emph{t-kernel} at a 30-65\% increase, but performance is 160-1200\% slower, where the authors note the benchmark producing the 13x slowdown is more typical of sensor node code. They also note more complex analysis of the binary code could reduce the number of necessary checks, but that this would significantly increase the complexity of the verifier.
 
-\subsection{Safety in virtual machines}
+Finally, Safe TinyOS \cite{Cooprider:2007ub} imposes much less overhead, at 17\% slowdown and 27\% code size increase. It achieves this using Deputy \cite{Condit:2007uo}, a source-to-source compiler for ensuring type and memory safety for C code. The host can do more complex analysis of the source code to reduce the necessary run-time checks. While this protects against bugs, it provides a weaker type of safety because it depends on a trusted host and does not provide safety on the node itself.
+
+\section{Safety in virtual machines}
 \input{60-tbl-safety-checks}
 
 The complexity of reducing the necessary run-time checks noted by Harbor, is much lower when using a virtual machine. The JVM instruction set is relatively simple and restricted, compared to native CPU instruction sets, and is much easier to reason about. As we will see, many checks can be done at load time, reducing the need for runtime checks and the corresponding overhead.
@@ -42,7 +44,7 @@ When the node receives code, it will first receive the headers for all methods, 
 
 %TODO: implement this as well, just to be complete
 
-\subsection{Control flow safety}
+\section{Control flow safety}
 To ensure control flow safety, we can group instructions into four categories. Most instructions don't affect the control flow. The ones that do are: various kinds of branches, method invocations, and returns. The state is correct at the start of the programme, since the VM will start at the beginning of the first instruction. We will show the state will be correct after each instruction by looking at these four categories.
 
 \begin{table}[H]
@@ -61,17 +63,17 @@ others   & fall through to the next JVM instruction \\
 \end{tabular}
 \end{table}
 
-\subsubsection{Simple instructions}
+\subsection{Simple instructions}
 Starting with the last category: most instructions such as math operations, loads and stores, are translated to a single sequence of native instructions that will be executed top to bottom. In some cases this may \texttt{CALL} to a VM or libc function to perform some complex operation, but this is safe since these will return to the same location.
 
 For this category, the generated code will flow naturally into the next generated instruction, which is safe as long as there \emph{is} a next instruction. This produces our second translation-time check, \ref{chk-return-or-goto-at-end-of-method}: the last instruction in a method should be a \texttt{RETURN} or \texttt{GOTO} to prevent control from flowing into undefined territory after the method body.
 
-\subsubsection{Branch instructions}
+\subsection{Branch instructions}
 In our bytecode, branches don't target a bytecode offset as in normal JVM bytecode, but a branch target ID. These targets are marked with a \texttt{BRTARGET} instruction, which doesn't emit any code, but causes the AOT compiler to collect the address in a temporary table during translation. Once the whole method is translated, this temporary table is used to patch the correct target address into the branch instructions to handle forward branches.
 
 This makes checking the branch addresses easy. Each method announces the number of branch targets that will be used in the method header. To ensure each taken branch will branch to a legal instruction within the method, we need to check that the target ID of each branch is lower than the number of branch targets announced (\ref{chk-brtarget-exists}) so it points to an entry within the table, and that at the end of the method, all \texttt{BRTARGET} instructions have been found so all entries in the table point to the start of a translated instruction (\ref{chk-all-brtargets-found}).
 
-\subsubsection{Invoke instructions}
+\subsection{Invoke instructions}
 We have three kinds of method invocations in our VM.
 
 For lightweight method calls, we require the target to be declared before any call is made, to ensure the address of target is known at translation time and we can directly generate a \texttt{CALL} to it. Ensuring this calls to a correct address is therefore trivial: we must simply check the code for the method has already been generated (\ref{chk-invokelight-target-found}).
@@ -80,7 +82,7 @@ For static calls (\texttt{INVOKESTATIC} and \texttt{INVOKESPECIAL}) the target m
 
 Finally, for \texttt{INVOKEVIRTUAL} and \texttt{INVOKEINTERFACE}, we do not know the target at translation time, since \texttt{callMethod} will resolve this depending on the object we will invoke the method on, which will not be known at runtime. Therefore we need a run-time check to ensure the method can be found (\ref{chk-invokevirtual-target-found}), but this doesn't add any overhead since the method must be resolved to make the call anyway.
 
-\subsubsection{Return instructions}
+\subsection{Return instructions}
 Finally, return instructions will pop the return value from the stack, and then do a native \texttt{RET} instruction to return, either directly the AOT compiled code of the caller for lightweight methods, or to the VM's \texttt{callMethod} for other methods.
 
 The \texttt{RET} instruction will take the return address from the native stack, which is also used to store the JVM's integer operand stack. This means we need to check the integer operand stack is empty at return instructions (\ref{chk-stack-is-empty-after-return}), to ensure the return address will be at the top of the native stack. Memory safety then guarantees the application could not have corrupted it.
@@ -92,7 +94,7 @@ We add a check during non-lightweight invokes that the stack frame for the calle
 Lightweight calls do not add to the stack, since space for their local variables, stack, and return address was already allocated in the caller's frame. However, a method may make calls to the VM or libc functions. We can determine the maximum stack growth for all the possible calls our AOT generated code may make. If this were to grow into the heap, this could corrupt the stack. Therefore we add a certain safety margin between the stack and heap, which we have currently set conservatively, but could be reduced by adding extra stack checks in vm functions that cause the most stack growth.
 %TODO: find reference about max stack size
 
-\subsection{Memory safety}
+\section{Memory safety}
 \begin{figure}[]
   \includegraphics[width=\linewidth]{memlayout.eps}
   \caption{Global memory layout}
@@ -128,7 +130,7 @@ any instruction pushing          & reference or integer stack \\
 
 Since the JVM stack frames are created by the VM based on the method header, we know how much space will be available for local variables and the references stack for normal methods. For lightweight methods, we depend on the caller's stack frame, so we need to make sure this is large enough. Whenever we translate an \texttt{INVOKELIGHT} instruction we verify the stack frame of the current method has reserved enough free space for the lightweight method's locals and stack (\ref{chk-sufficient-stack-space-at-invokelight} and \ref{chk-sufficient-locals-at-invokelight}).
 
-\subsubsection{The operand stack}
+\subsection{The operand stack}
 The VM will reserve space for the operand stacks based on the information in the method header, so we need to make sure the actual stack depth neither underflows, or exceeds the maximum announced in the header.
 
 The effect of each instruction on the stack is known at translation time. We simply the verification process by requiring the stack to be empty at all branches, so we can determine the stack depth in a single top to bottom pass. Alternatively, we could announce the expected stack state for each branch target in the method header so we can check the state matches at each branch and corresponding branchtarget. However, this is more complex and in practice the overhead for requiring an empty operand stack at branches is minimal: in all our Java code, only four trivial rewrites to avoid the \texttt{? :} operator were necessary.
@@ -139,25 +141,25 @@ For each translated instruction, we then check there are enough values on the st
 
 Most bytecode instructions have a fixed effect on the stack, for example \texttt{IADD} will always consume two 32-bit ints and push another. We encoded this in a simple table. Method calls, discussed below, require some more work to determine the stack effects. 
 
-\paragraph{Invoke instructions}
+\subsubsection{Invoke instructions}
 The \texttt{INVOKESTATIC}, \texttt{INVOKESPECIAL}, and \texttt{INVOKELIGHT} instructions all contain the id of the method that will be invoked. We have the method headers for all methods available at translation time, so it is easy to determine the stack effects, since the number of arguments and return value are contained in the header.
 
 For \texttt{INVOKEVIRTUAL} and \texttt{INVOKEINTERFACE} however, the actual method that will be called depends on the object on the stack at run-time. We solve this by choosing the first method implementation that matches the call, and use this method header to determine the stack effects. For valid code all implementations should have the same signature, but malicious code could try to send an implementation in a subclass that has different stack effects. We therefore add a run-time check (\ref{chk-invokevirtual-stack-effects-match}) that will verify the method called at runtime has the same stack effects as the one used to verify the stack at translation time.
 
-\paragraph{Return}
+\subsubsection{Return}
 Note that \texttt{RETURN} instructions don't need any special care. The stack depth will be verified using the instruction found in the bytecode. The return value is passed in registers, so if the return instruction doesn't match the return type in the method header, the result is that either a return value is discarded, or whatever happens to be in registers is used as a return value.
 
 So even though it's possible for a method to break the contract established in the method header, for example by using \texttt{RETURN} instead of \texttt{IRETURN} in a method that should return an int, this can only corrupt the application's own state, and not the VM's.
 
-\subsubsection{\texttt{STORE}}
+\subsection{\texttt{STORE}}
 Local variable access is easy to verify at translation time. The method header is used to create the current method's stack frame, or for lightweight methods to verify any caller has reserved enough slots for the lightweight method's locals.
 
 Local methods are accessed as an offset from the Y register, which points to the start of the local variables. Since the Y register is controlled by the VM, we only need to check at translation time that the index of the local is within the range announced in the method header to make sure we will write to a valid location (\ref{chk-local-variable-slot-exists}).
 
-\subsubsection{\texttt{PUTSTATIC}}
+\subsection{\texttt{PUTSTATIC}}
 Static are allocated globally at the start of the application based on number of static variables in the \emph{infusion} header. The \texttt{PUTSTATIC} instruction contains a reference to an infusion, and the index of the static variable slot. At translation time, we simply need to check the referenced infusion exists (\ref{chk-static-variable-infusion-exists}), and the index is within the legal range (\ref{chk-static-variable-slot-exists}).
 
-\subsubsection{\texttt{PUTFIELD} and \texttt{PUTARRAY}}
+\subsection{\texttt{PUTFIELD} and \texttt{PUTARRAY}}
 The final type of memory access is to the heap, which happens using the \texttt{PUTFIELD} and \texttt{PUTARRAY} instructions to write to object fields and array elements respectively. The various \texttt{NEW} instructions used to create them are assumed to be safe since they are fully implemented in the VM.
 
 Access to objects and arrays is hard to verify at translation time, without extensive analysis that would be too expensive for a sensor node. For example, a null pointer bug could easily trick the VM to write to the lowest addresses. Since in the AVR, the lowest 32 bytes of the address space are mapped to the CPU's general purpose registers, this can cause very hard to diagnose bugs, as we have experienced first-hand. Similarly, using a high out-of-bounds index into an array, malicious code could easily gain access to the native stack and, for instance, corrupt return addresses.
@@ -172,8 +174,7 @@ The actual write to the heap is often done by an offset from Z. For example if t
 
 This means the write could end up at most 63 bytes above the end of the heap, for which we reuse the same small safety margin mentioned in check \ref{chk-no-nativestack-overflow}, which is safe since we will never be writing to a heap object and executing a function in the VM or libc at the same time.
 
-\paragraph{Alternatives}
-% TODO check why it seems to take 26 cycles in the fillarray benchmark. bug in my calculation, or in the trace processing script?
+\subsubsection{Alternatives}
 We considered several alternative implementations. Since the \texttt{CALL} and \texttt{RET} instruction account for 8 out of these 22 cycles, the checks could be made faster by inlining them. However, inlining would increase the code size overhead from 4 bytes to over 30 bytes, which we considered too high.
 
 We can also save 8 cycles if we keep the bounds in registers instead of memory, which would remove the need for the \texttt{LDS} instructions. However this reduces the performance of the stack cache since it means we have 2 register pairs less for stack caching.
