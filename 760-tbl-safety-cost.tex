@@ -1,0 +1,20 @@
+\begin{tabular}{lrrrrrrrrrrrr}
+\toprule
+BENCHMARK                          & b.sort            &  h.sort           & b.srch            & fft               & xxtea             & md5               & rc5               & coremk            & \makebox[0.2mm]{}   & average           \\
+\hline
+\multicolumn{10}{l}{PERFORMANCE OVERHEAD VS NATIVE C (\%)} \\
+unsafe                & 94.4  & 66.2  & 64.3  & 96.7  & 57.6 & 45.7 & 19.5  & 110   & & 69.3  \\
+safe writes           & 185.9 & 107.7 & 64.3  & 145.6 & 68.2 & 60.3 & 22.2  & 137.3 & & 98.9  \\
+safe reads and writes & 277.4 & 192.6 & 119.1 & 201.5 & 100  & 80.3 & 33.4  & 217.9 & & 152.8 \\
+\multicolumn{10}{l}{PERFORMANCE OVERHEAD VS UNSAFE VM (\%)} \\
+safe writes           & 47.1  & 25    & 0     & 24.9  & 6.7  & 10   & 2.3   & 13    & & 17.5  \\
+safe reads and writes & 94.1  & 76.1  & 33.4  & 53.3  & 26.9 & 23.7 & 11.6  & 51.4  & & 49.3  \\
+\multicolumn{10}{l}{CODE SIZE OVERHEAD VS NATIVE C (\%)} \\
+unsafe                & 102.6 & 67.9  & 85.8  & 17.6  & 55.1 & 54.9 & 120.7 & 50.1  & & 69.3  \\
+safe writes           & 107.9 & 71.8  & 85.8  & 20.3  & 56.2 & 55.7 & 124.2 & 54    & & 72    \\
+safe reads and writes & 113.2 & 77.5  & 89.6  & 24.2  & 60.1 & 59.1 & 131.2 & 61.3  & & 77    \\
+\multicolumn{10}{l}{CODE SIZE OVERHEAD VS UNSAFE VM (\%)} \\
+safe writes           & 2.6   & 2.3   & 0     & 2.3   & 0.7  & 0.5  & 1.6   & 2.6   & & 1.6   \\
+safe reads and writes & 5.2   & 5.7   & 2     & 5.6   & 3.2  & 2.7  & 4.8   & 7.5   & & 4.5   \\
+\bottomrule
+\end{tabular}  

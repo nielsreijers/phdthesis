@@ -13,26 +13,28 @@ A better performing VM is needed, preferably one that performs as close to nativ
 Therefore, we focus on the middle option: translating the bytecode to native code on the device itself, at load time. The main research questions to answer are: how close an AOT compiling sensor node VM can come to native C performance, what optimisations are necessary to achieve this, what tradeoffs are involved and what the impact is of the JVM's design decisions for AOT compilation on a sensor node.
 
 \section{Safety}
-Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes from one another and the kernel. Instead, the entire address range is accessible from any part of the code running on the device.
+Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes. Instead, the entire address range is accessible from any part of the code running on the device.
 
-At the same time, while small, sensor node code can be complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit more functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects. In such an environment, mistakes are easily made, and  can have catastrophic consequences with full access to the entire address space. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
+At the same time, sensor node code can be complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit as much functionality and data on a device, for example by storing data in simple byte arrays instead of using more expensive objects. In such an environment, mistakes are easily made, and with full access to the entire address space can have catastrophic consequences. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
 
-To guard against both buggy code and malicious attacks, the ability to execute code in a sandboxed manner and isolate untrusted application code from the VM itself is a desirable property. Specifically, we want to guarantee that malicious code cannot:
+To guard against both buggy code and malicious attacks, a desirable property would be the ability to execute code in a sand boxed manner and isolate untrusted application code from the VM itself. Specifically, we want to guarantee that malicious code cannot:
 \begin{enumerate}
 	\item write to memory outside the range assigned by the VM
 	\item perform actions it does not have permission for
 	\item retain control of the CPU indefinitely
 \end{enumerate}
 
-Note that these guarantees do not say anything about the correctness of the application itself: code may still corrupt it's own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds runtime checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this depends on a trusted and correct host, and doesn't protect against malicious code being sent to the device.
+Note that these guarantees do not say anything about the correctness of the application itself: buggy code may still corrupt it's own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds runtime checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this doesn't protect against malicious code being sent to the device and depends on the correctness of the host.
 
-Our approach depends only on the correctness of our VM. It guarantees the VM's own data cannot be corrupted, and that it can always regain control of the node and terminate any buggy or malicious application that attempts an illegal write or other action it is not permitted to do.
+Our approach depends only on the correctness of our VM, and guarantees it can always regain control of the node and terminate any misbehaving application before it executes an illegal write or performs an action it is not permitted to.
+
 
 \section{Scope}
 todo
 %TODO: Explain we focus on the AOT translation process, and not on infuser. Instead we only consider some simple optimisations that a better infuser could easily do, and manually do these to the Java source to determine the performance that could be achieved.
 
 \section{Contributions}
+
 This thesis makes the following contributions:
 \begin{itemize}
 	\item We identify the major sources of overhead when using the baseline approach as described by Ellul and Martinez.
@@ -44,6 +46,8 @@ This thesis makes the following contributions:
 \end{itemize}
 
 \section{Structure of thesis}
+
+%TODO Mention we will describe alternative choices where relevant, since there's always different ways to implement something, and motivate our choice.
 
 \section{List of publications}
 

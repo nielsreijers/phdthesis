@@ -1,0 +1,13 @@
+\section{Worst case benchmarks}
+to do
+
+% many come from the type 3 instruction set overhead. example: storing to the array for the rc5 benchmark
+% also note that a some of these are a result of directly translating C code, which is the only way to get a comparison that doesn't depend on arbitrary choices by me. but someone writing in Java, especially someone with knowledge of the VM, would probably write it differently
+% also state very clearly that here we only show sythetic, isolated worst-case scenarios and any real algorithm might contain some code like this, but the overhead will be mixed with code that produces far less overhead
+
+% try to make some general statements about what the VM is good at and what it's bad at.
+
+% good: variable bit shifts: they do the same loop as avr-gcc emits
+% bad:  consecutive array access (needs to recalculate the address each time)
+%       safety: the more array and object writes we do, the worse the performance will be. show 8,16,32 bit write benchmarks. both loop and unrolled.
+%       6 bit shifts

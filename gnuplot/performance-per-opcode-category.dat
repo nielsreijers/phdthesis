@@ -1,0 +1,7 @@
+#X                       push/pop    move            load/store     other        total
+simple peephole,            148.0 ,  -3.5  ,              114.8 ,    67.3  ,     326.5                                       
+improved peephole,           50.7 ,   7.8  ,              114.8 ,    67.2  ,     240.6                                       
+stack caching,                0.6 ,  -2.2  ,              114.8 ,    67.2  ,     180.4                                       
+popped value caching,         0.6 ,  -2.1  ,               70.7 ,    66.5  ,     135.8                                       
+mark loops,                   7.2 ,   5.3  ,               17.3 ,    66.7  ,      96.5                                       
+const shift,                  6.1 ,   5.8  ,               17.2 ,    38.9  ,      68.0                                       

@@ -1,0 +1,20 @@
+\begin{table*}[]
+\centering
+\caption{Comparison of our approach to related work}
+\label{tbl-contribution-comparison}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Approach        & Platform    & Safe               & Performance        & Code size               \\
+                & independent &                    &                    & \\
+\midrule
+Native code     & No          & No                 & 1x                 & 1x                      \\
+Interpreters    & Yes         & Mostly no          & 300-23000\% slower & ~50\% smaller           \\
+Ellul's AOT     & Yes         & No                 & 123-844\% slower   & 120-346\% larger        \\
+Safe TinyOS     & No          & Depends on a trusted host   & 17\% slower        & 27\% larger             \\
+\emph{t-kernel} & No          & Yes                & 50-200\% slower    & 500-750\% larger        \\
+Harbor          & No          & Yes                & 160-1230\% slower  & 30-65\% larger          \\
+Our VM (unsafe) & Yes         & No                 & 20-110\% slower    & 17-120\% larger         \\
+Our VM (safe)   & Yes         & Yes                & 22-185\% slower    & 20-124\% larger         \\
+\bottomrule
+\end{tabular}
+\end{table*}

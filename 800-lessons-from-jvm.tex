@@ -20,7 +20,7 @@ In this chapter we discuss the most pressing issues with current sensor node VMs
     \input{800-tbl-vm-size} 
 \end{table*}
 
-A minimum Java APIs for resource constrained devices was proposed by Sun Microsystems, namely the Connected Limited Device Configuration (CLDC) specification \cite{cldc1.1}.  CLDC was primarily intended for larger devices than typical resource constrained sensor nodes.  Providing support for the full CLDC specification would require a substantial amount of memory and program space for features that are rarely required for sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the Darjeeling VM \cite{brouwers2009darjeeling}.  Below we outline the most notable features of the CLDC specification that are not necessary for most WSN applications.
+A minimum Java APIs for resource constrained devices was proposed by Sun Microsystems, namely the Connected Limited Device Configuration (CLDC) specification \cite{CLDC}.  CLDC was primarily intended for larger devices than typical resource constrained sensor nodes.  Providing support for the full CLDC specification would require a substantial amount of memory and program space for features that are rarely required for sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the Darjeeling VM \cite{Brouwers:2009cj}.  Below we outline the most notable features of the CLDC specification that are not necessary for most WSN applications.
 
 String support, which requires a substantial amount of program space, is rarely required within sensor node applications. Although strings may be beneficial during debugging they provide little benefit to application execution. Communication with peripheral hardware is often by means of a stream of bytes. To facilitate such code it would be of benefit to support constant strings at the programming language level (which could be converted to byte arrays under the hood).
 
@@ -59,7 +59,7 @@ Supporting constant arrays will require changes to both the language and bytecod
 
 \section{Better language support for shorts and bytes}
 \label{sec-small-datatypes}
-Because RAM is scarce, 16-bit short and single byte data types are commonly used in WSN code. The standard JVM only has 32 and 64-bit operations, and variables (instance, local or static) and stack values are stored as 32-bit, even if the actual type is shorter. On a sensor node this wastes memory, and causes a performance overhead since most nodes have 8 or 16-bit architectures, so many sensor node JVMs introduce 16-bit operations and store values in 16-bit slots \cite{brouwers2009darjeeling}.
+Because RAM is scarce, 16-bit short and single byte data types are commonly used in WSN code. The standard JVM only has 32 and 64-bit operations, and variables (instance, local or static) and stack values are stored as 32-bit, even if the actual type is shorter. On a sensor node this wastes memory, and causes a performance overhead since most nodes have 8 or 16-bit architectures, so many sensor node JVMs introduce 16-bit operations and store values in 16-bit slots \cite{Brouwers:2009cj}.
 
 However, redesigning the VM is only half of the solution. At the language level, Java defines that an expression evaluates to 32-bits, or 64-bits if at least one operand is long. Attempting to store this in a 16-bit variable will result in a `lossy conversion' error at compile time.
 
@@ -106,7 +106,7 @@ At a minimum, we should have a way to define simple aliases for primitive types,
 
 \section{Explicit and efficient inlining}
 \label{sec-inlining}
-Java method calls are inherently more expensive than C functions. On the desktop, JIT compilers can remove much of this overhead, but on a sensor node we do not have the resources for this. We found this often is a problem for small helper functions that are frequently called. As an example, a C version of the xxtea cipher \cite{wheeler1998xxtea} contains this macro: 
+Java method calls are inherently more expensive than C functions. On the desktop, JIT compilers can remove much of this overhead, but on a sensor node we do not have the resources for this. We found this often is a problem for small helper functions that are frequently called. As an example, a C version of the xxtea cipher \cite{Wheeler:1998} contains this macro: 
 \begin{minted}[fontsize=\footnotesize]{c}
   #define MX (((z>>5^y<<2) + (y>>3^z<<4)) \\
              ^ ((sum^y) + (key[(p&3)^e] ^ z)))
@@ -125,14 +125,14 @@ Another option is to give the developer more control over inlining, which could 
 Java compilers typically do not optimise the bytecode and translate the source more or less as-is. Without a clear performance model it is not always clear which option is faster, and the bytecode is expected to be run by a JIT compiler, which can make better optimisation decisions knowing the target platform and runtime behaviour. However, a sensor node does not have the resources for this and must execute the code as it is received. This leads to significant overhead, for example by repeatedly reevaluating a constant expression in a loop.
 
 \textbf{Possible solutions}
-Even without a clear performance model, some basic optimisations can be done. In the experiments described in \cite{reijers2017aot-journal}, some very conservative optimisations already result in code twice as fast as the original.
+Even without a clear performance model, some basic optimisations can be done. In the experiments described in Section \ref{sec-evaluation-manual-optimisations}, some very conservative optimisations already result in code twice as fast as the original.
 
 
 \section{Allocating objects on stack}
 \label{sec-no-gc}
 While memory management is too big a topic to cover completely, we do want to mention one relevant observation. In Java anything larger than a primitive value has to be allocated on the heap. This introduces a performance overhead, both for allocating the objects, and the occasional garbage collection run, which may take several thousand cycles.
 
-As an example, one function in the CoreMark \cite{coremark} benchmark uses two small local arrays of 8 ints, which are on the stack in C, but need to be on the heap in Java. In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's case this adds up to a performance overhead of about 60\% relative to C \cite{reijers2017aot-journal}.
+As an example, one function in the CoreMark benchmark uses two small local arrays of 8 ints, which are on the stack in C, but need to be on the heap in Java. In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's case this adds up to a performance overhead of about 60\% relative to C.
 
 \textbf{Possible solutions}
 We suspect it may be possible to avoid this cost in many cases by extending the VM's memory model to allow us to allocate objects and arrays on the stack under certain conditions. We know from TakaTuka's experience that there are many cases where we can determine at compile time that an object can be garbage collected at a certain point \cite{aslam2010optimized}.

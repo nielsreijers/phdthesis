@@ -21,8 +21,8 @@ The most common optimisations we performed are:
 We will briefly examine the effect of some 'unfair' optimisations on the Core Mark benchmark in Section \ref{sec-evaluation-coremark}.
 
 
-%\paragraph{Temporary variables}
-%The first two optimisations generate extra store instructions, which means they may not always be beneficial if the value is never used again. But a value often only needs to be reused only once for it to be faster to store in a local variable than to calculate it twice. If we use the mark loops optimisation discussed in Section \ref{sec-optimisation-markloops}, in many cases the variable may be stored in registers, making the store either very cheap, or free.
+\paragraph{Temporary variables}
+The first two optimisations generate extra store instructions, which means they may not always be beneficial if the value is never used again. But a value often only needs to be reused only once for it to be faster to store in a local variable than to calculate it twice. If we use the mark loops optimisation discussed in Section \ref{sec-optimisation-markloops}, in many cases the variable may be stored in registers, making the store either very cheap, or free.
 
 \paragraph{Manual inlining}
 We manually inline all small methods that were either a \mycode{\#define} in the original C code, or a function that was inlined by \mycode{avr-gcc}. ProGuard can also inline small methods, but when it does, it simply replaces the \mycode{INVOKE} instruction with the callee's body, prepended with \mycode{STORE} instructions to pop the parameters off the stack and initialise the callee's local variables. Manual inlining often results in better code, because it may not be necessary to store the parameters if they are only used once. Again, it is easy to imagine that an optimising compiler should be able to come to the same result automaticallly.

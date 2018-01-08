@@ -20,4 +20,8 @@ Our reason to use JVM is the availability of a lot of infrastructure to build on
 
 One important question that should be considered is whether that instruction set should be stack-based or register-based. Many modern bytecode formats are register-based, and a number of publications report on the advantages of this approach \cite{Zhang:2012wf, Shi:2005ba}. However, these tradeoffs are quite different for a powerful JIT compiler, and a resource-constrained VM. When working with tiny devices, an important advantage of a stack-based architecture is its simplicity, and our results here show that much of the overhead associated with the stack-based approach can be eliminated during the translation process.
 
+
+
 %TODO Mention CoreMark on desktop numbers here. Nice point to end the paper on (although it's not a fair comparison since the desktop version does things like bounds checking)
+
+%TODO point to make somewhere: more complex techniques could possibly improve results further, but will cost more. 2x slowdown seems acceptable. there's always a tradeoff and we needs several datapoints to make a choice. this work shows we can achieve a lot with very little, but we may be able to achieve even more at a greater cost.
