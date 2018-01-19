@@ -40,7 +40,7 @@ Many of our checks will depend on the \emph{method header}. Each method in our V
 We will collect our checks in Table \ref{tbl-safety-checks}. The first check we do is a basic sanity check on the data in the method headers (\ref{chk-method-header-is-sane}). For example, since each parameter becomes a local variable, the number of local variable slots must be at least as high as the number of parameter, and the total number of slots must be at least as high as the method's own local variable slots, while the rest may be used for lightweight methods.
 
 \subsection{Control flow safety}
-We will first guarantee control flow safety by considering the effect of each possible JVM instruction and showing they either flow into the start of a legal next instruction, or return control back to the VM. To do so, we group them into four categories. Most instructions don't affect the control flow. The ones that do are: various kinds of branches, method invocations, and returns. The state is correct at the start of the programme, since the VM will start it by jumping to the beginning of the first instruction in the main method. We will show the state will be correct after each instruction by looking at these four categories.
+We will first guarantee control flow safety by considering the effect of each possible JVM instruction and showing they either flow into the start of a legal next instruction, or return control back to the VM. To do so, we group them into four categories, shown in Table \ref{tbl-control-flow-instructions}. Most instructions don't affect the control flow. The ones that do are: various kinds of branches, method invocations, and returns. The state is correct at the start of the programme, since the VM will start it by jumping to the beginning of the first instruction in the main method. We will show the state will be correct after each instruction by looking at these four categories.
 
 \begin{table}[H]
 \centering
@@ -105,12 +105,12 @@ The native stack grows down in memory towards the heap. This contains a mix of n
 
 Thus, the VM's private data and the application data are mixed in the node's memory. The application is only allowed to write to the areas indicated with bars to the right. Any write outside of these designated areas may corrupt the VM's internal state, and needs to be prevented by our safety checks.
 
-Having ensured control flow safety, we can now rely on the fact that we will always execute complete JVM instructions, and the application cannot skip past an inserted run-time check by jumping to the middle of a generated instruction. This means we can demonstrate memory safety by considering each how each JVM instruction writes to memory, and showing they are all either guaranteed to write to a correct address, or checked at run-time. Again, we group instructions in the categories shown below with respect to their writes to memory, and consider each separately.
+Having ensured control flow safety, we can now rely on the fact that we will always execute complete JVM instructions, and the application cannot skip past an inserted run-time check by jumping to the middle of a generated instruction. This means we can demonstrate memory safety by considering each how each JVM instruction writes to memory, and showing they are all either guaranteed to write to a correct address, or checked at run-time. Again, we group instructions in the categories shown below with respect to their writes to memory, as shown in Table \ref{tbl-memory-write-instructions}, and consider each separately.
 
 \begin{table}[H]
 \centering
 \caption{Instructions writing to memory}
-\label{tbl-control-flow-instructions}
+\label{tbl-memory-write-instructions}
 \begin{tabular}{ll}
 \toprule
 type     & writes to \\

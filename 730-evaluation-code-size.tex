@@ -10,6 +10,8 @@
  \setlength{\tabcolsep}{6pt}
 \end{table}
 
+%TODO: say something about the size of class initialisers for constant data tables (FFT8,FFT16,MoteTrack)
+
 Next we examine the effects of our optimisations on code size. Two factors are important here: the size of the VM itself and the size of the code it generates.
 
 The size overhead for the generated code is shown in figures \ref{fig-codesize-per-opcode-category} and \ref{fig-codesize-per-benchmark}, again split up per instruction category and benchmark respectively. For the first three optimisations, the two graphs follow a similar pattern as the performance graphs. These optimisations eliminate the need to emit certain instructions, which reduces code size and improves performance at the same time.

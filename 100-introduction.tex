@@ -1,18 +1,128 @@
 \chapter{Introduction}
-Internet-of-Things devices come in a wide range, with vastly different performance characteristics, cost, and power requirements. On one end of the spectrum are devices like the Intel Edison and Raspberry Pi: powerful enough to run Linux, but relatively expensive and power hungry. On the other end are CPUs like the Atmel Atmega or TI MSP430, commonly used in sensor nodes: much less powerful, but also much cheaper and low power enough to potentially last for months or years on a single battery. For the first class normal operating systems, languages, and compilers can be used, but in this paper, we focus specifically on the latter class for which no such clear standards exist. Our experiments were all performed on an ATmega128: a 16MHz 8-bit processor, with 4KB of RAM and 128KB of flash programme memory, but the approach should yield similar results on other CPUs in this category.
 
-There are several advantages to using VMs. One is ease of programming. Many VMs allow the developer to write programmes at a higher level of abstraction than the bare-metal C programming that is still common for these devices. Second, a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device. A third advantage is platform independence. While early wireless sensor network applications often consisted of homogeneous nodes, current Internet-of-Things/Machine-to-Machine  applications are expected to run on a range of different platforms. A VM can significantly ease the deployment of these applications.
+Production of integrated circuits has advanced at a consistent and rapid pace for over half a century, doubling the transistors density every one to two years in accordance with Moore's law. Only in recent years has the cadence has slowed as we approach fundamental physical limits.
 
-\section{Performance}
-While current VMs offer an impressive set of features, almost all sacrifice performance. The VMs for which we have found concrete performance data are all between one and two orders of magnitude slower than native code. In many scenarios this may not be acceptable for two reasons: for many tasks such as periodic sensing there is a hard limit on the amount of time that can be spent on each measurement, and an application may not be able to tolerate a slowdown of this magnitude. Perhaps more importantly, one of the main reasons for using such tiny devices is their extremely low power consumption. Often, the CPU will be in sleep mode most of the time, so little energy is be spent in the CPU compared to communication, or sensors. But if the slowdown incurred by a VM means the CPU has to stay active 10 to 100 times longer, this may suddenly become the dominant factor.
+While this is most commonly associated with improvements in performance, doing more within the same physical size, it has also allowed us to reduce the size of computers: doing the same thing in ever smaller packages.
 
-As an example, one of the few applications reporting a detailed breakdown of its power consumption is Mercury \cite{Lorincz:2009kt}, a platform for motion analysis. The greatest energy consumer is the sampling of a gyroscope, at 53.163 mJ. Only 1.664 mJ is spent in the CPU on application code for an activity recognition filter and feature extraction. When multiplied by 10 or 100 however, the CPU becomes a very significant, or even by far the largest energy consumer. A more complex operation such as a 512 point FFT costs 12.920 mJ. For tasks like this, even a slowdown by a much smaller factor will have a significant impact on the total energy consumption.
+This trend has not been as smooth as the improvements in performance. While any improvement in performance is a direct advantage, reducing the size by a little bit usually isn't. However, at certain thresholds, it causes small revolutions: moving from room-sized computers to home computers and PCs in every home,  scaling them down further to portable/laptop computers, and eventually handhelds and smart phones. Once established, each of these areas then benefitted from Moore's law to improve their capabilities, but the truly disruptive moments are when miniaturisation allowed whole new applications areas to emerge.
 
-A better performing VM is needed, preferably one that performs as close to native performance as possible. Translating bytecode to native code is a common technique to improve performance in desktop VMs. Translation can occur at three moments: offline, ahead-of-time (AOT), or just-in-time (JIT). JIT compilers translate only the necessary parts of bytecode at run-time, just before they are executed. They are common on desktops and on more powerful mobile environments, but are impractical on sensor node platforms that can often only execute code from flash memory. This means a JIT compiler would have to write to flash memory at run-time, which would cause unacceptable delays. Translating to native code offline, before it is sent to the node, has the advantage that more resources are available for the compilation process. We do not have a JVM to AVR compiler to test the resulting performance, but we would expect it would be similar to compiled C code. However, doing so, even if only for small, performance critical sections of code, sacrifices two of the key advantages of using a VM: The host now needs knowledge of the target platform, and needs to prepare a different binary for each type of CPU used in the network, and for the node it will be difficult to provide a safe execution environment when it receives binary code.
+The term 'ubiquitous computing' was coined by Mark Weiser, predicting in 1991 that computing would move from a dedicated device on the desktop, to devices all around us, from alarm clocks to coffee makers \cite{Weiser:1991wz}. Around the turn of the century, we were able able to scale down useful, working devices to the size of a few millimetres \cite{Warneke:2001ui}. This gave rise to a whole new area of research called Wireless Sensor Networks (WSN): many small and inexpensive sensor nodes, often called 'motes', working together to perform continuous automated sensing tasks.
+
+Many promising WSN applications were proposed: military applications \cite{Arora:2004}, precision agriculture \cite{Langendoen:2006un}, habitat monitoring \cite{Mainwaring:2002wb}, environmental monitoring \cite{WernerAllen:2006ta}, etc. While these applications vary greatly, the platforms used are quite similarly constrained. Since they are usually battery powered, power consumption is the main concern to achieve useful battery lifetime. For these applications this is measured in weeks or months rather than hours, which they achieve by using very simple CPUs, which very restricted memor, typically only a few KB of RAM, a full six orders of magnitude less than most modern computers.
+
+In 2001 Pister predicted that by 2010, size would be reduced to a cubic centimetre, and cost to less than a dollar \cite{Pister:2001vr}. While the first prediction has come true \cite{Wang:2014cq}, the latter so far has not. Future improvements in IC technology may allow more capabilities at the same level of cost and power consumption, but for many applications an increase in battery lifetime or a reduction in cost may be more valuable, and may enable completely new applications not possible at the current level of technology.
+
+Thus, much of the research into WSN focuses on achieving useful functionality in as small a space as possible, gradually exploring the design space between capabilities, accuracy and performance on one side, and their cost in terms of memory and power consumption on the other. It is not sufficient to simply improve one aspect without considering the cost, and a cheaper way of achieving the same goal at slightly lower performance or accuracy may still be valuable.
+
+To make these applications work new protocols were needed at every layer in an application. This includes lightweight MAC protocols for radio communication trading latency for energy by turning off the radio as much as possible \cite{Ye:2002uv, vanDam:2018tr}, lightweight operating systems and virtual machines trading functionality for size and complexity \cite{Levis:2004ws, Gu:2006ww, Han:2005tha, Levis:2002ku, Brouwers:2009cj}, lightweight routing and data aggregation \cite{Intanogonwiwat:2018wz, Braginsky:2002wg}, lightweight data compression and reprogramming techniques trading CPU cycles for transmitted bits \cite{Marcelloni:2009ja, Reijers:2003ww}, lightweight localisation trading accuracy for complexity \cite{Niculescu:2001bl, Savarese:2002tx, Savvides:2002uf}, etc.
+
+What these all have in common is that they revisit classing computer science problems, and adjust them to fit one a sensor node, making trade-offs to optimise for power consumption, either directly by reducing the time the processor or radio is active, or indirectly by reducing code size and memory consumption enough for them to run on the extremely low power, but also very resource-constrained CPUs.
+
+\section{Internet-of-Things}
+Recently, research into the Internet-of-Things (IoT) focusses on connecting many everyday objects and building smart applications with them. In this vision, similar to Weiser's ubiquitous computing, any object could be connected to the internet, and cooperate to achieve useful goals. For example a house with a smart airconditioning system may use sensors in each room, weather forecast information downloaded from the internet, past data on how the house responds to weather changes, and the user's current location, and combine all of this information to conserve energy and still make sure the house is at a comfortable temperature when the user gets home.
+
+While IoT and WSN overlap and are sometimes used interchangeably, an important difference is that WSN research typically focussed on applications consisting of a large number of homogeneous and resource-constrained nodes, while current IoT devices come in a wide range, with vastly different performance characteristics, cost, and power requirements.
+
+On one end of the spectrum are devices like the Intel Edison and Raspberry Pi. These are the results of another decade of miniaturisation since the beginning of WSN research, and are basically a complete PC in a very small form factor. They are powerful enough to run a normal operating system like Linux, but relatively expensive and power hungry. On the other end are more traditional WSN CPUs like the Atmel Atmega or TI MSP430: much less powerful, but also much cheaper and low power enough to potentially last for months or years on a single battery. Since both classes of devices have such different characteristics, solutions that are appropriate for one, usually don't work for the other. What works well on a powerful device is often too heavy for a sensor node, and the tradeoffs made in sensor node solutions often don't make sense when more resources are available.
+
+An important difference between WSN and IoT application is that in WSN applications the network is usually dedicated to a specific task and the hardware is an integral part of the design of the application. In the broadest IoT vision, the smart devices a user has cooperate to implement new applications, but these may come from many different vendors. Coming back to the example from Weiser's paper \cite{Weiser:1991wz}, it is unlikely a user would be willing to buy a matching pair of a coffee maker and an alarm clock, just so that they will work together to have his coffee ready in the morning. The challenge for IoT is to allow a smart coffee maker and a smart alarm clock to be programmed in such a way to enable this application.
+
+Thus, many IoT applications are inherently heterogeneous, and as Gu points out, even when powerful devices are used like the Raspberry Pi, it is not unusual for low power devices to be included to form a hybrid network and take advantage of their extremely long battery lifetime \cite{Gu:2006ww}.
+
+\section{Virtual machines}
+One of the main challenges is how to programme these networks of IoT devices. A VM is an attractive option for several reasons. There are several advantages to using VMs. The most obvious one is platform independence. In such a heterogenous environment as IoT applications are expected to be, a VM can significantly ease the deployment of these applications if the same programme can be sent to any node, regardless of it's hardware platform.
+
+A second advantage is that a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device.
+
+A final often quoted advantage is ease of programming. Many VMs allow the developer to write programmes at a higher level of abstraction than the bare-metal C programming that is still common for sensor nodes. However, it could be argued that this could also be achieved using more high level languages that compile to native code, so the two advantages of VMs that we will focus on in this thesis are safety and platform independent reprogramming.
+
+\subsection{Why performance matters: energy consumption}
+The use of virtual machines has been common in desktop computing for a long time, with Java and .Net being the most well-known examples. Since the early days of WSN research, many sensor node VMs, some based on Java and .Net, have also been developed. While these manage to pack an impressive set of features on such a limited platform, almost all sacrifice performance.
+
+The VMs for which we have found concrete performance data are all between one and two orders of magnitude slower than native code. In many scenarios this may not be acceptable for two reasons: for many tasks such as periodic sensing there is a hard limit on the amount of time that can be spent on each measurement, and an application may not be able to tolerate a slowdown of this magnitude. Perhaps more importantly, one of the main reasons for using such tiny devices is their extremely low power consumption. In many applications the CPU is expected to be in sleep mode most of the time, so little energy is be spent in the CPU compared to communication, or sensors. But if the slowdown incurred by a VM means the CPU has to stay active 10 to 100 times longer, this may suddenly become the dominant factor.
+
+\begin{table}[H]
+\centering
+\caption{Energy consumption breakdown for the Mercury motion analysis application}
+\label{tbl-mercury-energy}
+\begin{tabular}{lr}
+\toprule
+component                          & energy (uJ) \\
+\midrule
+Sampling accel                     & 2805  \\
+CPU (activity filter)              & 946   \\
+Radio listen (LPL, 4\% duty cycle) & 2680  \\
+Time sync protocol (FTSP)          & 125   \\
+Sampling gyro                      & 53163 \\
+Log raw samples to flash           & 2590  \\
+Read raw samples from flash        & 3413  \\
+Transmit raw samples               & 19958 \\
+\midrule
+Compute features                   & 718   \\
+Log features to flash              & 34    \\
+Read features to flash             & 44    \\
+Transmit features                  & 249   \\
+\midrule
+512-point FFT                      & 12920 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Mercury}
+As an example, one of the few applications reporting a detailed breakdown of its power consumption is Mercury \cite{Lorincz:2009kt}, a platform for motion analysis. As shown in Table \ref{tbl-mercury-energy}, the greatest energy consumer is the sampling of a gyroscope, at 53163 uJ. Only 1664 uJ is spent in the CPU on application code for an activity recognition filter and feature extraction. When multiplied by 10 or 100 however, the CPU becomes a very significant, or even by far the largest energy consumer.
+
+In Table \ref{tbl-mercury-energy} we also see transmitting raw data is a major energy consumer. To reduce this, Mercury has the option of first extracting features from the sensor data, and transmitting this instead. Mercury has five maximum peak-to-peak amplitude; mean; RMS; peak velocity; and RMS of the jerk time series built in, but notes that the exact feature extractor used may be customised by an application. This is the kind of code we may want to update at a later time using a VM to provide safety and platform independence, however a 10 to 100x slowdown in the feature extraction would defeat the purpose since more energy would then be spent in the CPU than we would save on transmission.
+
+Finally, a more complex operation such as a 512 point FFT costs 12.920 mJ. For tasks like this, even a slowdown by a much smaller factor will have a significant impact on the total energy consumption.
+
+\paragraph{Compression}
+As a second example we consider data compression. Since the radio is typically one of the major power consumers on mobile devices, compressing data before it is sent is an attractive option to conserve energy. However, energy must also be spent on the CPU during (de)compression. Barr and Asanovi\ ́c have analysed this tradeoff for five compression algorithms on the Skiff research platform, with hardware similar to the Compaq iPAQ. They found the break-even point to be at about 1000 instructions for each bit saved, but discovered several cases where some compression algorithms would actually spend more energy compressing the data than was saved in reduced transmission cost \cite{Barr:2006vg}.
+
+Most of the algorithms considered by they Barr and Asanovi\ ́c are too complex to run on a sensor node, so specialised compression algorithms have been developed for sensor nodes. One such algorithm is LEC \cite{Marcelloni:2009ja}, a simple lossless compression algorithm that can be implemented in only a few lines of code and only needs a few bytes of state. We will use a rough calculation to show why performance is also a concern for the simpler compression algorithms developed for sensor nodes.
+
+%TODO: check these calculations
+Using the power consumption from the datasheets for the Atmel ATMEGA128 and Texas Instruments MSP430F1611 CPUs \cite{Atmel:ATMEGA128Datasheet, TexasInstrumentsIncorporated:MSP430F1611Datasheet} we determine the energy per cycle. Assuming a node running in active mode at 10 Mhz and 3V power, they consume virtually the same power: 4.5mA for the ATMEGA and 5.0mA for the MSP430. Since the two are so close, we will use the lower value of 4.5mA:
+
+$4.5mA * 3V / 10MHz = 1.35nJ / cycle$
+
+We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 radio.  This radio can also operate at 3V, consuming between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
+
+$17.4mA * 3V / 250kbps = 208.8nJ / bit$
+
+As a result, we can spend $209/1.35 \approx 155$ cycles per bit to reduce the size of the transmitted data and still conserve energy.
+
+We implemented the LEC compression algorithm and used it to compress a dataset of 256 16-bit ECG measurements \cite{physionet-ecg-data}, or 4096 bits of data. LEC compression reduced this to  1840 bits, saving 2256 bits.
+
+
+
+\begin{table}[H]
+\centering
+\caption{Energy consumption breakdown for the Mercury motion analysis application}
+\label{tbl-mercury-energy}
+\begin{tabular}{lr}
+\toprule
+%// component                          & energy (uJ) \\
+\midrule
+ATMEGA128 energy per cycle            & 1.35 nJ/cycle  \\
+CC2420 energy per transmitted bit     & 208.8 nJ/cycle  \\
+\midrule
+LEC compression cycles spent          & 97052 cycles\\
+~~~ energy equivalent                 & 131 uJ \\
+LEC compression bits saved            & 2256 bits \\
+~~~ energy equivalent                 & 471 uJ \\
+LEC compression cycles per bit        & 43 cycles/bit \\
+\end{tabular}
+\end{table}
+
+Both these CPUs as well as the Chipcon radio are very common in typical sensor nodes, for example the popular TelosB is based on the CC2420 radio and MSP430F1611 cpu.
+
+
+
+Thus, a better performing VM is needed, preferably one that performs as close to native performance as possible. Translating bytecode to native code is a common technique to improve performance in desktop VMs. Translation can occur at three moments: offline, ahead-of-time (AOT), or just-in-time (JIT). JIT compilers translate only the necessary parts of bytecode at run-time, just before they are executed. They are common on desktops and on more powerful mobile environments, but are impractical on sensor node platforms that can often only execute code from flash memory. This means a JIT compiler would have to write to flash memory at run-time, which would cause unacceptable delays. Translating to native code offline, before it is sent to the node, has the advantage that more resources are available for the compilation process. We do not have a JVM to AVR compiler to test the resulting performance, but we would expect it would be similar to compiled C code. However, doing so, even if only for small, performance critical sections of code, sacrifices two of the key advantages of using a VM: The host now needs knowledge of the target platform, and needs to prepare a different binary for each type of CPU used in the network, and for the node it will be difficult to provide a safe execution environment when it receives binary code.
 
 Therefore, we focus on the middle option: translating the bytecode to native code on the device itself, at load time. The main research questions to answer are: how close an AOT compiling sensor node VM can come to native C performance, what optimisations are necessary to achieve this, what tradeoffs are involved and what the impact is of the JVM's design decisions for AOT compilation on a sensor node.
 
-\section{Safety}
+\subsection{Safety}
 Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes. Instead, the entire address range is accessible from any part of the code running on the device.
 
 At the same time, sensor node code can be complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit as much functionality and data on a device, for example by storing data in simple byte arrays instead of using more expensive objects. In such an environment, mistakes are easily made, and with full access to the entire address space can have catastrophic consequences. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
@@ -33,6 +143,10 @@ Our approach depends only on the correctness of our VM, and guarantees it can al
 todo
 %TODO: Explain we focus on the AOT translation process, and not on infuser. Instead we only consider some simple optimisations that a better infuser could easily do, and manually do these to the Java source to determine the performance that could be achieved.
 
+%For the first class normal operating systems, languages, and compilers can be used, but in this paper, we focus specifically on the latter class for which no such clear standards exist. Our experiments were all performed on an ATmega128: a 16MHz 8-bit processor, with 4KB of RAM and 128KB of flash programme memory, but the approach should yield similar results on other CPUs in this category.
+
+
+
 \section{Contributions}
 
 This thesis makes the following contributions:
@@ -52,6 +166,7 @@ This thesis makes the following contributions:
 \section{List of publications}
 
 \section{Naming}
+% TODO: consistent spelling and caps for bytecode runtime, compilation time, translation time, load time, atmega, etc.
 
 Define some commonly used names here. Using WSN instead of IoT since it is longer established and more clearly focussed on tiny node, while IoT may contain much more powerful devices.
 

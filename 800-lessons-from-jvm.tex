@@ -10,6 +10,16 @@ In this chapter we discuss the most pressing issues with current sensor node VMs
 \end{table*}
 
 
+\section{MoteTrack}
+\begin{itemize}
+	\item Java doesn't handle lots of small arrays efficiently. Every array becomes a heap object, taking up 8 bytes in headers. MoteTrack has lots of tiny arrays (containing 2 bytes or shorts), so this overhead is too high.
+\end{itemize}
+
+\section{LEC}
+\begin{itemize}
+	\item Not being able to allocate on the stack is a problem because we need to return two values from encode: bsi and bsi\_length. We can put them in an object, but that's slow.
+\end{itemize}
+
 \section{A tailored standard library}
 \label{sec-std-lib}
 \begin{table*}
