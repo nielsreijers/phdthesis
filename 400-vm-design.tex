@@ -1,4 +1,6 @@
 \chapter{VM design}
+
+
 \section{Ahead-of-Time translation}
 \label{sec-aot-translation}
 Our implementation is based on Darjeeling \cite{Brouwers:2009cj}, a Java VM for sensor nodes, running on an Atmel ATmega CPU. Like other sensor node VMs, it is originally an interpreter. We add an AOT compiler to Darjeeling: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATmega, cannot do.
@@ -112,6 +114,12 @@ In our AOT compiler we use the native stack for the JVM integer operand stack, w
 The AVR family of CPUs is widely used in low power embedded systems. We implemented our VM for the ATmega128 CPU. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
 
 The ATmega128 has 32 8-bit registers. We ran several experiments where we restrict the number of registers our VM may use. As is often the case with caches, we found the first few available registers to have the largest impact, while the added improvement gets less for each added register. Based on this we expect the Cortex M0, with 12 32-bit general purpose registers, or the MSP430, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well.
+
+\section{Constraints}
+
+Refer back to WuKong here. Motivation for using as little memory as possible: we want to keep other components running when a new wuclass arrives.
+
+Go as low as possible. Many things to do on a device, can't spend all on reprogramming.
 
 %TODO: references for M0 and MSP430?
 

@@ -47,13 +47,15 @@ While Java allows us to declare variables as \mycode{final}, this is only a lang
 This is especially important for arrays of constant data, which are common in WSN applications. (constant primitive variables are inlined by the compiler, and constant objects are rare) For example our FFT benchmark contains an array of 256 precalculated sine wave values that would be too expensive for the node to calculate at run-time.
 
 When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a Java array object, and then uses the normal array access instructions to initialise each element individually:
-\begin{minted}{java}
+
+%TODO fix this
+%\begin{minted}[fontsize=\scriptsize]{c}
 sspush(256);newarray;       // create the array
-adup;sconst_0;sconst_0;bastore;  // set index 0
-adup;sconst_1;sconst_3;bastore;  // set index 1
-adup;sconst_2;bspush(6);bastore; // set index 2
+adup;sconst\_0;sconst\_0;bastore;  // set index 0
+adup;sconst\_1;sconst\_3;bastore;  // set index 1
+adup;sconst\_2;bspush(6);bastore; // set index 2
 etc...
-\end{minted}
+%\end{minted}
 
 
 There are two problems with this: (i) the array will occupy scarce RAM; and (ii) initialising array elements using JVM instructions requires 4 instructions per element, resulting in 1669 bytes of code to initialise a 256 byte array.
