@@ -116,12 +116,11 @@ As a second example we consider lossless data compression. Since the radio is ty
 Most of the traditional algorithms considered by they Barr and Asanovi\ ́c are too complex to run on a sensor node, so specialised compression algorithms have been developed for sensor nodes. One such algorithm is LEC \cite{Marcelloni:2009ja}, a simple lossless compression algorithm that can be implemented in only a few lines of code and only needs to maintain a few bytes of state. We will use a rough calculation to show why performance is also a concern for the simpler compression algorithms developed for sensor nodes.
 
 %TODO: check these calculations
-Using the power consumption from the datasheets for the Atmel ATMEGA128 \cite{Atmel:ATMEGA128Datasheet} and Texas Instruments MSP430F1611 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet} CPUs, we determine the energy per cycle. Assuming a node running in active mode at 10 Mhz and 3V, they consume virtually the same power: 4.5mA for the ATMEGA and 5.0mA for the MSP430. Since the two are so close, we will use the lower value of 4.5mA to calculate the energy per cycle:
+Using the power consumption from the datasheets for the Atmel ATMEGA128 \cite{Atmel:ATMEGA128Datasheet} CPU, we determine the energy per cycle. Running at 8 Mhz and 2.7V, the ATMEGA consumes 7.5mA.
 
 \begin{equation}
-	4.5mA * 3V / 10MHz = 1.35nJ / cycle  
+	7.5mA * 2.7V / 8MHz = 2.53nJ / cycle  
 \end{equation}
-
 
 We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 radio.  This radio can also operate at 3V, and consumes between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
 
@@ -129,9 +128,9 @@ We can do a similar calculation to determine the energy per bit for the Chipcon 
   17.4mA * 3V / 250kbps = 208.8nJ / bit
 \end{equation}
 
-As a result, we can spend $208.8/1.35 \approx 155$ cycles per bit to reduce the size of the transmitted data, and still conserve energy.
+As a result, we can spend $208.8/2.53 \approx 83$ cycles per bit to reduce the size of the transmitted data, and still conserve energy.
 
-We implemented the LEC compression algorithm and used it to compress a dataset of 256 16-bit ECG measurements \cite{physionet-ecg-data}, or 4096 bits of data. The results are shown in Table \ref{tbl-lec-energy}. LEC compression reduced the dataset to 1840 bits, saving 2256 bits, or 471 uJ on transmitting the data, at the expense of 131 uJ extra energy spent in the CPU.
+We implemented the LEC compression algorithm and used it to compress a dataset of 256 16-bit ECG measurements \cite{physionet-ecg-data}, or 4096 bits of data. The results are shown in Table \ref{tbl-lec-energy}. LEC compression reduced the dataset to 1840 bits, saving 2256 bits, or 471 uJ on transmitting the data, at the expense of 317 uJ extra energy spent in the CPU.
 
 \begin{table}[H]
 \centering
@@ -141,24 +140,25 @@ We implemented the LEC compression algorithm and used it to compress a dataset o
 \toprule
 %// component                          & energy (uJ) \\
 \midrule
-ATMEGA128 energy per cycle            & 1.35 nJ/cycle  \\
+ATMEGA128 energy per cycle            & 2.53 nJ/cycle  \\
 CC2420 energy per transmitted bit     & 208.8 nJ/cycle  \\
 \midrule
 LEC compression cycles spent          & 97052 cycles\\
 LEC compression bits saved            & 2256 bits \\
 LEC compression cycles per bit        & 43 cycles/bit \\
-~~~ energy expended                   & 131 uJ \\
+~~~ energy expended                   & 246 uJ \\
 ~~~ energy saved                      & 471 uJ \\
-~~~ ratio saved/expended              & 3.6x \\
+~~~ ratio saved/expended              & 1.9x \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-This shows that for this combination of hardware and sensor data, LEC compression is effective in reducing total energy consumption. However the energy saved is only 3.6x more than the extra energy expended on the CPU. This means that if the slowdown from running this in a VM is more than 3.6, and thus time and energy spent on the CPU increases by a factor larger than 3.6, this would tip the balance in favour of just sending the raw data.
+This shows that for this combination of hardware and sensor data, LEC compression is effective in reducing total energy consumption. However the energy saved is only 1.9x more than the extra energy expended on the CPU. This means that if the slowdown from running this in a VM is more than 1.9, and thus time and energy spent on the CPU increases by a factor larger than 1.9, this would tip the balance in favour of just sending the raw data.
 
-Where exactly the break-even point lies depends on many factors. The CPUs and radio used in this calculation are very common in typical sensor nodes, for example the widely used Telos platform \cite{Polastre:2005ut} is based on the CC2420 radio and MSP430F1611 cpu. However many parameters will affect the results. Power consumption is roughly linear in relation to clock frequency, so at the same voltage the cost per cycle will be similar, but at lower frequencies the CPU can operate at a lower voltage which does lower the cost per cycle. The cost per bit depends on many factors including the link quality. A bad link will increase the cost per bit due to retransmissions, but if the node chooses to transmit at a lower power, for example to reduce the number of neighbours and collisions, the cost per bit will be lower than calculated.
+%TODO rewrite now that we don't list the MSP430 anymore
+Where exactly the break-even point lies depends on many factors. The CPUs and radio used in this calculation are very common in typical sensor nodes, for example the widely used Telos platform \cite{Polastre:2005ut} is based on the CC2420 radio and the ATMEGA cpu is found in many Arduinos. However many parameters will affect the results. Power consumption is roughly linear in relation to clock frequency, so at the same voltage the cost per cycle will be similar, but at lower frequencies the CPU can operate at a lower voltage which lowers the cost per cycle. The cost per bit depends on many factors including the link quality. A bad link will increase the cost per bit due to retransmissions, but if the node chooses to transmit at a lower power, for example to reduce the number of neighbours and collisions, the cost per bit will be lower than calculated.
 
-This calculation is only meant to indicate that there are many situations where the slowdown caused by current sensor node VMs will be an issue. For Mercury's feature extraction, the break-even point is around 27x slowdown, while for this case of LEC compression it is at 3.6x. While the exact numbers depend on the application, it is clear that a slowdown of one to two orders of magnitude will affect battery lifetime in many cases.
+This calculation is only meant to indicate that there are many situations where the slowdown caused by current sensor node VMs will be an issue. For Mercury's feature extraction, the break-even point is around 27x slowdown, while for this case of LEC compression it is at only 1.9x. While the exact numbers depend on the application, it is clear that a slowdown of one to two orders of magnitude will affect battery lifetime in many cases.
 
 \paragraph{Ahead of time compilation}
 

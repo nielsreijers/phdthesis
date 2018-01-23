@@ -1,18 +1,70 @@
 \chapter{State of the art}
+This chapter presents the state of the art in Internet of Things and sensor networks relevant to the work in this thesis. It starts with existing work on programming WSN and IoT networks, and the virtual machines developed for them. Next, it discusses proposed ways to improve sensor node VM performance, and ways to guarantee safety on sensor devices.
 
 \section{Programming Internet-of-Things devices}
 
-This challenge can be split into two questions
+This challenge of programming IoT devices can be split into two questions:
 
 \begin{itemize}
-	\item How can we build applications at a higher level, coordinating the behaviour of many devices without having to specify the behaviour from each device's individual perspective.
-	\item Given such a system, how can then control each 
+	\item How can we build applications at a higher level, coordinating the behaviour of many devices without having to specify the behaviour from each device's individual perspective?
+	\item How can we best reprogramme individual nodes safey and efficiently to support these applications?
 \end{itemize}
 
-paste SENSORNETS paper section here.
+This thesis is concerned with the second question, and argues that a virtual machine can be an attractive option in many scenarios. But we will first discuss the higher level question of how to programme WSN/IoT applications and use one of these systems as a motivating example.
+
+\subsection{Programming IoT applications}
+
+
+
+Cornell’s MagnetOS \cite{Liu:2005wsa}, is interesting because it proposes a novel programming model which allows the user to write the application as a single Java application, not explicitly related to individual nodes. The system then automatically partitions the applications into pieces (by default along object boundaries), and places these pieces on nodes in the network in such a way as to minimise energy consumption. However, it requires nodes significantly more powerful than what we expect to find in a typical WSN. We consider this to be a possible future direction for our study if and when all future WSNs are proved to be more powerful.
+
+In Agilla \cite{Fok:2005bh} programs consist of software agents that can move around autonomously in the network. While this allows some behaviours to be expressed in a natural way, the paradigm is very different from conventional languages, and the assembly-like instruction set which is based on the Maté VM \cite{Levis:2002ku} discussed below makes it hard to use.
+
+ADAE \cite{Chang:2010ek}, developed at the IT University of Copenhagen, configures the network according to a policy describing the desired data quality, including fallback options which the system may use in case the ideal situation cannot be achieved. ADAE then dynamically reconfigures the network in response to changing conditions such as node failures, unexpected power drops, or interesting events detected by the network. However, the language used to describe the policy and constraints is hard to use and it’s likely a skilled engineer is still needed to translate the user’s requirements into the constraint optimisation problem ADAE uses as input.
+
+
+LooCI \cite{Hughes:dg} is a component infrastructure middleware for WSNs with standard support for runtime reconfiguration. The LooCI component model supports dynamic binding and interoperability between different hardware platforms, in their case a typical sensor node and the slightly more powerful Sun SPOT, and different languages, with implementations in C and Java. However, it considers component selection to be higher-level services outside of its core functionality.
+%TODO: read LooCI paper again.
+%TODO: use from LooCI somewhere: it uses Java and C
+%TODO: use from LooCI somewhere: it has a nice list of requirements for middleware, including it shouldn't use too much memory and should be fast.
+
+-----------------------------------wip
+
+
+
+
+
+
+
+-----------------------------------old text
+
+There have been several projects which have developed virtual machines for very resource constrained devices in general, or for sensor networks specifically. Designed specifically for WSN, UC Berkeley’s Maté [2] was one of the first to prove VMs can be made to run on sensor nodes. Recently ETH Zürich has developed a more powerful VM called SwissQM [3]. It is based on a small subset of the JVM instruction set, extended with several sensor network specific instructions. In both systems however, the application has to be programmed in very low level, assembly-like language.
+Several VMs for more high level languages like Python or Java have also been developed, which fit on severely resource constrained nodes. Almost all rewrite the original bytecode to their own format and employ various techniques to reduce code size. Some functionality is sacrificed in order to fit on the sensor nodes, for instance reflection is typically not supported.
+The Python-on-a-chip project [4] developed a Python bytecode interpreter small enough to fit on sensor nodes. Requiring 55K of program memory and a recommended 8K of RAM, it fits on many, but not all of the current sensor boards. Darjeeling [5] from Delft University of Technology is able to run modified Java bytecode on sensor nodes, with only minor restrictions. It has no support for floating point, 64-bit datatypes, reflection or synchronised method calls, although the later is not really a restriction since synchronised blocks are supported. Similarly TakaTuka [6] is a slightly more complete and more complex JVM, also running on both AVR and MSP based sensor nodes and offering it’s own debugger. Sun’s Squawk VM [7] is significantly larger than Darjeeling and TakaTuka, but offers full CLDC [8] compliance.
+The opposite approach is taken by NanoVM [9], which takes a minimal approach, trading support for a large number of java opcodes for simplicity and code size. The whole VM fits in the 8K flash of an ATMega8 CPU, leaving 512bytes of EEPROM and 75% of the CPU’s 1K RAM to the application. It’s small size and simple design make it a suitable choice to build our initial prototypes on.
+
+While these technologies allow the application to be developed in a higher level language, and to be deployed on heterogeneous networks, applications still have to be written in an imperative way, and from the node’s perspective. These technologies will serve as a basis on which we build our middleware. We plan to enhance the VM design with the policy framework so that WSN applications can be coded in a very high level manner, similar to a script language for many new application domains.
+Very different approaches are taken by Agilla [10] and MagnetOS [11]. 
+
+On profile related research, sMap [12] provides an attractive and flexible RESTful interface through which we can discover what sensors are available at a certain node and get or set several configuration properties. Although the authors succeeded in dramatically reducing the footprint, it is still relatively resource intensive. It is also limited in the number of properties it exposes, but the idea could easily be expanded to include more diverse node types and configuration options. ZigBee’s approach [13] is less resource intensive, and offers a more complete description of a node and can be applied to more devices. However it is less flexible since it works with a fixed set of device descriptors. In the Z-Wave community, a device class is used to define device profiles. Each profile contains a set of required and recommended command classes. Z-Wave defines a device into a profile which lists the device class and all supported command classes. The profiles are quite generic and fixed.
+
+
+
+There are projects that have addressed some parts of our goals. 
+
+
+
+There have been several projects which have developed virtual machines for very resource constrained devices, either using general purpose languages like Python or Java (Brouwers, Langendoen & Corke, 2009, Aslam, et al., 2008, Harbaum), or specialised for WSN (Levis & Culler, 2002, Müller, Alonso and Kossmann, 2007). These technologies allow the application to be developed in a higher level language on heterogeneous networks. However, applications are still written in an imperative way, and from the node’s perspective.
+Very different approaches are taken by Agilla (Fok, Roman & Lu, 2005) and MagnetOS (Liu, et al., 2005)
+
+
+
+% todo: mention s-map and zigbee profiles (take text from lin et al)
+
 
 \subsection{WuKong}
 Motivating example
+
 
 \section{Sensor node virtual machines}
 Many VMs have been proposed that are small enough to fit on a resource-constrained sensor node. They can be divided into two categories: generic VMs and application-specific VMs, or ASVMs \cite{Culler05} that provide specialised instructions for a specific problem domain. One of the first VMs proposed for sensor networks, Mat\'e \cite{Levis:2002ku}, is an ASVM. It provides single instructions for tasks that are common on a sensor node, so programmes can be very short. Unfortunately they have to be written in a low-level assembly-like language, limiting its target audience. SwissQM \cite{Muller:2007fs} is a more traditional VM, based on a subset of the Java VM, but extended with instructions to access sensors and do data aggregation. VM* \cite{Koshy:2005ww} sits halfway between the generic and ASVM approach. It is a Java VM that can be extended with new features according to application requirements. Unfortunately, it is closed source.
