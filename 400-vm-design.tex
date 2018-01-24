@@ -1,4 +1,4 @@
-\chapter{VM design}
+\chapter{CapeVM}
 
 
 \section{Ahead-of-Time translation}
@@ -13,7 +13,9 @@ Our implementation is based on Darjeeling \cite{Brouwers:2009cj}, a Java VM for 
 
 % TODO: clarify two terms: compile-time (javac/proguard/infuser) and translation-time (the VM), and scan the whole text to make sure they're used consistently.
 
-The process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}. Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes, which are optimised by ProGuard \cite{proguard}. The optimised Java classes are then transformed into Darjeeling's own format, called an 'infusion'. For details of this transformation we refer to the Darjeeling paper \cite{Brouwers:2009cj}. Here it is sufficient to know that the bytecode is modified to make it more suitable for execution on a tiny device, for example by adding 16-bit versions of most operations, but the result remains very similar to standard JVM bytecode. It is also important to note that no knowledge of the target platform is used in this transformation, so the result is still platform independent. This infusion is then sent to the node, where it is translated to native AVR code at load time.
+The process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}.
+
+Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes, which are optimised by ProGuard \cite{proguard}. The optimised Java classes are then transformed into Darjeeling's own format, called an 'infusion'. For details of this transformation we refer to the Darjeeling paper \cite{Brouwers:2009cj}. Here it is sufficient to know that the bytecode is modified to make it more suitable for execution on a tiny device, for example by adding 16-bit versions of most operations, but the result remains very similar to standard JVM bytecode. It is also important to note that no knowledge of the target platform is used in this transformation, so the result is still platform independent. This infusion is then sent to the node, where it is translated to native AVR code at load time.
 
 We made several modifications to Darjeeling's infuser and bytecode format to support our AOT compiler and improve performance. These changes will be introduced in more detail in the following sections, but for completeness we also list them here:
 
@@ -84,10 +86,7 @@ JVM & AOT compiler & AVR & cycles \\
 \end{tabular}
 \end{table}
 
-\subsubsection{Peephole optimisation}
-From Table \ref{tbl-basic-translation} it is clear that this approach results in many unnecessary push and pop instructions. Since the JVM is a stack-based VM, each instruction must obtain its operands from the stack and push any result back onto it. As a result, almost half the instructions are push or pop instructions.
 
-To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:2012thesis}. The compilation process results in many push instructions that are immediately followed by a pop. If they target the same register, they have no effect and are removed. If the source and destination registers differ, the two instructions are replaced by a move. The result is shown in the third column of Table \ref{tbl-basic-translation}. Two push/pop pairs have been removed, and one has been replaced by a move.
 
 \subsubsection{Branches}
 Forward branches pose a problem for our direct translation approach since the target address is not yet known. A second problem is that on the ATmega, a branch may take 1 to 3 words, depending on the distance to the target, so it is also not known how much space should be reserved for a branch.
@@ -99,14 +98,13 @@ There is still the matter of the different sizes a branch may take. We could sim
 This is an example of something we often see: an optimisation may take a few hundred bytes to implement, but its usefulness may depend on the characteristics of the code being run. In this work we usually decided to implement these optimisations, since they often also result in smaller generated code.
 
 \subsection{Darjeeling split-stack architecture}
-\label{sec-darjeeling-split-architecure}
 \begin{figure}[]
   \includegraphics[width=0.5\linewidth]{object-and-stack-frame-layout.eps}
   \caption{Object and stack frame layout}
   \label{fig-object-and-stack-frame-layout}
 \end{figure}
 
-In Darjeeling, reference and integer values are separated throughout the VM. When the garbage collection runs, it needs to determine which stack values, local variables, static variables and object fields are references. To handle this efficiently, Darjeeling splits references and integers in all these cases, as shown in Figure \ref{fig-object-and-stack-frame-layout}.
+% todo explain one stack for ints on the native stack and another for refs in the frame
 
 In our AOT compiler we use the native stack for the JVM integer operand stack, while space for the reference stack is reserved in the stack frame. This uses less memory than having the integer stack in the stack frame, since we need to reserve space for the maximum stack depth in the frame, which is often much lower for the reference stack than for the integer stack. We use the AVR's X register as a stack pointer for the reference stack.
 
@@ -115,9 +113,11 @@ The AVR family of CPUs is widely used in low power embedded systems. We implemen
 
 The ATmega128 has 32 8-bit registers. We ran several experiments where we restrict the number of registers our VM may use. As is often the case with caches, we found the first few available registers to have the largest impact, while the added improvement gets less for each added register. Based on this we expect the Cortex M0, with 12 32-bit general purpose registers, or the MSP430, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well.
 
+%TODO refer to evaluation 8/16/32 bit and number of regs
+
 \section{Constraints}
 
-Refer back to WuKong here. Motivation for using as little memory as possible: we want to keep other components running when a new wuclass arrives.
+Refer back to WuKong here (Section \ref{sec-state-of-the-art-wukong}. Motivation for using as little memory as possible: we want to keep other components running when a new wuclass arrives.
 
 Go as low as possible. Many things to do on a device, can't spend all on reprogramming.
 

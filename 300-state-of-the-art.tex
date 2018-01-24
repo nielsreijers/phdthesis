@@ -1,7 +1,7 @@
 \chapter{State of the art}
 This chapter presents the state of the art in Internet of Things and sensor networks relevant to the work in this thesis. It starts with existing work on programming WSN and IoT networks, and the virtual machines developed for them. Next, it discusses proposed ways to improve sensor node VM performance, and ways to guarantee safety on sensor devices.
 
-\section{Programming Internet-of-Things devices}
+\section{Programming WSN and IoT devices}
 
 This challenge of programming IoT devices can be split into two questions:
 
@@ -12,71 +12,123 @@ This challenge of programming IoT devices can be split into two questions:
 
 This thesis is concerned with the second question, and argues that a virtual machine can be an attractive option in many scenarios. But we will first discuss the higher level question of how to programme WSN/IoT applications and use one of these systems as a motivating example.
 
-\subsection{Programming IoT applications}
+Initially, many WSN applications were built directly on top of the hardware or on some minimum operating system, such as TinyOS \cite{Levis:2004ws}. This results in applications being programmed from the individual node’s perspective, rather than allowing the application to express globally what it wants from the sensor network, which makes it hard to reason about the global behaviour, especially as the number of devices and tasks increases.
 
+Therefore, systems have been developed that make it easier for the developer to control the potentially larger number of heterogeneous nodes. Some of these are centralised, were the initiative of the application is with some central host, and devices are loaded with a runtime that allows the host to control them. Other systems are more distributed, where the application is split into components that are deployed onto nodes and from there operate more autonomously, only to receive further guidance from the host where necessary.
 
-
-Cornell’s MagnetOS \cite{Liu:2005wsa}, is interesting because it proposes a novel programming model which allows the user to write the application as a single Java application, not explicitly related to individual nodes. The system then automatically partitions the applications into pieces (by default along object boundaries), and places these pieces on nodes in the network in such a way as to minimise energy consumption. However, it requires nodes significantly more powerful than what we expect to find in a typical WSN. We consider this to be a possible future direction for our study if and when all future WSNs are proved to be more powerful.
-
-In Agilla \cite{Fok:2005bh} programs consist of software agents that can move around autonomously in the network. While this allows some behaviours to be expressed in a natural way, the paradigm is very different from conventional languages, and the assembly-like instruction set which is based on the Maté VM \cite{Levis:2002ku} discussed below makes it hard to use.
+In the first category fall systems like sMap \cite{DawsonHaggerty:2010eo}, which provides an attractive and flexible RESTful interface through which we can discover what sensors are available at a certain node and get or set several configuration properties. Although the authors succeeded in dramatically reducing the footprint, it is still relatively resource intensive. It is also limited in the number of properties it exposes, but the idea could easily be expanded. TinyDB \cite{Madden:2005tj} makes an entire network of sensor nodes available through a SQL-like query language.
 
 ADAE \cite{Chang:2010ek}, developed at the IT University of Copenhagen, configures the network according to a policy describing the desired data quality, including fallback options which the system may use in case the ideal situation cannot be achieved. ADAE then dynamically reconfigures the network in response to changing conditions such as node failures, unexpected power drops, or interesting events detected by the network. However, the language used to describe the policy and constraints is hard to use and it’s likely a skilled engineer is still needed to translate the user’s requirements into the constraint optimisation problem ADAE uses as input.
 
+While in the previous two systems, applications run on a centralised host and simply control the nodes in the network, in Agilla \cite{Fok:2005bh} programmes are more distributed and consists of software agents that can move around autonomously in the network. While this allows some behaviours to be expressed in a natural way, the paradigm is very different from conventional languages, and the assembly-like instruction set which is based on the Maté VM \cite{Levis:2002ku} discussed below makes it hard to use.
 
 LooCI \cite{Hughes:dg} is a component infrastructure middleware for WSNs with standard support for runtime reconfiguration. The LooCI component model supports dynamic binding and interoperability between different hardware platforms, in their case a typical sensor node and the slightly more powerful Sun SPOT, and different languages, with implementations in C and Java. However, it considers component selection to be higher-level services outside of its core functionality.
+
+Cornell’s MagnetOS \cite{Liu:2005wsa}, proposes a novel programming model which allows the user to write the application as a single Java application, not explicitly related to individual nodes. The system then automatically partitions the applications into pieces (by default along object boundaries), and places these pieces on nodes in the network in such a way as to minimise energy consumption. However, it requires nodes significantly more powerful than what we expect to find in a typical WSN. We consider this to be a possible future direction for our study if and when all future WSNs are proved to be more powerful.
+
 %TODO: read LooCI paper again.
 %TODO: use from LooCI somewhere: it uses Java and C
 %TODO: use from LooCI somewhere: it has a nice list of requirements for middleware, including it shouldn't use too much memory and should be fast.
 
------------------------------------wip
-
-
-
-
-
-
-
------------------------------------old text
-
-There have been several projects which have developed virtual machines for very resource constrained devices in general, or for sensor networks specifically. Designed specifically for WSN, UC Berkeley’s Maté [2] was one of the first to prove VMs can be made to run on sensor nodes. Recently ETH Zürich has developed a more powerful VM called SwissQM [3]. It is based on a small subset of the JVM instruction set, extended with several sensor network specific instructions. In both systems however, the application has to be programmed in very low level, assembly-like language.
-Several VMs for more high level languages like Python or Java have also been developed, which fit on severely resource constrained nodes. Almost all rewrite the original bytecode to their own format and employ various techniques to reduce code size. Some functionality is sacrificed in order to fit on the sensor nodes, for instance reflection is typically not supported.
-The Python-on-a-chip project [4] developed a Python bytecode interpreter small enough to fit on sensor nodes. Requiring 55K of program memory and a recommended 8K of RAM, it fits on many, but not all of the current sensor boards. Darjeeling [5] from Delft University of Technology is able to run modified Java bytecode on sensor nodes, with only minor restrictions. It has no support for floating point, 64-bit datatypes, reflection or synchronised method calls, although the later is not really a restriction since synchronised blocks are supported. Similarly TakaTuka [6] is a slightly more complete and more complex JVM, also running on both AVR and MSP based sensor nodes and offering it’s own debugger. Sun’s Squawk VM [7] is significantly larger than Darjeeling and TakaTuka, but offers full CLDC [8] compliance.
-The opposite approach is taken by NanoVM [9], which takes a minimal approach, trading support for a large number of java opcodes for simplicity and code size. The whole VM fits in the 8K flash of an ATMega8 CPU, leaving 512bytes of EEPROM and 75% of the CPU’s 1K RAM to the application. It’s small size and simple design make it a suitable choice to build our initial prototypes on.
-
-While these technologies allow the application to be developed in a higher level language, and to be deployed on heterogeneous networks, applications still have to be written in an imperative way, and from the node’s perspective. These technologies will serve as a basis on which we build our middleware. We plan to enhance the VM design with the policy framework so that WSN applications can be coded in a very high level manner, similar to a script language for many new application domains.
-Very different approaches are taken by Agilla [10] and MagnetOS [11]. 
-
-On profile related research, sMap [12] provides an attractive and flexible RESTful interface through which we can discover what sensors are available at a certain node and get or set several configuration properties. Although the authors succeeded in dramatically reducing the footprint, it is still relatively resource intensive. It is also limited in the number of properties it exposes, but the idea could easily be expanded to include more diverse node types and configuration options. ZigBee’s approach [13] is less resource intensive, and offers a more complete description of a node and can be applied to more devices. However it is less flexible since it works with a fixed set of device descriptors. In the Z-Wave community, a device class is used to define device profiles. Each profile contains a set of required and recommended command classes. Z-Wave defines a device into a profile which lists the device class and all supported command classes. The profiles are quite generic and fixed.
-
-
-
-There are projects that have addressed some parts of our goals. 
-
-
-
-There have been several projects which have developed virtual machines for very resource constrained devices, either using general purpose languages like Python or Java (Brouwers, Langendoen & Corke, 2009, Aslam, et al., 2008, Harbaum), or specialised for WSN (Levis & Culler, 2002, Müller, Alonso and Kossmann, 2007). These technologies allow the application to be developed in a higher level language on heterogeneous networks. However, applications are still written in an imperative way, and from the node’s perspective.
-Very different approaches are taken by Agilla (Fok, Roman & Lu, 2005) and MagnetOS (Liu, et al., 2005)
-
-
-
-% todo: mention s-map and zigbee profiles (take text from lin et al)
-
-
 \subsection{WuKong}
-Motivating example
+\label{sec-state-of-the-art-wukong}
+A final example that we will look at a bit more detail at is WuKong \cite{Reijers:2013ut, Lin:2013dc}.
+
+
+\begin{figure}[]
+  \centering
+  \includegraphics[width=0.8\linewidth]{wukong-fbp.png}
+  \caption{Example WuKong flow based programme}
+  \label{fig-wukong-fbp}
+\end{figure}
+
+
+Applications in WuKong are written in the form of a flow based programme, an example of which is shown in Figure \ref{fig-wukong-fbp}. Components are called WuObjects, and are instances of WuClasses. Each WuClass has a number of input and output properties. For example, the Temperature Sensor WuClass has a single 'output' property, while the Heater has a single 'on/off' property.
+
+When deploying an application, the host, called 'master' in WuKong, will first discover the available resources in the network and then try to find a node to deploy each component on.
+
+For a node's hardware components, the node creates WuObjects to represent them at startup, so the master can discover the sensors and actuators available in the network. When deploying the application, the master may use a hardware WuObject by connecting its properties.
+
+Software components, like the Threshold or And\_Gate in the example, can be written in either C or Java. A node may have native C implementations built in for a number of commonly used classes from the WuKong standard library, which it will advertise during the discovery phase. If the master cannot find a native implementation of a required class, it may use a Java version instead, which is slower, but more flexible since it can be deployed as part of the application. To support this, the WuKong middleware contains a version of the Darjeeling JVM \cite{Brouwers:2009cj}.
+
+An WuClass is defined by  and two C functions or Java methods:
+\begin{itemize}
+	\item Its list of properties
+	\item A \mycode{setup()} function, called once when an object is created
+	\item A \mycode{update()} function, called (i) periodically, for example to sample a sensor, or (ii) when one of the input properties changes value, to compute a new output value or drive an actuator
+\end{itemize}
+
+The WuKong middleware takes care of propagating property changes along the links drawn in the FBP. For example, if in Figure \ref{fig-wukong-fbp} the output of the Or\_Gate changes, the new output value is automatically propagated to the Heater's on/off property, and the Heater's \mycode{update()} function is called. An application in WuKong is defined by a number of compact tables, describing the components and links between them, and optionally a number of Java WuClasses.
+
+In WuKong's vision, the master dynamically manages the network. A node may be used in multiple applications, and it's tasks may change dynamically while the application is running if the master decides to reconfigure the network, for example in response to failure \cite{Su:2014uf} or because network conditions change.
 
 
 \section{Sensor node virtual machines}
-Many VMs have been proposed that are small enough to fit on a resource-constrained sensor node. They can be divided into two categories: generic VMs and application-specific VMs, or ASVMs \cite{Culler05} that provide specialised instructions for a specific problem domain. One of the first VMs proposed for sensor networks, Mat\'e \cite{Levis:2002ku}, is an ASVM. It provides single instructions for tasks that are common on a sensor node, so programmes can be very short. Unfortunately they have to be written in a low-level assembly-like language, limiting its target audience. SwissQM \cite{Muller:2007fs} is a more traditional VM, based on a subset of the Java VM, but extended with instructions to access sensors and do data aggregation. VM* \cite{Koshy:2005ww} sits halfway between the generic and ASVM approach. It is a Java VM that can be extended with new features according to application requirements. Unfortunately, it is closed source.
+Many VMs have been proposed that are small enough to fit on a resource-constrained sensor node. They can be divided into two categories: generic VMs and application-specific VMs, or ASVMs \cite{Culler05} that provide specialised instructions for a specific problem domain. As an example, designed specifically for WSN, Mat\'e \cite{Levis:2002ku} was one of the first to prove VMs can be made to run on sensor nodes. It provides single instructions for tasks that are common on a sensor node, so programmes can be very short.  
 
-Several generic VMs have also been developed, allowing the programmer to use general purpose languages like Java, Python, or even LISP \cite{Harbaum, Brouwers:2009cj, Aslam:2008, Evers:2010ur}. The smallest official Java standard is the Connected Device Limited Configuration \cite{CLDC}, but since it targets devices with at least a 16 or 32-bit CPU and 160-512KB of flash memory available, it is still too large for most sensor nodes. The available Java VMs for sensor nodes all offer some subset of the standard Java functionality, occupying different points in the tradeoff between the features they provide, and the resources they require.
+SwissQM \cite{Muller:2007fs} is a more traditional and more powerful VM, based on a subset of the Java VM, but extended with sensor network specific instructions to access sensors and do data aggregation. In both systems however, the application has to be programmed in very low level, assembly-like language, limiting their target audience.
+
+VM* \cite{Koshy:2005ww} sits halfway between the generic and ASVM approach. It is a Java VM that can be extended with new features according to application requirements. Unfortunately, it is closed source.
+
+Several generic VMs for high level languages like Python or Java have also been developed, which fit on severely resource constrained nodes. Almost all rewrite the original bytecode to their own format and employ various techniques to reduce code size. Some functionality is sacrificed in order to fit on the sensor nodes, for instance reflection or floating point support are typically not supported.
+
+The Python-on-a-chip project \cite{python-on-a-chip} developed a Python bytecode interpreter small enough to fit on sensor nodes. Requiring 55K of programme memory and a recommended 8K of RAM, it fits on many, but not all of the current sensor boards. MicroPython \cite{micropython} requires slightly more hardware at 256KB programme and 16KB RAM, but has it's own hardware platform and runs Python 3.
+
+The smallest official Java standard is the Connected Device Limited Configuration \cite{CLDC}, but since it targets devices with at least a 16 or 32-bit CPU and 160-512KB of flash memory available, it is still too large for most sensor nodes. The available Java VMs for sensor nodes all offer some subset of the standard Java functionality, occupying different points in the tradeoff between the features they provide, and the resources they require.
+
+Darjeeling \cite{Brouwers:2009cj} from Delft University of Technology is able to run modified Java bytecode on sensor nodes, with only minor restrictions. It has no support for floating point, 64-bit datatypes, reflection or synchronised method calls, although the later is not really a restriction since synchronised blocks are supported. Similarly TakaTuka \cite{Aslam:2008} is a slightly more complete and more complex JVM, also running on both AVR and MSP based sensor nodes and offering it’s own debugger. Another unique property is it's ability to reduce garbage collection cost by static code analysis. Whenever the compiler can determine an object can be safely discarded at a certain point, it annotates the bytecode to tell the VM to do so, thus freeing up memory earlier and reducing the number of times the garbage collector has to run. Sun’s Squawk VM \cite{Shaylor:2003ws} is significantly larger than Darjeeling and TakaTuka, but offers full CLDC compliance.
+
+The opposite approach is taken by NanoVM \cite{Harbaum}, which takes a minimal approach, trading support for a large number of java opcodes for simplicity and code size. The whole VM fits in the 8K flash of an ATMega8 CPU, leaving 512bytes of EEPROM and 75\% of the CPU’s 1K RAM to the application.
+
+Finally, SensorScheme \cite{Evers:2010ur} implements a fully functioning LISP interpreter in under 41KB.
+
+\subsection{Darjeeling}
+Since our VM is based on Darjeeling, we will examine it in more detail in this section.
+
+\paragraph{Split VM architecture}
+\begin{figure}[]
+	\centering
+	\includegraphics[width=0.6\linewidth]{darjeeling-infusion-process}
+	\caption{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
+	\label{fig-darjeeling-infusion-process}
+\end{figure}
+Like most other sensor node JVMs, it uses a \emph{split VM architecture} \cite{Simon:2006wd}. The actual virtual machine running on the node does not use standard JVM class files, but these class files first have to be transformed by an offline tool into a format more suitable for a sensor node. In Darjeeling's case this tool is called the \emph{infuser}, which takes several Java classes and statically links them into a single \emph{infusion}.
+
+The infuser changes the bytecode in several ways, replacing named references by a numbering scheme, so that the constant strings with class and method names can be removed from the constant pool, and flattening the Java classes into a list of statically entities. Infusions are typically libraries, such as the \mycode{java.lang} base library, networking protocols, or the application. An infusion can reference code in another infusion using header files, created during the infusion process that allow it to find the numbered identifiers of classes and methods in the referenced infusion. This is shown in Figure \ref{fig-darjeeling-infusion-process}.
+
+\paragraph{16-bit architecture}
+\begin{figure}[]
+	\centering
+	\includegraphics[width=0.6\linewidth]{32bit-vs-16bit-stack}
+	\caption{Unused memory for 32 and 16-bit stack width}
+	\label{fig-32bit-vs-16bit-stack}
+\end{figure}
+
+Besides statically linking classes, the infuser also makes several changes to the bytecode format. Since references on sensor nodes are usually 16-bit, and the use of 8-bit and 16-bit integer variable are commonly used in sensor node code to save memory, storing all data in 32-bit slots as the JVM does would lead to significant overhead, as shown in Figure \ref{fig-32bit-vs-16bit-stack}. Therefore, Darjeeling stack and variable slots are 16-bit wide, using two slots for 32-bit ints, similar to how the normal JVM uses two 32-bit slots for 64-bit longs. This means Darjeeling's bytecode also introduces 16-bit versions of many opcodes, for example \mycode{SADD} adds two 16-bit shorts, while \mycode{IADD} adds two 32-bit ints. The infuser analyses the type of expressions, and replaces the 32-bit instructions found in normal JVM bytecode with the 16-bit variants where possible.
 
 
+
+\paragraph{Double-ended stack}
+\begin{figure}[]
+	\centering
+	\includegraphics[width=0.6\linewidth]{darjeeling-split-stack}
+	\caption{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
+	\label{fig-darjeeling-split-stack}
+\end{figure}
+
+A second important modification is that Darjeeling splits the operand stack into separate reference and integer stacks, as shown in Figure \ref{fig-darjeeling-split-stack}. Each stack frame still allocates the same amount of space for it's operand stack, but Darjeeling places references on one side, and integers on the other. At the expense of having to keep track of two operand stack pointer, this reduces the complexity of the garbage collector significantly. When the garbage collector runs, it needs to find the \emph{root set} of all live objects, which includes objects with references on the stack but not stored elsewhere. Since the type of the values on the operand stack changes continuously, it would be hard to determine which values are references and which are integers in a single stack, but using Darjeeling's split stack design, it can simply place all values on the reference stack in the root set. For the same reason, Darjeeling also groups the slots allocated for local, static and instance variables into an integer and reference group.
+
+The necessary modifications to the byte code are taken care of by the infuser. Generic stack instructions such as \mycode{pop} are replaced by distinct versions for the integer and reference stack: \mycode{ipop} and \mycode{apop}.
+
+For details of this transformation we refer to the Darjeeling paper \cite{Brouwers:2009cj}. Here it is sufficient to know that the bytecode is modified to make it more suitable for execution on a tiny device, for example by adding 16-bit versions of most operations, but the result remains very similar to standard JVM bytecode. It is also important to note that no knowledge of the target platform is used in this transformation, so the result is still platform independent. This infusion is then sent to the node, where it is translated to native AVR code at load time.
+
+\paragraph{Limitations}
+Darjeeling implements a significant subset of Java, but like all sensor node JVMs needs to make some sacrifices to scale down to sensor node size. Specifically, it does not support the 64-bit \mycode{long} datatype or floating point variables. It does not support reflection, since the infusion process drops the necessary type information from its class files to significantly reduce their size. And it does not support the \mycode{synchronized} modifier on static methods.
 
 \section{Performance}
-Only a few papers describing sensor node VMs contain detailed performance measurements. TinyVM \cite{Hong:2009gc} reports a slowdown between 14x and 72x compared to native C, for a set of 9 benchmarks. DVM \cite{Balani:2006} has different versions of the same benchmark, where the fully interpreted version is 108x slower than the fully native version. Ellul reports measurements on the TakaTuka VM \cite{Aslam:2008, Ellul:2012thesis} where the VM is 230x slower than native code, and consumes 150x as much energy. SensorScheme \cite{Evers:2010ur} is up to 105x slower. Finally, Darjeeling \cite{Brouwers:2009cj} reports between 30x and 113x slowdown. Since performance depends on many factors, it is hard to compare these numbers directly. But the general picture is clear: current interpreters are one to two orders of magnitude slower than native code.
+While many different VMs have been published, only a few papers describing sensor node VMs contain detailed performance measurements, shown earlier in Table \ref{tbl-slowdown-for-sensornode-vms}. Darjeeling \cite{Brouwers:2009cj} reports between 30x and 113x slowdown for 3 benchmarks in 16-bit and 32-bit variations, compared to the native C equivalent. Ellul \cite{Ellul:2012thesis} reports measurements on the TakaTuka VM \cite{Aslam:2008} where the VM is 230x slower than native code, and consumes 150x as much energy. TinyVM \cite{Hong:2009gc} is between 14x and 72x slower than C, for a set of 9 benchmarks. DVM \cite{Balani:2006} has different versions of the same benchmark, where the fully interpreted version is 108x slower than the fully native version. Finally, SensorScheme \cite{Evers:2010ur} is up to 105x slower. Since performance depends on many factors, it is hard to compare these numbers directly. But the general picture is clear: current interpreters are one to two orders of magnitude slower than native code.
 
-Translating bytecode to native code to improve performance has been a common practice for many years. A wide body of work exists exploring various approaches, either offline, ahead-of-time  or just-in-time. One common offline method is to first translate the Java code to C as an intermediate language, and take advantage of the high quality C compilers available \cite{Muller:1997}. Courbot et al. describe a different approach, where code size is reduced by partly running the application before it is loaded onto the node, allowing them to eliminate code that is only needed during initialisation \cite{Courbot:2010}. Although the initialised objects are translated to C structures that are compiled and linked into a single image, the bytecode is still interpreted. While in general we can produce higher quality code when compiling offline, doing so sacrifices key advantages of using a VM.
+Translating bytecode to native code to improve performance has been a common practice for many years. A wide body of work exists exploring various approaches, either offline, ahead-of-time  or just-in-time. One common offline method is to first translate the Java code to C as an intermediate language, and take advantage of the high quality C compilers available \cite{Dean:1996wb, Muller:1997}. Courbot et al. describe a different approach, where code size is reduced by partly running the application before it is loaded onto the node, allowing them to eliminate code that is only needed during initialisation \cite{Courbot:2010}. Although the initialised objects are translated to C structures that are compiled and linked into a single image, the bytecode is still interpreted. While in general we can produce higher quality code when compiling offline, doing so sacrifices key advantages of using a VM.
 
 Hsieh et al. describe an early ahead-of-time compiling desktop Java VM \cite{Hsieh:1996cy}, focussing on translating the JVM's stack-based architecture to a register based one. In the Japale\~no VM, Alpern et al. take an approach that holds somewhere between AOT and JIT compilation \cite{Alpern:1999}. The VM compiles all code to native code before execution, but can choose from two different compilers to do so. A fast baseline compiler simply mimics the Java stack, but either before or during run-time, a slower optimising compiler may be used to speed up critical methods.
 
@@ -84,9 +136,27 @@ Since JIT compilers work at run-time, much effort has gone into making the compi
 
 Given our extreme size constraints - ideally we only want to use in the order of 100 bytes of RAM to allow our approach to be useful on a broad range of devices, and leave ample space for other tasks on the device - almost all AOT and JIT techniques found in literature require too much resources. Indeed, some authors suggest sensor nodes are too restricted to make AOT or JIT compilation feasible \cite{Aslam:2011thesis, Wirjawan:2008}.
 
-
+\subsection{AOT compilation for sensor nodes}
 % NOTE: the 811\% here comes from the manual optimisation table. since we calculate overhead slightly different there to be able to split it into 3 components, the total in that table is 811 instead of 815 in the trace output text file.
-On the desktop, VM performance has been studied extensively, but for sensor node VMs this aspect has been mostly ignored. To the best of our knowledge AOT compilation on a sensor node has only been tried by Ellul and Martinez \cite{Ellul:2010iw}, and our work builds on their approach. They improve performance considerably compared to the interpreters, but there is still much room for improvement. Using the standard CoreMark benchmark, their approach generates code that is 811\% slower and 245\% larger than optimised native C. While the reduced throughput may be acceptable for some applications, there are two other reasons why it is important to improve on these results: the loss of performance results in an equivalent increase in cpu power consumption, thus reducing battery life. More importantly, the increased size of the compiled code reduces the amount of code we can load onto a node. Given that flash memory is already restricted, this is a major sacrifice to make when adopting AOT on sensor nodes.
+On the desktop, VM performance has been studied extensively, but for sensor node VMs this aspect has been mostly ignored. To the best of our knowledge AOT compilation on a sensor node has only been tried by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}, and our work builds on their approach.
+
+Their approach is to translate JVM bytecode in a single pass, as it is being received by the node, and write native code to flash memory instead of the JVM bytecode. The translation process is very straightforward: each JVM bytecode instruction is mapped to a fixed sequence of native instructions that implement it.
+
+
+They use the native st
+
+\subsubsection{Peephole optimisation}
+From Table \ref{tbl-basic-translation} it is clear that this approach results in many unnecessary push and pop instructions. Since the JVM is a stack-based VM, each instruction must obtain its operands from the stack and push any result back onto it. As a result, almost half the instructions are push or pop instructions.
+
+To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:2012thesis}. The compilation process results in many push instructions that are immediately followed by a pop. If they target the same register, they have no effect and are removed. If the source and destination registers differ, the two instructions are replaced by a move. The result is shown in the third column of Table \ref{tbl-basic-translation}. Two push/pop pairs have been removed, and one has been replaced by a move.
+
+% TODO: describe their approach with some example
+% TODO: explain this allows us to get rid of interpreter loop overhead
+% TODO: read \cite{Suganuma:2000vl} and possibly quote for stack technique, see Joshua p. 59
+
+
+\subsubsection{Performance}
+They improve performance considerably compared to the interpreters, but there is still much room for improvement. Using the standard CoreMark benchmark, their approach generates code that is 811\% slower and 245\% larger than optimised native C. While the reduced throughput may be acceptable for some applications, there are two other reasons why it is important to improve on these results: the loss of performance results in an equivalent increase in cpu power consumption, thus reducing battery life. More importantly, the increased size of the compiled code reduces the amount of code we can load onto a node. Given that flash memory is already restricted, this is a major sacrifice to make when adopting AOT on sensor nodes.
 
 \subsection{Effect on energy consumption}
 

@@ -20,6 +20,10 @@ In this chapter we discuss the most pressing issues with current sensor node VMs
 	\item Not being able to allocate on the stack is a problem because we need to return two values from encode: bsi and bsi\_length. We can put them in an object, but that's slow.
 \end{itemize}
 
+\section{Cost of using Java}
+List all the drawbacks of using Java here.
+Refer back to Suganuma, who on page two mentions Java code typically results in many short method calls. This is bad for us.
+
 \section{A tailored standard library}
 \label{sec-std-lib}
 \begin{table*}
@@ -148,6 +152,8 @@ As an example, one function in the CoreMark benchmark uses two small local array
 
 \textbf{Possible solutions}
 We suspect it may be possible to avoid this cost in many cases by extending the VM's memory model to allow us to allocate objects and arrays on the stack under certain conditions. We know from TakaTuka's experience that there are many cases where we can determine at compile time that an object can be garbage collected at a certain point \cite{aslam2010optimized}.
+
+% TODO Suganuma seems to propose something similar on page 191 just before concluding remarks
 
 If the compiler can determine an object can be freed at the end of the method in which it was created, we can allocate space for it in the method's stack frame. This avoids the overhead of allocating on the heap, and the occasional garbage collection run triggered by this.
 
