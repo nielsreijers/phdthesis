@@ -42,6 +42,7 @@ A second advantage is that a VM can offer a safe execution environment, preventi
 Since the early days of WSN research, many sensor node VMs, some based on Java and .Net, have also been developed. They manage to pack an impressive set of features on such a limited platform, but almost all sacrifice performance.
 
 \subsection{Performance}
+\label{sec-introduction-performance}
 The VMs for which we have found concrete performance data are shown in Table \ref{tbl-slowdown-for-sensornode-vms}. The best case, the 'only' 4x slowdown in one of SensorScheme's benchmarks, is a tiny benchmark that just calls a random number generator, so this only tells us a function call costs about 3 times longer than generating the random number. Apart from this single data point, all interpreting VM are between one and two orders of magnitude slower than native code.
 
 \begin{table*}[]
