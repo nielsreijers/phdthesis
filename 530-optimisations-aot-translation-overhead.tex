@@ -25,16 +25,16 @@ POP  Rd
  \end{minted}
 \end{listing}
 
-In this case the pair can be eliminated if \mycode{Rs} == \mycode{Rd}, otherwise it is replaced by a '\mycode{mov Rd, Rs}'. Two push/pop pairs remain in Table \ref{tbl-basic-translation}. The pair in instructions 5 and 7 pops to register R2. Since instruction 6 does not use register R2, we can safely replace this pair with a direct move. In contrast, the pair in instructions 1 and 3 cannot be optimised since the value is popped into register R1, which is also used by instruction 2.
+In this case the pair can be eliminated if \mycode{Rs} == \mycode{Rd}, otherwise it is replaced by a '\mycode{mov Rd, Rs}'. Two push/pop pairs remained in our earlier example Table \ref{tbl-basic-translation}. For the pair in instructions 5 and 7, the value is popped into register R2. Since instruction 6 does not use register R2, we can safely replace this pair with a direct move. In contrast, the pair in instructions 1 and 3 cannot be optimised since the value is popped into register R1, which is also used by instruction 2.
 
 % This optimisation adds 278 bytes to the optimiser, since it now needs to understand the bytecode well enough to determine which registers are being used.
 
 \subsection{Simple stack caching}
 \label{sec-optimisations-simple-stack-caching}
 \input{531-tbl-optimisations-stackcaching}
-The improved peephole optimiser can remove part of the type 1 overhead, but still many cases remain where it cannot eliminate the push/pop instructions. We use a form of stack caching \cite{Ertl:1995dv} to eliminate most of the remaining push/pop overhead. Stack caching is not a new technique, but the tradeoffs are very different depending on the scenario it is applied in, and it turns out to be exceptionally well suited for a sensor node AOT compiler:
+The improved peephole optimiser can remove part of the type 1 overhead, but still many cases remain where it cannot eliminate the push/pop instructions. We use a form of stack caching \cite{Ertl:1995dv} to eliminate most of the remaining push/pop overhead. Stack caching is not a new technique, originally proposed for Forth interpreters in 1995. But the tradeoffs involved are very different depending on the scenario it is applied in, and it turns out to be exceptionally well suited for a sensor node AOT compiler:
 
-First, the VM in the original paper is an interpreter, which means the stack cache has to be very lightweight, otherwise the overhead from managing it at run-time will outweigh the time saved by reducing memory accesses. Since we only use the cache state at load time, this restriction does not apply for an AOT compiler and we can afford to spend more time managing the cache. Second, the simplicity of the approach means it requires very little memory: only 11 bytes of RAM and less than 1KB of code more than the peephole optimiser.
+First, the VM in the original paper is an interpreter, which means the stack cache has to be very lightweight, or the overhead from managing it at run-time will outweigh the time saved by reducing memory accesses. Since we only need to keep track of the cache state at load time, this restriction does not apply for an AOT compiler and we can afford to spend more time managing it. Second, the simplicity of the approach means it requires very little memory: only 11 bytes of RAM and less than 1KB of code more than the peephole optimiser.
 
 The basic idea of stack caching is to keep the top elements of the stack in registers instead of main memory. We add a cache state to our VM to keep track of which registers are holding stack elements. For example, if the top two elements are kept in registers, an ADD instruction does not need to access main memory, but can simply add these registers, and update the cache state. Values are only spilled to memory when all registers available for stack caching are in use.
 

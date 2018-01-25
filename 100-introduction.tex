@@ -126,12 +126,12 @@ Using the power consumption from the datasheets for the Atmel ATMEGA128 \cite{At
 We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 radio.  This radio can also operate at 3V, and consumes between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
 
 \begin{equation}
-  17.4mA * 3V / 250kbps = 208.8nJ / bit
+  17.4mA * 2.7V / 250kbps = 187.9nJ / bit
 \end{equation}
 
-As a result, we can spend $208.8/2.53 \approx 83$ cycles per bit to reduce the size of the transmitted data, and still conserve energy.
+As a result, we can spend $187.9/2.53 \approx 74$ cycles per bit to reduce the size of the transmitted data, and still conserve energy.
 
-We implemented the LEC compression algorithm and used it to compress a dataset of 256 16-bit ECG measurements \cite{physionet-ecg-data}, or 4096 bits of data. The results are shown in Table \ref{tbl-lec-energy}. LEC compression reduced the dataset to 1840 bits, saving 2256 bits, or 471 uJ on transmitting the data, at the expense of 317 uJ extra energy spent in the CPU.
+We implemented the LEC compression algorithm and used it to compress a dataset of 256 16-bit ECG measurements \cite{physionet-ecg-data}, or 4096 bits of data. The results are shown in Table \ref{tbl-lec-energy}. LEC compression reduced the dataset to 1840 bits, saving 2256 bits, or 424 uJ on transmitting the data, at the expense of 246 uJ extra energy spent in the CPU.
 
 \begin{table}[H]
 \centering
@@ -142,19 +142,19 @@ We implemented the LEC compression algorithm and used it to compress a dataset o
 %// component                          & energy (uJ) \\
 \midrule
 ATMEGA128 energy per cycle            & 2.53 nJ/cycle  \\
-CC2420 energy per transmitted bit     & 208.8 nJ/cycle  \\
+CC2420 energy per transmitted bit     & 187.9 nJ/cycle  \\
 \midrule
 LEC compression cycles spent          & 97052 cycles\\
 LEC compression bits saved            & 2256 bits \\
 LEC compression cycles per bit        & 43 cycles/bit \\
 ~~~ energy expended                   & 246 uJ \\
-~~~ energy saved                      & 471 uJ \\
-~~~ ratio saved/expended              & 1.9x \\
+~~~ energy saved                      & 424 uJ \\
+~~~ ratio saved/expended              & 1.7x \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-This shows that for this combination of hardware and sensor data, LEC compression is effective in reducing total energy consumption. However the energy saved is only 1.9x more than the extra energy expended on the CPU. This means that if the slowdown from running this in a VM is more than 1.9, and thus time and energy spent on the CPU increases by a factor larger than 1.9, this would tip the balance in favour of just sending the raw data.
+This shows that for this combination of hardware and sensor data, LEC compression is effective in reducing total energy consumption. However the energy saved is only 1.7x more than the extra energy expended on the CPU. This means that if the slowdown from running this in a VM is more than 1.9, and thus time and energy spent on the CPU increases by a factor larger than 1.9, this would tip the balance in favour of just sending the raw data.
 
 %TODO rewrite now that we don't list the MSP430 anymore
 Where exactly the break-even point lies depends on many factors. The CPUs and radio used in this calculation are very common in typical sensor nodes, for example the widely used Telos platform \cite{Polastre:2005ut} is based on the CC2420 radio and the ATMEGA cpu is found in many Arduinos. However many parameters will affect the results. Power consumption is roughly linear in relation to clock frequency, so at the same voltage the cost per cycle will be similar, but at lower frequencies the CPU can operate at a lower voltage which lowers the cost per cycle. The cost per bit depends on many factors including the link quality. A bad link will increase the cost per bit due to retransmissions, but if the node chooses to transmit at a lower power, for example to reduce the number of neighbours and collisions, the cost per bit will be lower than calculated.

@@ -120,8 +120,6 @@ A second important modification is that Darjeeling splits the operand stack into
 
 The necessary modifications to the byte code are taken care of by the infuser. Generic stack instructions such as \mycode{pop} are replaced by distinct versions for the integer and reference stack: \mycode{ipop} and \mycode{apop}.
 
-For details of this transformation we refer to the Darjeeling paper \cite{Brouwers:2009cj}. Here it is sufficient to know that the bytecode is modified to make it more suitable for execution on a tiny device, for example by adding 16-bit versions of most operations, but the result remains very similar to standard JVM bytecode. It is also important to note that no knowledge of the target platform is used in this transformation, so the result is still platform independent. This infusion is then sent to the node, where it is translated to native AVR code at load time.
-
 \paragraph{Limitations}
 Darjeeling implements a significant subset of Java, but like all sensor node JVMs needs to make some sacrifices to scale down to sensor node size. Specifically, it does not support the 64-bit \mycode{long} datatype or floating point variables. It does not support reflection, since the infusion process drops the necessary type information from its class files to significantly reduce their size. And it does not support the \mycode{synchronized} modifier on static methods.
 
@@ -137,6 +135,7 @@ Since JIT compilers work at run-time, much effort has gone into making the compi
 Given our extreme size constraints - ideally we only want to use in the order of 100 bytes of RAM to allow our approach to be useful on a broad range of devices, and leave ample space for other tasks on the device - almost all AOT and JIT techniques found in literature require too much resources. Indeed, some authors suggest sensor nodes are too restricted to make AOT or JIT compilation feasible \cite{Aslam:2011thesis, Wirjawan:2008}.
 
 \subsection{AOT compilation for sensor nodes}
+\label{sec-state-of-the-art-elluls-aot}
 % NOTE: the 811\% here comes from the manual optimisation table. since we calculate overhead slightly different there to be able to split it into 3 components, the total in that table is 811 instead of 815 in the trace output text file.
 On the desktop, VM performance has been studied extensively, but for sensor node VMs this aspect has been mostly ignored. To the best of our knowledge AOT compilation on a sensor node has only been tried by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}, and our work builds on their approach.
 
@@ -186,7 +185,7 @@ POP R13           &        &        &                   &        & \\
 PUSH R13          & 6      & 2      & MOV R13, R14      & 1      & 1 \\
 POP R14           &        &        &                   &        & \\
 \midrule
-MOV \#0, R15      & 2      & 2      & CLR R15           & 2      & 2 \\
+MOV \#0, R15      & 2      & 2      & CLR R15           & 2      & 1 \\
 \midrule
 MOV R6,R5         & 5      & 3      & MOV R6,0x0000(R4) & 4      & 2 \\
 MOV R5,0x0000(R4) &        &        &                   &        & \\
@@ -216,19 +215,21 @@ Regardless of these concerns, there are scenarios that may not be able to tolera
 \label{sec-state-of-the-art-safety}
 With some exceptions \cite{Evers:2010ur}, most current sensor node VMs don't discuss safety, but instead focus on the functionality provided and how this can be implemented on a tiny sensor node. This is unfortunate, because the ability to provide a safety execution environment is both desirable, and easier to implement using a VM than it is using native code.
 
-Several non-VM systems exists to provide various levels of safety for sensor nodes. They fall into two distinct categories: they either depend on a trusted host, or allow the node to guarantee safety independent of whatever malicious code it may receive from the host. Obviously the latter is the stronger guarantee, but it also comes at a higher price.
+Several non-VM systems exists to provide various levels of safety for sensor nodes. They fall into two distinct categories: they either depend on a trusted host to add the necessary checks, or they allow the node to guarantee safety independent of whatever code it may receive from the host. The first protects against programming errors, while the latter can protect against malicious attacks. Obviously the latter is the stronger guarantee, but it also comes at a higher price.
 
 \subsection{Source code approaches}
-A number of systems have been developed that guarantee safety at the source code level. Virgil \cite{Titzer:2006uy} is a language that is inherently safe and specifically designed for sensor nodes. The application is explicitly split into an initialisation and run-time phase, where objects are only allocated during the initialisation phase. The initialisation phase happens during compilation (to C code), which means all object and their locations are know at this point, allowing Virgil to ensure safety and optimise the code at compile time.
+In the first category are systems that guarantee safety at the source code level. Virgil \cite{Titzer:2006uy} is a language that is inherently safe and specifically designed for sensor nodes. The application is explicitly split into an initialisation and run-time phase, where objects are only allocated during the initialisation phase. The initialisation phase happens during compilation (to C code), which means all object and their locations are know at this point, allowing Virgil to ensure safety and optimise the code at compile time.
 
 Safe TinyOS on the other hand, works on annotated nesC TinyOS code. It uses the Deputy \cite{Condit:2007uo} source-to-source compiler to analyse the C source code and insert the necessary run-time checks were necessary. Because this happens on the host, before sending the code to the node, it can use the host's resources to do more complex analysis of the source code and eliminate checks where the it can determine a memory access to be safe at compile time, resulting in a much lower overhead
 
-Both approaches eventually result in standard C, which is then compiled and sent to the node. Therefore, both approaches may protect against accidental programming errors, but do not protect the node from malicious code an attacker may send to it.
+Both approaches eventually result in standard C, which is then compiled and sent to the node. Therefore, both approaches may protect against accidental programming errors, but not against malicious code an attacker may send to it.
 
 \subsection{Native code approaches}
 For desktop applications, Wahbe et al. described software fault isolation \cite{Wahbe:1994cj} techniques to isolate a piece of untrusted code, without the overhead of using processes and the CPU's memory protection. A typical example is a plugin that frequently needs to interact with an application. It should be isolated from the application so bugs in the plugin can't bring down the whole application, but running it as a separate process would incur high overhead due to frequent context switches. Two basic methods are described to isolate such code from the main application: we can either rewrite the native code at load time, inserting checks at all potentially unsafe writes, or we can compile the code to a more restricted format with the appropriate checks already in place, and verify the code adheres to this standard at load time.
 
-Since we don't have processes or CPU memory protection on a sensor node, Wahbe's approach provides an attractive alternative. Two systems exist that provide safety for sensor nodes using each of these approaches. \emph{t-kernel} raises the level of system abstraction for the developer by providing three features typically missing on sensor nodes: preemptive scheduling, virtual memory, and memory protection. It does this by extensive rewriting of the binary code at load time. While \emph{t-kernel} is heavily optimised, the price for this is that programmes still run 50-200\% slower, and code size increases by 500-750\%.
+Since we don't have processes or CPU memory protection on a sensor node, Wahbe's approach provides an attractive alternative. Two systems exist that provide safety for sensor nodes using each of these approaches.
 
-The other approach is taken by Harbor \cite{Kumar:2007ge}, which consists of two components. On the desktop a binary rewriter sandboxes an application by inserting run-time checks before it is sent to the node. The SOS operating system \cite{Han:2005th} is then extended with a binary verifier to verify incoming binaries. The correctness only depends on the correctness of this verifier. The increase in code size is more modest than for \emph{t-kernel} at a 30-65\% increase. But performance is 160-1230\% slower, where the authors note the benchmark producing the highest slowdown is more typical of sensor node code. They also note more complex analysis of the binary code could reduce the number of necessary checks, but this would significantly increase the complexity of the verifier.
+\emph{t-kernel} does more than providing memory safety. It raises the level of system abstraction for the developer by providing three features typically missing on sensor nodes: preemptive scheduling, virtual memory, and memory protection. It does this by extensive rewriting of the binary code at load time. While \emph{t-kernel} is heavily optimised, the price for this is that programmes still run 50-200\% slower, and code size increases by 500-750\%.
+
+The other approach is taken by Harbor \cite{Kumar:2007ge}, which consists of two components. On the desktop a binary rewriter sandboxes an application by inserting run-time checks before it is sent to the node. The SOS operating system \cite{Han:2005th} is then extended with a binary verifier to verify incoming binaries. The correctness only depends on the correctness of this verifier. The increase in code size is more modest than for \emph{t-kernel} at a 30-65\% increase, but performance is 160-1230\% slower, where the authors note the benchmark producing the highest slowdown is more typical of sensor node code. They also note more complex analysis of the binary code could reduce the number of necessary checks, but at the cost of significantly increasing the complexity of the verifier.
 

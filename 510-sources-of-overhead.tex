@@ -1,5 +1,5 @@
 \section{Sources of overhead}
-The performance of this basic approach is still far behind optimised native C. To improve performance, it is important to identify the causes of this overhead. The main sources of overhead we found are:
+The performance of our baseline approach is still far behind that of optimised native C. To improve performance, it is important to identify the causes of this overhead. The main sources of overhead we found are:
 \begin{itemize}
 	\item Lack of optimisations in the Java compiler
 	\item AOT code generation overhead
@@ -47,7 +47,7 @@ The final source of overhead comes from method calls. In the JVM, each method ha
 "containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked and any other bookkeeping information that may be required by the implementation (stack pointer, program counter, reference to previous activation frame, and the like)" \cite{Gosling:2014}
 \end{quotation}
 
-Darjeeling's stack frame layout is shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps Darjeeling goes through to invoke a Java method:
+Darjeeling's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps Darjeeling goes through to invoke a Java method:
 
 \begin{enumerate}
   \small
@@ -65,7 +65,7 @@ Darjeeling's stack frame layout is shown in Figure \ref{fig-object-and-stack-fra
     \item return to the caller's AOT compiled code the return value (if any) in R22 and higher
   \end{enumerate}
   \item restore stack pointer and X register
-  \item push the return value onto the stack (using stack caching, so this is free)
+  \item push the return value onto the stack (using stack caching this will be free)
 \end{enumerate}
 
 Even after considerable effort optimising this process, this requires roughly 550 cycles for the simplest case: a call to a static method without any parameters or return value. For a virtual method the cost is higher because we need to look up the right implementation. While we may be able to save some more cycles with an even more rigorous refactoring, it is clear that the number of steps involved will always take considerably more time than a native function call.
