@@ -32,9 +32,9 @@ Assuming we have high quality JVM bytecode, a second source of overhead comes fr
 
 In Table \ref{tbl-basic-translation}, it is clear that the \mycode{SLOAD\_0} instruction at label 5 is unnecessary since the value is already in R1.
 
-\subsubsection{Type 3: JVM instruction set limitations} A final source of overhead comes from optimisations that are done in native code, but are not possible in JVM bytecode, at least not in our resource-constrained environment.
+\subsubsection{Type 3: JVM instruction set limitations} A third source of overhead due to the baseline AOT compilation process comes from optimisations that are done in native code, but are not possible in JVM bytecode, at least not in our resource-constrained environment.
 
-The JVM instruction set is very simple, which makes it easy to implement, but this also means some things cannot be expressed as efficiently as in native code. Given enough processing power, compilers can do the complex transformations necessary to make the compiled JVM code run almost as fast as native C, but on a sensor node we do not have such resources and must simply execute the instructions as they are.
+The JVM instruction set is very simple, which makes it easy to implement, but this also means some things cannot be expressed as efficiently in JVM bytecode as in native code. Given enough processing power, compilers can do the complex transformations necessary to make the compiled JVM code run almost as fast as native C, but on a sensor node we do not have such resources and must simply execute the instructions as they are.
 
 In Table \ref{tbl-basic-translation} we see that there is no way to express a single bit shift directly. Instead we have to load the constant 1 onto the stack and execute the generic bit shift instruction. Compare this to addition, where the JVM bytecode does have a special INC instruction to add a constant value to a local variable.
 
@@ -94,7 +94,7 @@ AOT translation overhead                       & \\
 &                                               & Mark loops \\
 &\hspace{.5cm} JVM instruction set limitations  & \mycode{SIMUL} instruction \\
 &                                               & \mycode{GET/PUTFIELD\_A\_FIXED} instructions \\
-&                                               & constant shift optimisation \\
+&                                               & constant bit shift optimisation \\
 &                                               & 16-bit array indexes \\
 
 Section \ref{sec-optimisations-method-calls} &

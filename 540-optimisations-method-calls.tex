@@ -1,9 +1,9 @@
 \section{Method calls}
 \label{sec-optimisations-method-calls}
 
-Finally we will look at the overhead caused by method calls. In native code, the smallest functions only need 8 cycles for a \mycode{CALL} and \mycode{RET}, and some \mycode{MOV}s may be needed to move the parameters to the right registers. More complicated functions may spend up to 76 cycles saving and restoring call-saved registers. As we have seen in Section \ref{sec-overhead-method-call}, in Java a considerable amount of state needs to be initialised. For the simplest method call this takes about 550 cycles, and this increases further for large methods with many parameters.
+Finally, we will look at the overhead caused by method calls. In native code, the smallest function call only has 8 cycles of overhead for a \mycode{CALL} and \mycode{RET}, and some \mycode{MOV}s may be needed to move the parameters to the right registers. More complicated functions may spend up to 76 cycles saving and restoring call-saved registers. As we have seen in Section \ref{sec-overhead-method-call}, in Java a considerable amount of state needs to be initialised. For the simplest method call this takes about 550 cycles, and this increases further for large methods with many parameters.
 
-When we look at the methods in a programme, we typically see a spectrum from a few large methods at the base of the call tree that take a long time to complete and are only called a few times, to small (near-)leaf methods that are fast and frequently called. Figure \ref{fig-coremark-method-calls-vs-duration} shows this spectrum for the CoreMark benchmark.
+When we look at the methods in a programme, we typically see a spectrum from a limited number of large methods at the base of the call tree that take a long time to complete and are only called a few times, to small (near-)leaf methods that are fast and frequently called. Figure \ref{fig-coremark-method-calls-vs-duration} shows this spectrum for the CoreMark benchmark.
 
 For the slow methods at the base, the impact of the method call is not very significant for the overall execution time and we can afford to take the 550 cycles penalty. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
 
@@ -12,24 +12,18 @@ At the very end of this spectrum we have tiny helper functions that may be inlin
 \subsection{Lightweight methods}
 For these cases we introduce a new type of method call: lightweight methods. These methods differ from normal methods in two ways:
 \begin{itemize}
-	\item we do not create a stack frame for lightweight methods, but use the caller's frame
-	\item parameters are passed on the stack, rather than in local variables
+	\item We do not create a stack frame for lightweight methods, but use the caller's frame.
+	\item Parameters are passed on the stack, rather than in local variables.
 \end{itemize}
 
 \begin{figure*}[]
+  \centering
   \includegraphics[width=.5\linewidth]{method-calls-vs-duration.eps}
-  \caption{CoreMark method calls vs duration}
+  \caption{CoreMark method calls vs duration with logarithmic scales}
   \label{fig-coremark-method-calls-vs-duration}
 \end{figure*}
 
-
-% case                  & call method   & size overhead    & perf overhead
-% slow large methods    & normal invoke & none             & high
-% smallest leaf methods & inlining      & code duplication (serious when used for all but the smallest methods) & none
-% in-between            & lightweight   & none             & low
-
-
-Lightweight methods give us third choice, in between a normal method call and method inlining. When calling a lightweight method, we directly \mycode{CALL} the method's code. We bypass the VM completely, reusing the caller's stack frame, and leaving the parameters on the (caller's) stack. In effect, the lightweight method behaves similar to inlined code, but since we can \mycode{CALL} it from multiple places, we do not incur the code size overhead of inlining large methods.
+Lightweight methods give us third choice, in between a normal method call and method inlining. When calling a lightweight method, we directly \mycode{CALL} the method's code. We bypass the VM completely, reusing the caller's stack frame, and leaving the parameters on the (caller's) stack. In effect, the lightweight method behaves similar to inlined code, but since we can \mycode{CALL} it from multiple places, we do not incur the code size overhead of duplicating large inlined methods.
 
 Because the method will be called from multiple locations which may have different cache states, we do have to flush the stack cache to memory before a call. This results in slightly more overhead than for inlined code, but much less than for a normal method call.
 
@@ -134,6 +128,7 @@ A normal method that invokes a possible string of lightweight methods, needs to 
 % For each method the number of locals is known by the infuser. If it is a lightweight method that will call another lightweight, one extra slot is reserved for the return address. In addition, each method needs to reserve the maximum number of extra slots required for of any lightweight method it may call. Since we can only call one at a time, they can all use the same space reserved in the caller's stack frame. A similar calculation is done to determine any extra reference stack space needed to accommodate the lightweight methods that may be called.
 
 \begin{figure}[]
+  \centering
   \includegraphics[width=0.80\linewidth]{stack-frame-lightweight-method.eps}
   \caption{Stack frame layout for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls lightweight method \mycode{h\_lw}.}
   \label{fig-stack-frame-lightweight-method}

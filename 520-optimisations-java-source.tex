@@ -2,7 +2,7 @@
 \label{sec-optimisations-manual-java-source-optimisation}
 As shown in Section \ref{sec-compilation-process}, our current implementation uses three steps to translate Java source code to Darjeeling bytecode: the standard Java compiler, the ProGuard optimiser, and Darjeeling's infuser. None of these do any complex optimisations. 
 
-In a future version, ProGuard and the infuser should be merged into an 'optimising infuser' which uses normal, well-known optimisation techniques to produce better quality bytecode, but at the moment we do not have the resources to build such an optimising infuser.
+In a future version, ProGuard and the infuser should be merged into an 'optimising infuser' which uses all the normal, well-known optimisation techniques to produce better quality bytecode, but at the moment we do not have the resources to build such an optimising infuser.
 
 Since our goal is to find out what level of performance is possible on a sensor node, we manually optimise the Java source to get better quality JVM bytecode from \mycode{javac}. While these changes are not an automatic optimisation we developed, we find it imporant to mention them explicitly and analyse their impact, since many developers may expect many of these to happen automatically, and without this step it would be impossible to reproduce our results.
 
@@ -10,16 +10,14 @@ We have been careful to limit ourselves to 'fair' optimisations, by which we mea
 
 The most common optimisations we performed are:
 \begin{itemize}
-	\item Store the result of expressions calculated in a loop in a temporary variable, if it is known the result will be the same for each iteration
-	\item Since array and object field access is relatively expensive and not cached by the mark loop optimisation discussed in Section \ref{sec-optimisation-markloops}, prefer to store a value in a local variable if it may be used again soon rather than accessing the array or object twice
-	\item Manually inlining small methods
-	\item Prefer to use 16-bit variables for array indexes where possible
-	\item Use bit shifts for multiplications by a power of two
-	% TODO should we say more about 16-bit array indexes here? Actually this is not something an optimiser can solve. The reason the change has little effect on the C version is that the C version does less address calculations.
+	\item Store the result of expressions calculated in a loop in a temporary variable, if it is known the result will be the same for each iteration.
+	\item Since array and object field access is relatively expensive and not cached by the mark loop optimisation discussed in Section \ref{sec-optimisation-markloops}, prefer to minimise array and object access by using a temporary local variable, if the value may be used again soon.
+	\item Manually inlining small methods.
+	\item Prefer to use 16-bit variables for array indexes where possible.
+	\item Use bit shifts for multiplications by a power of two.
 \end{itemize}
 
-We will briefly examine the effect of some 'unfair' optimisations on the CoreMark benchmark in Section \ref{sec-evaluation-coremark}.
-
+We will briefly examine the effect of some 'unfair' optimisations on the CoreMark benchmark in Section \ref{sec-evaluation-coremark}. These are optimisations that the infuser most likely couldn't do automatically, but a developer who's aware of the performance of the VM could easily do manually.
 
 \paragraph{Temporary variables}
 The first two optimisations generate extra store instructions, which means they may not always be beneficial if the value is never used again. But a value often only needs to be reused only once for it to be faster to store in a local variable than to calculate it twice. If we use the mark loops optimisation discussed in Section \ref{sec-optimisation-markloops}, in many cases the variable may be stored in registers, making accessing them either very cheap, or free.
@@ -30,7 +28,7 @@ We manually inline all small methods that were either a \mycode{\#define} in the
 \paragraph{Platform independence}
 Assuming an optimising infuser does raise the question how platform independent the resulting code is. If the infuser has more specific knowledge about the target platform, it can produce better code for that platform, but, while it should still run anywhere, this may not be as efficient on other platforms.
 
-However, the optimisations described here are only based on very conservative assumptions that would work well for most devices in this class.
+However, the optimisations described here are only based on very conservative assumptions, and would work well for most devices in this class.
 
 \paragraph{Example} An example of these manual optimisations, applied to the bubble sort benchmark, can be seen in Listing \ref{lst-manual-optimisation}. To have a fair comparison, we applied exactly the same optimisations to the C versions of our benchmarks, but here this had little or no effect on the performance.
 
