@@ -125,20 +125,20 @@ Before & Cycles & Length & After & Cycles & Length \\
 Instructions      & & (bytes) & Instructions      &  & (bytes) \\
 \midrule
 \midrule
-PUSH Rx           & 4      & 4      &                   & 0      & 0 \\
-POP Rx            &        &        &                   &        & \\
+\mycode{PUSH Rx}           & 4      & 4      &                            & 0      & 0 \\
+\mycode{POP Rx}            &        &        &                            &        & \\
 \midrule
-PUSH Rx           & 4      & 4      & MOV Ry, Rx        & 1      & 2 \\
-POP Ry            &        &        &                   &        & \\
+\mycode{PUSH Rx}           & 4      & 4      & \mycode{MOV Ry, Rx}        & 1      & 2 \\
+\mycode{POP Ry}            &        &        &                            &        & \\
 \midrule
-ST X+, Rx         & 4      & 4      &                   & 0      & 0 \\
-LD -X, Rx         &        &        &                   &        & \\
+\mycode{ST X+, Rx}         & 4      & 4      &                            & 0      & 0 \\
+\mycode{LD -X, Rx}         &        &        &                            &        & \\
 \midrule
-ST X+, Rx         & 4      & 4      & MOV Ry, Rx        & 1      & 2 \\
-LD -X, Ry         &        &        &                   &        & \\
+\mycode{ST X+, Rx}         & 4      & 4      & \mycode{MOV Ry, Rx}        & 1      & 2 \\
+\mycode{LD -X, Ry}         &        &        &                            &        & \\
 \midrule
-MOV Ry, Rx        & 2      & 4      & MOVW Ry, Rx       & 1      & 2 \\
-MOV Ry+1, Rx+1    &        &        &                   &        & \\
+\mycode{MOV Ry, Rx}        & 2      & 4      & \mycode{MOVW Ry, Rx}       & 1      & 2 \\
+\mycode{MOV Ry+1, Rx+1}    &        &        &                            &        & \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
