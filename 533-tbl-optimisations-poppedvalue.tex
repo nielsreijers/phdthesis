@@ -1,0 +1,39 @@
+\begin{table*}[hbt]
+\centering
+\caption{Popped value caching}
+\label{tbl-poppedvaluecaching}
+\scriptsize
+\addtolength{\tabcolsep}{-2pt}
+\begin{tabular}{llll|c|c|c|c}
+\toprule
+JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1       & cache state R2       & cache state R3       & cache state R4       \\
+\hline
+0: BRTARGET(0)     & \sccomment{record current address}                   &                     &        & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+1: SLOAD\_0        & operand\_1 = sc\_getfreereg()                        &                     &        & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_LDD(operand\_1,Y+0)                            & LDD R1,Y+0          & 4      & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \sce{Int1}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+2: SCONST\_1       & operand\_1 = sc\_getfreereg()                        &                     &        & \sce{Int1}{LS0}{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_LDI(operand\_1,1)                              & LDI R2,1            & 2      & \sce{Int1}{LS0}{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \sce{Int2}{LS0}{   } & \sce{Int1}{CS1}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+3: SUSHR           & operand\_1 = sc\_pop\_destructive()                  &                     &        & \sce{Int1}{LS0}{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & operand\_2 = sc\_pop\_destructive()                  &                     &        & \sce{\use}{   }{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_JMP(+2)                                        & JMP +2              & 2      & \sce{\use}{   }{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_LSR(operand\_2)                                & LSR R1              & 2      & \sce{\use}{   }{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_DEC(operand\_1)                                & DEC R2              & 1      & \sce{\use}{   }{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_BRPL(-2)                                       & BRPL -2             & 1      & \sce{\use}{   }{   } & \sce{\use}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & sc\_push(operand\_2)                                 &                     &        & \sce{\use}{   }{   } & \sce{Int1}{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+4: SSTORE\_0       & operand\_1 = sc\_pop\_tostore()                      &                     &        & \sce{    }{   }{   } & \sce{\use}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_STD(Y+0,operand\_1)                            & STD Y+0,R2          & 4      & \sce{    }{   }{   } & \sce{\use}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+5: SLOAD\_0        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{    }{   }{   } & \sce{Int1}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+6: SLOAD\_1        & operand\_1 = sc\_getfreereg()                        &                     &        & \sce{\use}{   }{   } & \sce{Int1}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_LDD(operand\_1,Y+2)                            & LDD R1,Y+2          & 4      & \sce{\use}{   }{   } & \sce{Int1}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & sc\_push(operand\_1)                                 &                     &        & \sce{Int1}{LS1}{   } & \sce{Int2}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+7: IF\_SCMPGT 0:   & operand\_1 = sc\_pop\_nondestructive()               &                     &        & \sce{\use}{LS1}{   } & \sce{Int1}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & operand\_2 = sc\_pop\_nondestructive()               &                     &        & \sce{\use}{LS1}{   } & \sce{\use}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_CP(operand\_1, operand\_2);                    & CP R1,R2            & 2      & \sce{\use}{LS1}{   } & \sce{\use}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                   & emit\_branchtag(GT, 0);                              & BRGT 0:             & 2      & \sce{\use}{LS1}{   } & \sce{\use}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+\bottomrule
+\end{tabular}
+\addtolength{\tabcolsep}{2pt}
+\end{table*}
+
