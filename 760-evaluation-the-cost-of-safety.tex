@@ -119,6 +119,7 @@ The difference is due to Harbor's more fine grained protection, which allows it 
 
 % This means our approach should have a distinct advantage for code with frequent writes to local variables. The Harbor paper also contains an FFT benchmark, and in the source code we find a copy of the same fixed point FFT algorithm used in our benchmark, albeit in a 16-bit version while our benchmark uses the 8-bit version. In Harbor's case this results in an overhead of 380\%, while our VM is significantly faster at only 145\%.
 
-%TODO: implement 16 bit FFT benchmark for our evaluation as well.
+
+
 %TODO: figure this out: if we do the same /65*22 on this 380 performance, Harbor is only 128\% slower, beating our 145\%...
 %TODO: say something about Harbor's claim to reduce checks at the cost of more complexity

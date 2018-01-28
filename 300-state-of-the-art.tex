@@ -215,7 +215,18 @@ Regardless of these concerns, there are scenarios that may not be able to tolera
 \label{sec-state-of-the-art-safety}
 With some exceptions \cite{Evers:2010ur}, most current sensor node VMs don't discuss safety, but instead focus on the functionality provided and how this can be implemented on a tiny sensor node. This is unfortunate, because the ability to provide a safety execution environment is both desirable, and easier to implement using a VM than it is using native code.
 
-Several non-VM systems exists to provide various levels of safety for sensor nodes. They fall into two distinct categories: they either depend on a trusted host to add the necessary checks, or they allow the node to guarantee safety independent of whatever code it may receive from the host. The first protects against programming errors, while the latter can protect against malicious attacks. Obviously the latter is the stronger guarantee, but it also comes at a higher price.
+\begin{figure}[]
+  \centering
+  \includegraphics[width=0.8\linewidth]{safe-compilation-process.eps}
+  \caption{Three approaches to provide a safe execution environment}
+  \label{fig-safe-compilation-process}
+\end{figure}
+
+Several non-VM systems exists to provide various levels of safety for sensor nodes. They fall into two distinct categories, as shown in Figure \ref{fig-safe-compilation-process}. If we trust the host, it can verify the code and add runtime safety checks where needed, before sending it to the node. If the node could receive untrusted code from untrusted sources, for example to support mobile agents as in Agilla \cite{Fok:2005bh}, it needs to guarantee safety independent of whatever code it may receive from the host to guard against malicious attack.
+
+The first can guard against programming errors, but not against malicious attacks unless the node has some, potentially expensive, authentication mechanism to make sure it only accepts code from trusted sources. The latter is obviously the stronger guarantee, but it also comes at a higher price.
+%TODO: add reference to argue authentication is expensive.
+%TODO: add section on "Lightweight Module Isolation for Sensor Nodes" paper, eventough it's not implemented and has no evaluation. there's only 3 papers on the topic, so we might as well cite it.
 
 \subsection{Source code approaches}
 In the first category are systems that guarantee safety at the source code level. Virgil \cite{Titzer:2006uy} is a language that is inherently safe and specifically designed for sensor nodes. The application is explicitly split into an initialisation and run-time phase, where objects are only allocated during the initialisation phase. The initialisation phase happens during compilation (to C code), which means all object and their locations are know at this point, allowing Virgil to ensure safety and optimise the code at compile time.
