@@ -100,6 +100,7 @@ By far the largest number of instructions, 99 out of 206, are for loading or sto
 Each JVM bytecode is encoded as a single byte. Some are followed by some operands, for example the method to call, or the type of object to create, but most are not. This very simple instruction set makes it a suitable basis for a sensor node VM, where we don't have the resources to process anything much more complicated.
 
 \subsection{Memory}
+\label{sec-background-jvm-memory}
 The JVM stores information in three different places:
 \begin{itemize}
 	\item The heap: objects and arrays are stored here, and automatically garbage-collected when no longer used.

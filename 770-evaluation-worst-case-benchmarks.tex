@@ -17,6 +17,8 @@ to do
  - threads
  - lots of tiny objects
  - no multidimensional arrays
- 
+ - performance depends more on the choices made by developer. Implementation choices impact performance for both C and Java, but more for Java. For example, functions that need to return more than one value can do so by creating and returning an object, which would be the most natural way to do this in Java. However, creating an object is expensive, so if this function is called in a loop, it is faster to create the object before the loop starts and reuse it for each iteration, for example as done in the LEC benchmark.
+
+
 summarise cost of vm in terms of code size, performance, memory usage, reduced flexibility
 Refer back to Suganuma, who on page two mentions Java code typically results in many short method calls. This is bad for us.

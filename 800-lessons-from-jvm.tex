@@ -53,9 +53,9 @@ While Java allows us to declare variables as \mycode{final}, this is only a lang
 
 This is especially important for arrays of constant data, which are common in WSN applications. When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a Java array object, and then uses the normal array access instructions to initialise each element individually:
 
-%TODO: fix this
+% TODO: fix this
 %\begin{minted}{c}
-%sspush(256); newarray;                   // create the array
+%sspush(256); newarray;                       // create the array
 %adup; sconst_0;    sconst_0;   bastore;      // set index 0
 %adup; sconst_1;    sconst_3;   bastore;      // set index 1
 %adup; sconst_2;    bspush(6);  bastore;      // set index 2
@@ -80,10 +80,6 @@ Finally, the MoteTrack benchmark contains a large dictionary of reference RSSI s
 
 At 20560 bytes, this dictionary is small enough to fit in flash memory, but over 5 times larger than the available RAM. Similar to the 16-bit FFT benchmark, the only way to implement this in a VM without support for this kind of constant data, is to store it in flash and use a native method to read the signatures.
 
-% 
-% ####################################### RTC INFUSION bm_fft
-%    0     177509286  [avrora.rtc] 3 Start method javax.rtcbench.RTCBenchmark.<clinit> ()V at 0x12e12:    0     201454660  [avrora.rtc] 4  ends at 0x1569a, AOT size: 10376, JVM size: 1669
-
 \paragraph{Possible solutions}
 Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{AALOAD} and \mycode{IALOAD}) to read from them.
 
@@ -92,9 +88,67 @@ Supporting constant arrays will require changes to both the language and bytecod
 
 \section{Support for nested data structures}
 \label{sec-nested-data}
-MoteTrack Java doesn't handle lots of small arrays efficiently. Every array becomes a heap object, taking up 8 bytes in headers. MoteTrack has lots of tiny arrays (containing 2 bytes or shorts), so this overhead is too high.
+Besides the need to support constant data, the MoteTrack benchmark exposes another weakness of Java: it does not support complex data structures of many small elements (anything larger than a primitive type) efficiently. Listing \ref{lst-motetrack-data-structure} shows the main \mycode{RefSignature} data structure used in MoteTrack. This structure consists of a location, which is a simple struct of 3 shorts, and a signature, which has an id, and an array of 18 signals. A signal is defined by a source ID, and an array of 2 elements with rssi values.
 
-Mention that while constant arrays would already make MoteTrack feasible, to make it truly efficient
+%TODO: consistent font size for all listings
+\begin{listing}[H]
+\small
+\centering
+\begin{minted}{c}
+#define NBR_RFSIGNALS_IN_SIGNATURE 18
+#define NBR_FREQCHANNELS            2
+
+struct RefSignature
+{
+    Point location;
+    Signature sig;
+};
+
+struct Point
+{
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+};
+
+struct Signature
+{
+    uint16_t id;
+    RFSignal rfSignals[NBR_RFSIGNALS_IN_SIGNATURE];
+};
+
+struct RFSignal
+{
+    uint16_t sourceID;
+    uint8_t rssi[NBR_FREQCHANNELS];
+};
+\end{minted}
+\caption{MoteTrack \mycode{RefSignature} data structure}
+\label{lst-motetrack-data-structure}
+\end{listing}
+
+\begin{figure}[]
+  \centering
+  \includegraphics[width=0.9\linewidth]{motetrack-refsignature-objects}
+  \caption{The \mycode{RefSignature} data structure as C struct, and collection of Java objects}
+  \label{fig-motetrack-refsignature-objects}
+\end{figure}
+
+Since all the arrays are of fixed length, in C the layout of the whole structure is known at compile time, shown in Figure \ref{fig-motetrack-refsignature-objects}.
+
+In Java, we have no concept of a struct. As described in Section \ref{sec-background-jvm-memory}, in Java every object is made up of a list of primitive values: either an int or a reference to another object. Thus, the most natural way to translate the C structures in Listing \ref{lst-motetrack-data-structure} to Java, is as a collection of objects on the heap, as shown in the right half of Figure \ref{fig-motetrack-refsignature-objects}. Note that every one of the 18 \mycode{RFSignal} structs becomes an object, which in turn has a pointer to an array of rssi values.
+
+There are two problems with this. First, since the location of these Java objects is not known until runtime, there is a performance penalty for having to follow the chain of references. MoteTrack will loop over the signals to compare two signatures. If we start from the \mycode{rfSignals} array, Java needs to lookup the right element in \mycode{rfSignals} to get the right signal, then lookup the \mycode{rssi} field to get the RSSI array, and then another array lookup to get the right RSSI value. For the C version, all the offsets are known at compile time, so the compiler can generate a much more efficient loop, directly reading from the right offsets.
+
+The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes in Darjeeling. In addition, the 19 arrays have a 3 byte header, and the Java objects and arrays contain a total of 39 references, which take up 2 bytes each. In total, the collection of Java objects takes up:
+
+$80 + 40*5 + 19*3 + 39*2 = 415$ bytes
+
+Combined with MoteTrack's other data structures, this became too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variable stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 235 bytes, and reading a rssi value still takes two lookups.
+
+Generally, arrays of primitive types don't suffer from this problem and can be stored efficiently, but programmes containing large arrays of objects can cause significant overhead. In many cases we can work around this problem by flattening the structure, for instance in MoteTrack's case we could replace the array of \mycode{RFSignal}s with three separate arrays for \mycode{sourceID}s, \mycode{rssi\_0} and \mycode{rssi\_1}, but only at a significant cost in readability.
+
+
 
 
 \section{Better language support for shorts and bytes}
@@ -113,7 +167,6 @@ Passing literal integer values to a method call treats them as ints, even if the
 \mintinline{java}{f((byte)1);}
 
 While seemingly a small annoyance, in more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read.
-
 
 \paragraph{Possible solutions}
 If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.
@@ -172,9 +225,12 @@ Even without a clear performance model, some basic optimisations can be done. In
 \label{sec-no-gc}
 While memory management is too big a topic to cover completely, we do want to mention one relevant observation. In Java anything larger than a primitive value has to be allocated on the heap. This introduces a performance overhead, both for allocating the objects, and the occasional garbage collection run, which may take several thousand cycles.
 
-As an example, one function in the CoreMark benchmark uses two small local arrays of 8 ints, which are on the stack in C, but need to be on the heap in Java. In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's case this adds up to a performance overhead of about 60\% relative to C.
+For example, one function in the CoreMark benchmark uses two small local arrays of 8 ints, which are on the stack in C, but need to be on the heap in Java.
+
+In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's case this adds up to a performance overhead of about 60\% relative to C.
 
 % TODO: Also mention experience from LEC: Not being able to allocate on the stack is a problem because we need to return two values from encode: bsi and bsi\_length. We can put them in an object, but that's slow.
+% TODO: Expand with an example
 
 
 \paragraph{Possible solutions}
@@ -224,13 +280,13 @@ Specifically, it is the reason Darjeeling uses a `split-stack' architecture: the
 
 
 
-\section{Conclusion and future work}
+\section{Conclusion}
 In this chapter we described a number of issues we encountered over the years while using and developing sensor node VMs. They may not apply to every scenario, but the wide range of the issues we present suggests many applications will be affected by at least some.
 
 Most sensor node VMs already modify the instruction set of the original VM and usually support only a subset of the original language. The issues described here indicate these changes do not go far enough, and we still need to refine our VMs further to make them truly useful in real-world projects.
 
-There are two possible paths to follow: a number of issues can be solved by improving existing Java-based VMs. Staying close to Java also has the advantage of being able to reuse existing knowledge and infrastructure.
+There are two possible paths to follow: a number of issues can be solved by improving existing Java-based VMs. Staying close to Java has the advantage of being able to reuse existing knowledge and infrastructure.
 
-However the issues discussed in the last few sections require more invasive changes to both the source language and VM. If the goal is to run platform independent code safely and efficiently, rather than running Java, we should start from the specific requirements and constraints of sensor node software development. We suspect this would lead us to more lightweight features and more predictable memory models.
+However some of the issues require more invasive changes to both the source language and VM. If the goal is to run platform independent code safely and efficiently, rather than running Java, we should start from the specific requirements and constraints of sensor node software development. We suspect this would lead us to more lightweight features and more predictable memory models.
 
 For either path, we hope the points presented in this chapter can help in the development better future sensor node VMs.
