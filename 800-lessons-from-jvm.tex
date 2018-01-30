@@ -53,15 +53,14 @@ While Java allows us to declare variables as \mycode{final}, this is only a lang
 
 This is especially important for arrays of constant data, which are common in WSN applications. When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a Java array object, and then uses the normal array access instructions to initialise each element individually:
 
-% TODO: fix this
-%\begin{minted}{c}
-%sspush(256); newarray;                       // create the array
-%adup; sconst_0;    sconst_0;   bastore;      // set index 0
-%adup; sconst_1;    sconst_3;   bastore;      // set index 1
-%adup; sconst_2;    bspush(6);  bastore;      // set index 2
-%...
-%adup; bspush(255); bspush(-3); bastore;      // set index 255
-%\end{minted}
+\begin{minted}{c}
+sspush(256); newarray;                       // create the array
+adup; sconst_0;    sconst_0;   bastore;      // set index 0
+adup; sconst_1;    sconst_3;   bastore;      // set index 1
+adup; sconst_2;    bspush(6);  bastore;      // set index 2
+...
+adup; bspush(255); bspush(-3); bastore;      // set index 255
+\end{minted}
 
 There are two problems with this: (i) the array will occupy scarce RAM; and (ii) initialising array elements using JVM instructions requires 4 instructions per element, resulting in 1669 bytes of code to initialise a 256 byte array.
 
@@ -173,11 +172,6 @@ If we want to have an efficient sensor node VM, both from a performance and memo
 
 We suggest that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: Declaring variable \mintinline{java}{a} as \mintinline{java}{unchecked short} would implictly narrow to short when needed, so \mintinline{java}{a=b+c;} would not need an explicit cast anymore, while declaring it as a normal \mintinline{java}{short} would.
 
-% In addition, the server-side component of the split VM should keep intermediate results as shorts where possible. In the example, there's no need to calculate \mintinline{java}{b+c} in 32-bits since the high bits will be truncated anyway.
-
-
-% Java defines that an expression evaluates to the type of its largest operand, or 32-bits, whichever is larger. This automatic expansion to 32-bits could be removed, which means adding two shorts should result in a short value. If we want the result to be 32-bit, we can achieve this by casting one of the operands. Storing a value in a smaller variable should still result in a compile time error, but for the \mycode{a=b+c;} example this would not be necessary anymore, since the result is already a short. In addition, the compiler should treat literal values as the smallest integer type large enough to store it.
-
 
 
 
@@ -223,22 +217,48 @@ Even without a clear performance model, some basic optimisations can be done. In
 
 \section{Allocating objects on stack}
 \label{sec-no-gc}
-While memory management is too big a topic to cover completely, we do want to mention one relevant observation. In Java anything larger than a primitive value has to be allocated on the heap. This introduces a performance overhead, both for allocating the objects, and the occasional garbage collection run, which may take several thousand cycles.
+In Java anything larger than a primitive value has to be allocated on the heap. This introduces a performance overhead, both for allocating the objects, and the occasional garbage collection run, which may take several thousand cycles.
 
-For example, one function in the CoreMark benchmark uses two small local arrays of 8 ints, which are on the stack in C, but need to be on the heap in Java.
+In our benchmarks we encountered a number of situations where a temporary object was needed. As we have seen in Section \ref{sec-evaluation-coremark-unfair-optimisations}, the CoreMark benchmark uses two small local arrays of 8 ints, which are allocated on the stack in C, but need to be on the heap in Java. Another typical example is the \mycode{encode} function in the LEC benchmark, that needs to return two values, \emph{bsi} and the number of bits in \emph{bsi}. In Java we can do this either by creating and returning an object from \mycode{encode}, or by having the caller create it, and passing it as a parameter for \mycode{encode} to fill in.
 
-In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's case this adds up to a performance overhead of about 60\% relative to C.
+In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's state machine case this adds up to a performance overhead of about 60\% relative to C.
 
-% TODO: Also mention experience from LEC: Not being able to allocate on the stack is a problem because we need to return two values from encode: bsi and bsi\_length. We can put them in an object, but that's slow.
-% TODO: Expand with an example
+\begin{listing}[H]
+	\centering
+	\begin{minted}[fontsize=\scriptsize]{java}
+    public static short LEC(short[] numbers, Stream stream) {
+        BSI bsi = new BSI();      // Allocate bsi only once
+        for (...) {
+            ...
+            compress(ri, ri_1, stream, bsi);
+            ...
+        }
+    }
 
+    private static void compress(short ri, short ri_1, Stream stream, BSI bsi) {
+        ...
+        encode(di, bsi);          // Pass bsi to encode to return both value and length
+        ...
+    }
+
+    private static void encode(short di, BSI bsi) {
+        ...
+        bsi.value = ...           // return value and length by setting object fields
+        bsi.length = ...
+    }
+	\end{minted}
+\caption{Avoiding multiple object allocations in the LEC benchmark}
+\label{lst-lec-avoiding-object-allocations}
+\end{listing}
+
+This overhead can often be reduced by allocating earlier and reusing the same objects in a loop. In Listing \ref{lst-lec-avoiding-object-allocations} we see this implemented for the LEC benchmark, where we use an object to return two values from \mycode{encode} to \mycode{compress}. Instead of creating a new object for each call to \mycode{encode}, we create \mycode{bsi} once, outside the main loop, and pass the same object to \mycode{compress} multiple times.
+
+While this technique can often be used to remove this sort of overhead, it gets very cumbersome if the objects need to be passed through multiple layers. Readability is also reduced, since objects that are only needed in a specific location are now visible from a much larger scope.
 
 \paragraph{Possible solutions}
-We suspect it may be possible to avoid this cost in many cases by extending the VM's memory model to allow us to allocate objects and arrays on the stack under certain conditions. We know from TakaTuka's experience that there are many cases where we can determine at compile time that an object can be garbage collected at a certain point \cite{aslam2010optimized}.
+On desktop JVM's escape analysis \cite{Choi:1999uw, Goetz:2005uy} is used to determine if an object can be safely allocated on the stack instead of the heap, thus saving both the cost of heap allocation, and the occasional garbage collection run triggered by it.
 
-% TODO Suganuma seems to propose something similar on page 191 just before concluding remarks
-
-If the compiler can determine an object can be freed at the end of the method in which it was created, we can allocate space for it in the method's stack frame. This avoids the overhead of allocating on the heap, and the occasional garbage collection run triggered by this.
+While the analysis of the bytecode required for this is far too complex for a sensor node, the infuser can do it offline, similar to TakaTuka's offline garbage collector analysis. When this determines an object can be allocated on the stack, it should reserve space for it in the method header, and a special version of the \mycode{new} opcodes may be introduced to instruct the VM to allocate in the space reserved in the stack frame instead of on the heap.
 
 
 
