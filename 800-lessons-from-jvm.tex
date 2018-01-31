@@ -219,11 +219,11 @@ Even without a clear performance model, some basic optimisations can be done. In
 \label{sec-no-gc}
 In Java anything larger than a primitive value has to be allocated on the heap. This introduces a performance overhead, both for allocating the objects, and the occasional garbage collection run, which may take several thousand cycles.
 
-In our benchmarks we encountered a number of situations where a temporary object was needed. As we have seen in Section \ref{sec-evaluation-coremark-unfair-optimisations}, the CoreMark benchmark uses two small local arrays of 8 ints, which are allocated on the stack in C, but need to be on the heap in Java. Another typical example is the \mycode{encode} function in the LEC benchmark, that needs to return two values, \emph{bsi} and the number of bits in \emph{bsi}. In Java we can do this either by creating and returning an object from \mycode{encode}, or by having the caller create it, and passing it as a parameter for \mycode{encode} to fill in.
+In our benchmarks we encountered a number of situations where a temporary object was needed. For example, the \mycode{encode} function in the LEC benchmark needs to return two values: \emph{bsi} and the number of bits in \emph{bsi}. In C we do this by passing a pointer. In Java we can wrap both values in an object and either create and return an object from \mycode{encode}, or let the caller create it and pass it as a parameter for \mycode{encode} to fill in.
 
-In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. In CoreMark's state machine case this adds up to a performance overhead of about 60\% relative to C.
+In code that frequently needs short-lived objects this overhead can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. Besides LEC, we saw similar situations in the CoreMark, MoteTrack and heat tracking benchmarks. The problem is especially serious on a sensor node, where the limited amount of memory means the garbage collector is triggered frequently even if relatively few temporary objects are created.
 
-\begin{listing}[H]
+\begin{listing}[]
 	\centering
 	\begin{minted}[fontsize=\scriptsize]{java}
     public static short LEC(short[] numbers, Stream stream) {
@@ -251,17 +251,16 @@ In code that frequently needs short-lived objects this overhead can be significa
 \label{lst-lec-avoiding-object-allocations}
 \end{listing}
 
-This overhead can often be reduced by allocating earlier and reusing the same objects in a loop. In Listing \ref{lst-lec-avoiding-object-allocations} we see this implemented for the LEC benchmark, where we use an object to return two values from \mycode{encode} to \mycode{compress}. Instead of creating a new object for each call to \mycode{encode}, we create \mycode{bsi} once, outside the main loop, and pass the same object to \mycode{compress} multiple times.
+This overhead can often be reduced by allocating earlier and reusing the same objects in a loop. In Listing \ref{lst-lec-avoiding-object-allocations} we see this implemented for the LEC benchmark, where we use an object to return two values from \mycode{encode} to \mycode{compress}. Instead of creating a new object in each iteration in the \mycode{compress} method where it is needed, we create \mycode{bsi} once, outside of the main loop, and pass the same object to \mycode{compress} multiple times.
 
-While this technique can often be used to remove this sort of overhead, it gets very cumbersome if the objects need to be passed through multiple layers. Readability is also reduced, since objects that are only needed in a specific location are now visible from a much larger scope.
+This technique of pulling object creation up the call chain can often be used to remove this sort of overhead, and it worked in all four benchmarks mentioned before. However, it gets very cumbersome if the number of objects is more than one or two, or if they need to be passed through multiple layers. Readability is also reduced, since objects that are only needed in a specific location are now visible from a much larger scope.
 
 \paragraph{Possible solutions}
-On desktop JVM's escape analysis \cite{Choi:1999uw, Goetz:2005uy} is used to determine if an object can be safely allocated on the stack instead of the heap, thus saving both the cost of heap allocation, and the occasional garbage collection run triggered by it.
+On desktop JVMs, escape analysis \cite{Choi:1999uw, Goetz:2005uy} is used to determine if an object can be safely allocated on the stack instead of the heap, thus saving both the cost of heap allocation, and the occasional garbage collection run triggered by it.
 
-While the analysis of the bytecode required for this is far too complex for a sensor node, the infuser can do it offline, similar to TakaTuka's offline garbage collector analysis. When this determines an object can be allocated on the stack, it should reserve space for it in the method header, and a special version of the \mycode{new} opcodes may be introduced to instruct the VM to allocate in the space reserved in the stack frame instead of on the heap.
+While the analysis of the bytecode required for this is far too complex for a sensor node, it can be done do it offline. Similar to TakaTuka's offline garbage collector analysis, the bytecode can be extended to use the results of this analysis in the VM. In this case, special versions of the \mycode{new} opcodes may be introduced to instruct the VM to place an object in the stack frame instead of the heap, and a field should be added to the method header to tell the VM how much extra space for stack objects needs to be reserved in the stack frame.
 
-
-
+There is a risk to doing this automatically. In our sensor node VM, the split between heap and stack memory is fixed, and both are limited. If the compiler automatically puts all objects that could be on the stack in the stack frame instead of the heap, we may end up with an empty heap, and stack overflow. Therefore, it is better to leave this optimisation to the develop by also introducing a new keyword at the language level, so the developer can explicitly indicate which objects go on the stack and which in the heap. Of course escape analysis is still necessary to check at compile time this keyword is only used in places where the object can go on the stack.
 
 \section{Reconsidering advanced language features}
 \label{sec-advanced-features}
