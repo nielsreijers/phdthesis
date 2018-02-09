@@ -1,0 +1,35 @@
+\section{Benchmarks}
+In this section we will briefly describe how the source code for each benchmark was obtained, and describe any relevant details in their implementation.
+
+
+
+We use a set of eleven different benchmarks to measure the effect of our optimisations:
+
+\begin{itemize}
+\item \emph{bubble sort}: taken from the Darjeeling sources, and used in \cite{Brouwers:2009cj, Ellul:2012thesis}
+\item \emph{heap sort}: standard heap sort \cite{heapsort}
+\item \emph{binary search}: taken from the TakaTuka \cite{Aslam:2008} source code
+\item \emph{fft}: fixed point FFT, adapted from the widespread fix\_fft.c and used in \cite{Kumar:2007ge}
+\item \emph{outlier detection}: our implementation of the algorithm described in \cite{Kumar:2007ge}
+\item \emph{xxtea}: as published in \cite{Wheeler:1998}
+\item \emph{md5}: also taken from the Darjeeling sources, and used in \cite{Brouwers:2009cj, Ellul:2012thesis}
+\item \emph{rc5}: from LibTomCrypt \cite{libtomcrypt}
+\item \emph{CoreMark 1.0}: a freely available benchmark developed by EEMBC \cite{coremark}
+\item \emph{MoteTrack}: RSSI based mote tracking \cite{motetrack, Lorincz:2006fc}
+\item \emph{Heat detection}: adapted from code used in our group to track objects using an 8x8 pixel heat sensor
+\end{itemize}
+
+The first seven are small benchmarks, consisting of only one or two methods. They all process an array of data, which we expect to be common on a sensor node, and likely to be a performance sensitive operation. However, the processing they do is different for each benchmark, allowing us to examine how our optimisations respond to different kinds of code. The eighth benchmark, CoreMark, is a standard benchmark representative of larger embedded applications.
+
+For each benchmark we implemented both a C and a Java version, keeping both implementations as close as possible. We manually optimised the code as described in Section \ref{sec-optimisations-manual-java-source-optimisation}. These optimisations did not affect the performance of the C version, indicating \mycode{avr-gcc} already does similar transformations on the original code. We use \mycode{javac} version 1.8.0, ProGuard 5.2.1, and \mycode{avr-gcc} version 4.9.1. The C benchmarks are compiled at optimisation level -O3, the rest of the VM at -Os.
+
+We manually examined the compiled code produced by \mycode{avr-gcc}. While we identified some points where more efficient code could have been generated, except for the constant shifts mentioned in the previous section, this did not affect performance by more than a few percent. This leads us to believe \mycode{avr-gcc} is a fair benchmark to compare to.
+
+We run our VM in the cycle-accurate Avrora simulator \cite{Titzer:2005vb}, emulating an ATmega128 processor. We modified Avrora to get detailed traces of the compilation process and of the run-time performance of both C and AOT compiled code.
+
+Our main measurement for both code size and performance is the overhead compared to optimised native C. To compare different benchmarks, we normalise this overhead to a percentage of the number of bytes or cpu cycles used by the native implementation: a 100\% overhead means the AOT compiled version takes twice as long to run, or twice as many bytes to store. The exact results can vary depending on factors such as which benchmarks are chosen, the input data, etc., but the general trends are all quite stable.
+
+
+\subsection{MoteTrack}
+\label{sec-evaluation-benchmark-implementation-motetrack}
+

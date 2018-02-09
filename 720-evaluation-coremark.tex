@@ -54,7 +54,7 @@ public static final class ListHead {
 \label{sec-evaluation-manual-optimisations}
 After translating the C to Java code, we only do 'fair' manual optimisations that we believe a future optimising infuser could easily do automatically. Since CoreMark is our most comprehensive benchmark, we use it to evaluate the effect of these manual optimisations.
 
-\input{710-tbl-evaluation-coremark}
+\input{720-tbl-evaluation-coremark}
 
 Table \ref{tbl-coremark-manual-optimisation} shows the slowdown over the native C version, broken down into CoreMark's three main components. The baseline version, using the original Java code and without using any of our optimisations, is 811\% slower than native C. Even after applying all our other optimisations, the best we can achieve with the original code is a 335\% slowdown, proving the importance of a better optimising infuser.
 

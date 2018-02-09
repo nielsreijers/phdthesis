@@ -9,13 +9,18 @@ Working on resource-constrained devices means we have to make some compromises. 
 
 WuKong, discussed in Section \ref{sec-state-of-the-art-wukong} is a good motivating example. Parts of WuKong applications may be written in Java. A node may be part of more than one application, and the WuKong master may dynamically decide to move an object to another node. This means new Java code may have to be loaded onto a device, while another (part of the) application is already running.
 
-To support scenarios like this, the translation process should be very light weight. Specifically, it	 should use as little memory as possible, since this is a very scarce resource and any memory used by the AOT compiler cannot be used for a different task running at the same time. This means we cannot do any analysis on the bytecode that would require us to hold 'large' data structures in memory.
+To support scenarios like this, the translation process should be very light weight. Specifically, it should use as little memory as possible, since this is a very scarce resource and any memory used by the AOT compiler cannot be used for a different task running at the same time. This means we cannot do any analysis on the bytecode that would require us to hold 'large' data structures in memory.
 
-Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but as we will see, quite a lot can be achieved with such limited resources.
+Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but as we will see, a lot can be achieved with very limited resources.
 
 The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is also larger than JVM bytecode. This is the price we pay for increased performance, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous AOT compilation techniques.
 
-\subsection{Compilation process}
+
+\begin{itemize}
+	\item Improve performance 
+\end{itemize}
+
+\section{Compilation process}
 \label{sec-compilation-process}
 \begin{figure}[]
   \includegraphics[width=\linewidth]{compilation-process.eps}
@@ -23,7 +28,7 @@ The two metrics we compromise on are load time and code size. Compiling to nativ
   \label{fig-translation-process}
 \end{figure}
 
-% TODO: clarify two terms: compile-time (javac/proguard/infuser) and translation-time (the VM), and scan the whole text to make sure they're used consistently.
+% TODO: clarify two terms: compile-time (javac/proguard/infuser) and translation-time (the VM)
 
 The complete process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}. Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes. We then use ProGuard \cite{proguard} to do some simple optimisations, but these are very basic steps like removing dead code, and overlapping local variable slots where possible, etc.
 
@@ -175,7 +180,7 @@ We implemented our VM for the ATmega128 CPU. The AVR family of CPUs is widely us
 The ATmega128 has 32 8-bit registers. We expect the Cortex M0, with 12 32-bit general purpose registers, or the MSP430, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well. In Chapter \ref{sec-evaluation} we will examine the expected impact of the number of registers and of using a 16 or 32-bit architecture.
 
 %TODO refer to evaluation 8/16/32 bit and number of regs
-%TODO: references for M0 and MSP430?
+%TODO references for M0 and MSP430?
 
 
 

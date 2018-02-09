@@ -156,7 +156,6 @@ LEC compression cycles per bit        & 43 cycles/bit \\
 
 This shows that for this combination of hardware and sensor data, LEC compression is effective in reducing total energy consumption. However the energy saved is only 1.7x more than the extra energy expended on the CPU. This means that if the slowdown from running this in a VM is more than 1.9, and thus time and energy spent on the CPU increases by a factor larger than 1.9, this would tip the balance in favour of just sending the raw data.
 
-%TODO rewrite now that we don't list the MSP430 anymore
 Where exactly the break-even point lies depends on many factors. The CPUs and radio used in this calculation are very common in typical sensor nodes, for example the widely used Telos platform \cite{Polastre:2005ut} is based on the CC2420 radio and the ATMEGA cpu is found in many Arduinos. However many parameters will affect the results. Power consumption is roughly linear in relation to clock frequency, so at the same voltage the cost per cycle will be similar, but at lower frequencies the CPU can operate at a lower voltage which lowers the cost per cycle. The cost per bit depends on many factors including the link quality. A bad link will increase the cost per bit due to retransmissions, but if the node chooses to transmit at a lower power, for example to reduce the number of neighbours and collisions, the cost per bit will be lower than calculated.
 
 This calculation is only meant to indicate that there are many situations where the slowdown caused by current sensor node VMs will be an issue. For Mercury's feature extraction, the break-even point is around 27x slowdown, while for this case of LEC compression it is at only 1.9x. While the exact numbers depend on the application, it is clear that a slowdown of one to two orders of magnitude will affect battery lifetime in many cases.
@@ -187,14 +186,6 @@ Our approach depends only on the correctness of our VM, and guarantees it can al
 
 \section{Scope}
 \label{sec-introduction-scope}
-The main focus of this thesis is on the suitability of VMs as a way to programme sensor node devices. The main research questions we will answer are:
-\begin{itemize}
-	\item How close can an AOT compiling sensor node VM come to native C performance?
-	\item What are the tradeoffs?
-	\item Can a VM be an efficient way to provide a safe, sandboxed execution environment on a sensor node?
-	\item Is Java a suitable language for a sensor node VM, and how may it be improved?
-\end{itemize}
-
 Internet-of-Things devices come in a wide range with varying capabilities. The larger IoT platforms are powerful enough to run standard operating systems, tools and languages, and VMs are well established as a good way to programme devices powerful enough to run advanced JIT compilers. This thesis focusses specifically on small sensor nodes for which no such standards exists. These platforms have the following characteristics:
 \begin{itemize}
 	\item Split data and programme memory: RAM for data, and flash memory for code are separated. While some device can execute code from both RAM and flash \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, others cannot \cite{Atmel:ATMEGA128Datasheet}.
@@ -227,9 +218,16 @@ The question we wish to answer is not "How well can \emph{Java} run on a sensor 
 We will see that in fact Java, in its current form, is nearly unusable for serious applications, and will end with a number of suggestions on how to remedy these issues.
 
 
-\section{Contributions}
+\section{Research questions and contributions}
+The main focus of this thesis is on assessing the suitability of VMs as a means to programme sensor node devices. The main research questions we will answer are:
+\begin{itemize}
+	\item How close can an AOT compiling sensor node VM come to native C performance?
+	\item What are the tradeoffs?
+	\item Can a VM be an efficient way to provide a safe, sandboxed execution environment on a sensor node?
+	\item Is Java a suitable language for a sensor node VM, and how may it be improved?
+\end{itemize}
 
-This thesis makes the following contributions:
+Specifically, this thesis makes the following contributions:
 \begin{itemize}
 	\item We identify the major sources of overhead when using the baseline approach to AOT compilation, as described by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}.
 	\item Using the results of this analysis, we propose a set of optimisations to address each source of overhead, including a lightweight alternative to Java method invocation to reduce method call overhead.
@@ -243,7 +241,6 @@ This thesis makes the following contributions:
 \end{itemize}
 
 \section{Structure of thesis}
-
 Chapter 2 introduces some necessary background knowledge on wireless sensor networks, Java and the Java virtual machine, and JIT and AOT compilation.
 
 Chapter 3 discusses the state of the art in improving performance for sensor node VMs and providing safe execution environments.
@@ -270,7 +267,6 @@ This dissertation is based on previously published technical reports or conferen
 \end{itemize}
 
 \section{Naming}
-% TODO: consistent spelling and caps for bytecode runtime, compilation time, translation time, load time, atmega, etc.
 In literature various names are used for our target devices. The word \emph{mote} was common in early WSN research, as was \emph{sensor node}, or \emph{device} although the latter may also refer to larger, more powerful devices. In this thesis we will use the terms \emph{sensor node} or simply \emph{node} interchangeably to refer solely to the type of severely resource-constrained devices described above.
 
 The terms \emph{wireless sensor networks}, \emph{cyber-physical systems} and \emph{internet-of-things} are all commonly used to describe sensor node applications. We will use WSN since it is the longer established term, and more clearly focussed on resource-constrained devices, but note that this also covers a large portion of IoT applications.

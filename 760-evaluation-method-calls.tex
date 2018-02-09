@@ -1,6 +1,6 @@
 \section{Method invocation}
 \label{sec-method-invocation}
-\input{750-tbl-benchmark-methods}
+\input{760-tbl-benchmark-methods}
 
 Most of our benchmarks consist of only a single method. The three small functions in the FFT benchmark were inlined by the C compiler, so we manually inlined them in the Java version. Heap sort does contain a real method call: it consist of a main loop, repeatedly calling the \mycode{siftDown} method. CoreMark is a much more extensive benchmark consisting of many methods.
 
