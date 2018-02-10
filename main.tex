@@ -11,6 +11,7 @@
 \usepackage{booktabs}
 \usepackage{color, colortbl}
 \usepackage{threeparttable}
+\usepackage{csquotes}
 \usepackage{minted}
 \setminted{frame=lines,linenos=true,baselinestretch=1}
 \setmonofont{Courier}
@@ -104,11 +105,12 @@
 \input{750-evaluation-benchmark-details}
 \input{760-evaluation-method-calls}
 \input{770-evaluation-the-cost-of-safety}
-\input{780-evaluation-limitations-and-the-cost-of-vm}
-\input{790-evaluation-other-platforms}
+\input{780-evaluation-other-platforms}
+\input{790-evaluation-limitations-and-the-cost-of-vm}
 \input{799-evaluation-conclusion}
 \input{800-lessons-from-jvm}
 \input{900-conclusion}
+
 
 %TODO: subsubsection and paragraph look very similar, maybe only use one?
 %TODO: consistent table layout. double midrule to separate header from body
@@ -117,6 +119,14 @@
 %TODO: consistent usage of compile-time (Java->bytecode) and translation-time (bytecode->native code)
 
 \appendix
+\chapter{LEC benchmark source code}
+\label{app-lec-source}
+\chapter{Outlier detection benchmark source code}
+\label{app-outlier-detection-source}
+\chapter{Heat detection benchmark source code}
+\label{app-heat-detection-source}
+\subsection{Calibration}
+\subsection{Detection}
 
 \backmatter
 

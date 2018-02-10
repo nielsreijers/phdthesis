@@ -2,22 +2,26 @@
 
 This chapter we introduce MyVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATMEGA, cannot do.
 
-
+%TODO add a picture somewhere showing there's no OS, but the VM runs directly on the hardware.
 
 \section{Goals}
+\label{sec-myvm-goals}
 Working on resource-constrained devices means we have to make some compromises. Our main goal is to build an AOT compiling VM that will produce code that both performs well, and adds as little code size overhead as possible. In addition, we want our VM to fit as many scenarios as possible, for example scenarios were multiple applications may be running on a single device. When new code is being loaded, the impact on other applications should be as small as possible.
 
 WuKong, discussed in Section \ref{sec-state-of-the-art-wukong} is a good motivating example. Parts of WuKong applications may be written in Java. A node may be part of more than one application, and the WuKong master may dynamically decide to move an object to another node. This means new Java code may have to be loaded onto a device, while another (part of the) application is already running.
 
 To support scenarios like this, the translation process should be very light weight. Specifically, it should use as little memory as possible, since this is a very scarce resource and any memory used by the AOT compiler cannot be used for a different task running at the same time. This means we cannot do any analysis on the bytecode that would require us to hold 'large' data structures in memory.
 
-Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but as we will see, a lot can be achieved with very limited resources.
+Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but, as we will see, a lot can be achieved with very limited resources.
 
-The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is also larger than JVM bytecode. This is the price we pay for increased performance, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous AOT compilation techniques.
+The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is already larger than JVM bytecode, and our AOT compiled code is on average 67\% larger than its optimised C equivalent. This is the price we pay for increased performance, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous AOT compilation techniques.
 
-
+We summarise our goals and constraints below:
 \begin{itemize}
-	\item Improve performance 
+	\item Improve performance to within half of native optimised code.
+	\item Provide the option to run applications in a safe, sandboxed environment.
+	\item Keep memory consumption to around 100 bytes to allow concurrent tasks to keep running and maintain their state as new code is loaded onto the device.
+	\item Limit code size overhead so the approach is feasible on mid-range sensor node devices: at least 64KB of programme memory for 8-bit Atmel CPUs.
 \end{itemize}
 
 \section{Compilation process}

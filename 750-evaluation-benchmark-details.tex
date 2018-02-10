@@ -51,3 +51,5 @@ For most benchmarks the maximum of 7 register pairs to pin variables to was also
 
 Figure \ref{fig-performance-pinnedregs-per-benchmark} shows the performance for each benchmark, as the number of pinned register pairs is increased. The three benchmarks that stay stable or even slow down when the number pinned pairs is increased beyond 5 are exactly the benchmarks that have a high stack depth: xxtea, md5 and rc5. It should be possible to develop a simple heuristic to allow the VM to make a better decision on the number of registers to pin. Since our current VM always pins 7 pairs, we used this as our end result and leave this heuristic to future work.
 
+%TODO MoteTrack: explain most of the overhead comes from reading from flash. C does a simple memcpy but Java has to fill a more complex data structure.
+

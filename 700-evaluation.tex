@@ -6,4 +6,23 @@
 %TODO EVALUATION: add section to investigate how the VM may perform on other platforms. vary number if registers available, and compare 32/16/8 bit versions of some benchmarks
 %TODO EVALUATION: add conclusion to discuss variation in results. YMMV.
 
-This dissertation presents a number of techniques to make sensor node virtual machines safe, and improve their performance
+This dissertation presents a number of techniques to make sensor node virtual machines safe, and improve their performance, staying within the constraints set out in Section \ref{sec-myvm-goals}. This chapter evaluates how MyVM meets these goals by measuring its performance and code size overhead for a number of different benchmarks.
+
+First, Section \ref{sec-evaluation-benchmarks} will describe our experimental setup, the benchmarks used, and how the source code for these benchmarks was obtained.
+
+Next, Section \ref{sec-evaluation-coremark} will use our largest benchmark to examine the effect of the lack of optimisations done by the standard \mycode{javac} compiler, and the manual optimisations we do on the Java source that in a future version should be done by an optimising compiler/infuser.
+
+Sections \ref{sec-evaluation-aot-translation-performance} and \ref{sec-evaluation-aot-translation-code-size} evaluate the result of our optimisations to the AOT translation process on performance and code size respectively.
+
+Section \ref{sec-evaluation-method-invocation} evaluates the cost of method invocation and the effect of our lightweight method calls.
+
+The cost of adding safety checks is examined in Section \ref{sec-evaluation-safety}.
+
+Platform independence is one of the main reasons to use a VM. While we only implement our approach for the Atmel AVR platform, Section \ref{sec-evaluation-other-platforms} presents measurements that give an indication of the expected performance on other sensor node platforms.
+
+In Section \ref{sec-evaluation-limitations} we discuss the limitations and cost of using a VM, and describe some known hard cases our VM currently does not handle as well.
+
+Finally we conclude this chapter in Section \ref{sec-evaluation-conclusion} by comparing our results to existing approaches to improve sensor node VM performance or provide a safe execution environment.
+
+
+

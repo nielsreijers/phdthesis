@@ -1,18 +1,18 @@
 \section{CoreMark}
 \label{sec-evaluation-coremark}
 
-First, we will examine the CoreMark benchmark. CoreMark was developed by the Embedded Microprocessor Benchmark Consortium as a general benchmark for embedded CPUs. It consists of three main parts:
+Next, we will examine the CoreMark benchmark. CoreMark was developed by the Embedded Microprocessor Benchmark Consortium as a general benchmark for embedded CPUs. It consists of three main parts:
 \begin{itemize}
   \item matrix multiplication
   \item a state machine
   \item linked list processing
 \end{itemize}
 
-As mentioned before, we kept the Java versions as close to the original C code as possible. The other benchmarks are all relatively simple, and porting them to Java is straightforward. CoreMark is a much more comprehensive benchmark, and the more complex code exposes some challenges when using Java on embedded devices.
+As mentioned before, we kept the Java versions as close to the original C code as possible. Since CoreMark is our largest benchmark, we will use it to discuss some of the challenges when translating its C code to Java.
 
 The biggest complication is that CoreMark makes extensive use of pointers, which do not exist in Java. In cases where a pointer to a simple variable is passed to a function, we simply wrap it in a wrapper object. A more complicated case is the \mycode{core\_list\_mergesort} function, which takes a function pointer parameter \mycode{cmp} used to compare list elements. Two different implementations exists, \mycode{cmp\_idx} and \mycode{cmp\_complex}. Here we choose the most canonical way to do this in Java, which is to define an interface and pass an object with the right to implementation \mycode{core\_list\_mergesort}.
 
-Finally, the C version of the linked list benchmark takes a block of memory and constructs a linked list inside it by and treating it as \mycode{list\_head} and \mycode{list\_data} structs, shown in Listing \ref{lst-coremark-list-data-structures}. One way to mimic this as closely as possible is to use an array of shorts of equal size to the memory block used in the C version, and use indexes into this array instead of pointers. However this leads to quite messy code.
+The C version of the linked list benchmark takes a block of memory and constructs a linked list inside it by and treating it as \mycode{list\_head} and \mycode{list\_data} structs, shown in Listing \ref{lst-coremark-list-data-structures}. One way to mimic this as closely as possible is to use an array of shorts of equal size to the memory block used in the C version, and use indexes into this array instead of pointers. However this leads to quite messy code.
 
 Instead we choose the more natural Java approach and define two classes to match the structs in C and create instances of these to initialise the list. This is also the faster option because accessing fields is faster than array access. The trade-off is memory consumption, since each object has its own heap header.
 
@@ -60,6 +60,7 @@ Table \ref{tbl-coremark-manual-optimisation} shows the slowdown over the native 
 
 Next we apply our manual optimisations to the Java source code, as described in Section \ref{sec-optimisations-manual-java-source-optimisation}, and add a small extra optimisation to \mycode{crcu8} which can be easily reorganised to reduce branch overhead.
 
+%TODO: check if the sentence about GC run is still true, now that we run GC before starting the AOT benchmark
 The effect depends greatly on the characteristics of the code. The matrix part of the benchmark benefits most from using short array indexes, the state machine frequently calls a small method and benefits greatly from inlining it, etc. The reason the linked list part is slightly slower after using short array index variables is that it allocates a small object, and the change in memory usage means this now triggers a run of the garbage collector, which presumably had already happened earlier in the version with int index variables. Combined these optimisations reduce the overhead for the whole benchmark from 335\% to 104\%.
 
 We also applied all these optimisations to the native C version to ensure a fair comparison, but the difference in performance was negligible.
@@ -82,7 +83,7 @@ This is the best we can do when we strictly translate the C to Java code, and on
 % one ListData           :  4 bytes
 % 4*5byte heap header    : 20 bytes
 
-Combined this improves the performance of CoreMark to only 61\% overhead over native C, right in the middle of the spectrum of the other benchmarks. However, the code is now fundamentally different than the original CoreMark, so it is not a completely fair comparison, although a developer writing this code in Java from the start may have made similar choices.
+Combined this improves the performance of CoreMark to only 61\% overhead over native C, right in the middle of the spectrum of the other benchmarks. However, it is not a completely fair comparison since code is now different than the original CoreMark, although a developer writing this code in Java from the start may have made similar choices.
 
 Either way, these results point at some weaknesses of Java when used as an embedded VM. The lack of cheap function pointers, or a way of allocating small local objects or arrays in a method's stack frame means there will be a significant overhead in situations where the optimisations we used here cannot be applied.
 

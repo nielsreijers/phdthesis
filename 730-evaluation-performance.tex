@@ -1,4 +1,5 @@
-\section{AOT translation overhead}
+\section{AOT translation: performance}
+\label{sec-evaluation-aot-translation-performance}
 \begin{table}[]
  \centering
  \caption{Performance data per benchmark}
@@ -10,7 +11,7 @@
  \setlength{\tabcolsep}{6pt}
 \end{table}
 
-Next we will look at the effect of our different optimisations for the baseline AOT translation approach, for all eight of our benchmarks.
+Next we will look at the effect of our optimisations to the baseline AOT translation approach, for all our benchmarks.
 
 The trace data produced by Avrora gives us a detailed view into the run-time performance and the different types of overhead. We count the number of bytes and cycles spent on each native instruction for both the native C and our AOT compiled version, and then group them into 4 categories that roughly match the 3 types of AOT translation overhead discussed in Section \ref{sec-overhead-aot-translation}:
 \begin{itemize}
@@ -22,7 +23,7 @@ The trace data produced by Avrora gives us a detailed view into the run-time per
 
 We define the overhead from each category as the number of bytes or cycles spent in the AOT version, minus the number spent by the native version for that category, and again normalise this to the \emph{total} number of bytes or cycles spent in the native C version. The detailed results for each benchmark and type of overhead are shown in tables \ref{tbl-performance-per-benchmark} and \ref{tbl-codesize-per-benchmark}.
 
-In Figure \ref{fig-performance-per-opcode-category} we see how our optimisations combine to reduce performance overhead. We take the average of the 8 benchmarks, and show both the total overhead, and the overhead for each instruction category. Figure \ref{fig-performance-per-benchmark} shows the total overhead for each individual benchmark. We start with the original AOT approach with only the simple peephole optimiser, and then incrementally add each of our optimisations. The lightweight method call optimisation is already included in these results. Its effect will be examined in detail in Section \ref{sec-method-invocation}.
+In Figure \ref{fig-performance-per-opcode-category} we see how our optimisations combine to reduce performance overhead. We take the average of the 8 benchmarks, and show both the total overhead, and the overhead for each instruction category. Figure \ref{fig-performance-per-benchmark} shows the total overhead for each individual benchmark. We start with the original AOT approach with only the simple peephole optimiser, and then incrementally add each of our optimisations. The lightweight method call optimisation is already included in these results. Its effect will be examined in detail in Section \ref{sec-evaluation-method-invocation}.
 
 \begin{figure}
  \centering
