@@ -52,20 +52,20 @@ plot "codesizeoverhead-per-opcode-category.dat" using 2 title 'push/pop'   with 
 set ylabel "Overhead (% of native C run time)"
 set xtics ("1" 0, "2" 1, "3" 2, "4" 3, "5" 4, "6" 5, "7" 6)
 
-set output "../performance-xxtea-overhead-per-pinnedregs.eps"
-plot "performance-xxtea-overhead-per-pinnedregs.dat" using 2 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
-     "performance-xxtea-overhead-per-pinnedregs.dat" using 3 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
-     "performance-xxtea-overhead-per-pinnedregs.dat" using 4 title 'load/store' with linespoints dashtype 4 lw 3 ps 1.5, \
-     "performance-xxtea-overhead-per-pinnedregs.dat" using 5 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5, \
-     "performance-xxtea-overhead-per-pinnedregs.dat" using 6 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5
+set output "../pinnedregs-performance-xxtea.eps"
+plot "pinnedregs-performance-xxtea.dat" using 2 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
+     "pinnedregs-performance-xxtea.dat" using 3 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
+     "pinnedregs-performance-xxtea.dat" using 4 title 'load/store' with linespoints dashtype 4 lw 3 ps 1.5, \
+     "pinnedregs-performance-xxtea.dat" using 5 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5, \
+     "pinnedregs-performance-xxtea.dat" using 6 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5
 
 set yrange [0:*]
-set output "../performance-benchmarks-per-pinnedregs.eps"
-plot "performance-benchmarks-per-pinnedregs.dat" using 2 title 'bubble sort'   with linespoints dashtype 1 lw 3 ps 1.5, \
-     "performance-benchmarks-per-pinnedregs.dat" using 3 title 'heap sort'     with linespoints dashtype 2 lw 3 ps 1.5, \
-     "performance-benchmarks-per-pinnedregs.dat" using 4 title 'binary search' with linespoints dashtype 3 lw 3 ps 1.5, \
-     "performance-benchmarks-per-pinnedregs.dat" using 5 title 'fft'           with linespoints dashtype 4 lw 3 ps 1.5, \
-     "performance-benchmarks-per-pinnedregs.dat" using 6 title 'xxtea'         with linespoints dashtype 5 lw 3 ps 1.5, \
-     "performance-benchmarks-per-pinnedregs.dat" using 7 title 'md5'           with linespoints dashtype 6 lw 3 ps 1.5, \
-     "performance-benchmarks-per-pinnedregs.dat" using 8 title 'rc5'           with linespoints dashtype 7 lw 3 ps 1.5
+set output "../pinnedregs-performance-all-benchmarks.eps"
+plot "pinnedregs-performance-all-benchmarks.dat" using 2 title 'bubble sort'   with linespoints dashtype 1 lw 3 ps 1.5, \
+     "pinnedregs-performance-all-benchmarks.dat" using 3 title 'heap sort'     with linespoints dashtype 2 lw 3 ps 1.5, \
+     "pinnedregs-performance-all-benchmarks.dat" using 4 title 'binary search' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "pinnedregs-performance-all-benchmarks.dat" using 5 title 'fft'           with linespoints dashtype 4 lw 3 ps 1.5, \
+     "pinnedregs-performance-all-benchmarks.dat" using 6 title 'xxtea'         with linespoints dashtype 5 lw 3 ps 1.5, \
+     "pinnedregs-performance-all-benchmarks.dat" using 7 title 'md5'           with linespoints dashtype 6 lw 3 ps 1.5, \
+     "pinnedregs-performance-all-benchmarks.dat" using 8 title 'rc5'           with linespoints dashtype 7 lw 3 ps 1.5
 
