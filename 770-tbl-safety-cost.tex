@@ -1,21 +1,21 @@
 \scriptsize
-\begin{tabular}{lrrrrrrrrrrrr}
+\begin{tabular}{lrrrrrrrrrrrrrrr}
 \toprule
-BENCHMARK                          & b.sort            &  h.sort           & b.srch            & fft               & xxtea             & md5               & rc5               & coremk            & \makebox[0.2mm]{}   & average           \\
+                                    & B.sort     &  H.sort    & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
 \hline
-\multicolumn{10}{l}{PERFORMANCE OVERHEAD VS NATIVE C (\%)} \\
-unsafe                & 94.4  & 66.2  & 64.3  & 96.7  & 57.6 & 45.7 & 19.5  & 110   & & 69.3  \\
-safe writes           & 185.9 & 107.7 & 64.3  & 145.6 & 68.2 & 60.3 & 22.2  & 137.3 & & 98.9  \\
-safe reads and writes & 277.4 & 192.6 & 119.1 & 201.5 & 100  & 80.3 & 33.4  & 217.9 & & 152.8 \\
-\multicolumn{10}{l}{PERFORMANCE OVERHEAD VS UNSAFE VM (\%)} \\
-safe writes           & 47.1  & 25    & 0     & 24.9  & 6.7  & 10   & 2.3   & 13    & & 17.5  \\
-safe reads and writes & 94.1  & 76.1  & 33.4  & 53.3  & 26.9 & 23.7 & 11.6  & 51.4  & & 49.3  \\
-\multicolumn{10}{l}{CODE SIZE OVERHEAD VS NATIVE C (\%)} \\
-unsafe                & 102.6 & 67.9  & 85.8  & 17.6  & 55.1 & 54.9 & 120.7 & 50.1  & & 69.3  \\
-safe writes           & 107.9 & 71.8  & 85.8  & 20.3  & 56.2 & 55.7 & 124.2 & 54    & & 72    \\
-safe reads and writes & 113.2 & 77.5  & 89.6  & 24.2  & 60.1 & 59.1 & 131.2 & 61.3  & & 77    \\
-\multicolumn{10}{l}{CODE SIZE OVERHEAD VS UNSAFE VM (\%)} \\
-safe writes           & 2.6   & 2.3   & 0     & 2.3   & 0.7  & 0.5  & 1.6   & 2.6   & & 1.6   \\
-safe reads and writes & 5.2   & 5.7   & 2     & 5.6   & 3.2  & 2.7  & 4.8   & 7.5   & & 4.5   \\
+\multicolumn{10}{l}{PERFORMANCE OVERHEAD VS NATIVE C (\% of nat. C)} \\
+unsafe                              &      101.2 &       88.5 &       65.2 &       57.6 &       45.7 &       19.5 &       17.7 &       75.7 &       86.5 &       98.1 &      165.4 &       30.5 &       73.4 &                   &      71.2 \\
+safe writes                         &      247.5 &      153.9 &       65.2 &       68.2 &       60.3 &       22.2 &       30.4 &      128.4 &      120.2 &      125.2 &      222.6 &       33.9 &       91.3 &                   &     105.3 \\
+safe reads and writes               &      393.9 &      287.8 &      151.7 &      100.0 &       80.3 &       33.4 &       44.9 &      226.6 &      193.2 &      203.4 &      382.6 &       43.9 &      126.9 &                   &     174.5 \\
+\multicolumn{10}{l}{PERFORMANCE OVERHEAD VS UNSAFE VM (\% of unsafe AOT)} \\
+safe writes                         &       72.7 &       34.7 &        0.0 &        6.7 &       10.0 &        2.3 &       10.8 &       30.0 &       18.1 &       13.7 &       21.6 &        2.6 &       10.3 &                   &      19.9 \\
+safe reads and writes               &      145.5 &      105.7 &       52.4 &       26.9 &       23.7 &       11.6 &       23.1 &       85.9 &       57.2 &       53.2 &       81.8 &       10.3 &       30.9 &                   &      60.3 \\
+\multicolumn{10}{l}{CODE SIZE OVERHEAD VS NATIVE C (\% of nat. C)} \\
+unsafe                              &      118.6 &      100.0 &      112.3 &       55.1 &       54.9 &      121.8 &        3.9 &      110.5 &       91.8 &       49.8 &      101.0 &      -17.2 &      107.7 &                   &      77.7 \\
+safe writes                         &      125.4 &      105.4 &      112.3 &       56.2 &       55.7 &      125.3 &        6.3 &      118.9 &       97.5 &       53.7 &      107.9 &      -16.4 &      114.7 &                   &      81.8 \\
+safe reads and writes               &      132.2 &      113.4 &      117.8 &       60.1 &       59.1 &      132.3 &       10.1 &      123.2 &      107.5 &       61.0 &      127.0 &      -13.9 &      118.5 &                   &      88.3 \\
+\multicolumn{10}{l}{CODE SIZE OVERHEAD VS UNSAFE VM (\% of unsafe AOT)} \\
+safe writes                         &        3.1 &        2.7 &        0.0 &        0.7 &        0.5 &        1.6 &        2.3 &        4.0 &        3.0 &        2.6 &        3.4 &        1.0 &        3.4 &                   &       2.3 \\
+safe reads and writes               &        6.2 &        6.7 &        2.6 &        3.2 &        2.7 &        4.7 &        6.0 &        6.0 &        8.2 &        7.5 &       12.9 &        4.0 &        5.2 &                   &       6.0 \\
 \bottomrule
 \end{tabular}  
