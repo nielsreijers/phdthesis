@@ -1,3 +1,5 @@
+% UPDATED 20180213
+
 \begin{table*}[]
 \centering
 \caption{Comparison of our approach to related work}
@@ -5,17 +7,19 @@
 \begin{threeparttable}
 \begin{tabular}{lrrrrrrrr}
 \toprule
-Approach        & Platform    & Safe               & Performance        & Code size               \\
-                & independent &                    &                    & \\
+Approach        & Platform    & Safe               & Performance           & Code size              \\
+                & independent &                    &                       & \\
 \midrule
-Native code     & No          & No                 & 1x                 & 1x                      \\
-Interpreters    & Yes         & Mostly no          & 300-23000\% slower & ~50\% smaller           \\
-Ellul's AOT     & Yes         & No                 & 123-844\% slower   & 120-346\% larger        \\
-Safe TinyOS     & No          & Yes\tnote{a}       & 17\% slower        & 27\% larger             \\
-\emph{t-kernel} & No          & Yes                & 50-200\% slower    & 500-750\% larger        \\
-Harbor          & No          & Yes                & 160-1230\% slower  & 30-65\% larger          \\
-Our VM (unsafe) & Yes         & No                 & 20-110\% slower    & 17-120\% larger         \\
-Our VM (safe)   & Yes         & Yes                & 22-185\% slower    & 20-124\% larger         \\
+Native code     & No          & No                 & 1x                    & 1x                     \\
+Interpreters    & Yes         & Mostly no          & 300-23000\% slower    & ~50\% smaller          \\
+Ellul's AOT     & Yes         & No                 & 123-844\% slower      & 120-346\% larger       \\
+Safe TinyOS     & No          & Yes\tnote{a}       & 17\% slower           & 27\% larger            \\
+\emph{t-kernel} & No          & Yes                & 50 to 200\% slower    & 500 to 750\% larger    \\
+Harbor          & No          & Yes                & 160 to 1230\% slower  & 30 to 65\% larger      \\
+% Our VM (unsafe) & Yes         & No                 & 18 to 165\% slower    & -17 to 121\% larger    \\
+% Our VM (safe)   & Yes         & Yes                & 22 to 247\% slower    & -16 to 125\% larger    \\
+Our VM (unsafe) & Yes         & No                 & 71\% slower           & 78\% larger            \\ % avg
+Our VM (safe)   & Yes         & Yes                & 105\% slower          & 82\% larger            \\ % avg
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
