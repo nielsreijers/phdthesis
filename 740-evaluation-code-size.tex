@@ -52,36 +52,14 @@ As is often the case, there is a tradeoff between size and performance. The inte
 
 For the smallest devices, or if we want to be able to load especially large programmes, we may decide to use only a selection of optimisations to limit the VM size and still get both a reasonable performance, and most of the code size reduction. Using only popped value stack caching reduces code size by 33.3\%, and results in a performance overhead of 156\%. The  16-bit array index optimisation should also be included, since this reduces the size of both the VM and the generated code.
 
-\begin{table*}[]
-% Memory consumption is based on using only 11 element arrays. Current implementation is lazy and just uses a 16 byte array, but we never use the first two and last three, since they're not used for stack caching. Original:
-%baseline             &  20B &  4450B &          &       \\
-%improved peephole    &  20B &  5016B &  -13.1\% &  4.3KB  \\
-%simple               &  36B &  6054B &  -28.1\% &  5.7KB  \\
-%popped               & 104B &  7314B &  -34.4\% &  8.3KB  \\
-%markloop             & 111B & 10172B &  -36.4\% & 15.7KB  \\
-%const shift          & 112B & 10766B &  -37.2\% & 17.0KB  \\
-
+\begin{table}[]
+% Memory consumption is based on using only 11 element arrays. Current implementation is lazy and just uses a 16 byte array, but we never use the first two and last three, since they're not used for stack caching.
 \centering
 \caption{Code size and memory consumption}
 \label{tbl-code-size-and-memory-consumption}
 \small
-\begin{tabular}{lrrrrrr}
-\toprule
-                      & size vs     & size vs  &            & AOT code  & break   & memory \\
-                      & interpreter & baseline &            & reduction & even    & usage  \\
-\hline
-Baseline              &     6245 B  &          &            &           &         & 30 B   \\
-Improved peephole     &     6523 B  &    278 B &  \scriptsize (+278)  &  -14.4\%  &  1.9 KB & 30 B   \\
-Simple stack caching  &     7243 B  &    998 B &  \scriptsize (+720)  &  -28.6\%  &  3.5 KB & 41 B   \\
-Popped value caching  &     8607 B  &   2362 B & \scriptsize (+1364)  &  -33.3\%  &  7.1 KB & 89 B   \\
-Markloop              &    11903 B  &   5658 B & \scriptsize (+3296)  &  -33.2\%  & 17.0 KB & 98 B   \\
-Const shift           &    12373 B  &   6128 B &  \scriptsize (+470)  &  -33.8\%  & 18.1 KB & 98 B   \\
-16-bit array index    &    12353 B  &   6108 B &   \scriptsize (-20)  &  -38.0\%  & 16.1 KB & 98 B   \\
-SIMUL                 &    12419 B  &   6174 B &   \scriptsize (+66)  &  -38.1\%  & 16.2 KB & 98 B   \\
-Lightweight methods   &    12961 B  &   6716 B &  \scriptsize (+542)  &  -38.4\%  & 17.5 KB & 98 B   \\
-\bottomrule
-\end{tabular}
-\end{table*}
+\input{741-tbl-evaluation-vm-size}
+\end{table}
 
 \subsection{VM memory consumption} The last column in Table \ref{tbl-code-size-and-memory-consumption} shows the size of the main data structure that needs to be kept in memory while translating a method. For the baseline approach we only use 30 bytes for a number of commonly used values such as a pointer to the next instruction to be compiled, the number of instructions in the method, etc. The simple stack caching approach adds a 11 byte array to store the state of each register pair we use for stack caching. Popped value caching adds two more arrays of 16-bit elements to store the value tag and age of each value. Mark loops only needs an extra 16-bit word to mark which registers are pinned, and a few other variables. Finally, the instruction set optimisations do not require any additional memory. In total, our compiler requires 98 bytes of memory during the compilation process.
 

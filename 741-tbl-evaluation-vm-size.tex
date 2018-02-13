@@ -1,0 +1,18 @@
+% UPDATED 20180213
+
+\begin{tabular}{lrrrrrr}
+\toprule
+                          & size vs     & size vs  &                      & AOT code  &   break & memory    \\
+                          & interpreter & baseline &                      & reduction &   even  & usage     \\
+\midrule
+Baseline                  &     6605 B  &          &                      &           &         & 23 B      \\
+Improved peephole         &     6881 B  &   276 B  & \scriptsize   (+276) &  -14.8\%  &  1.9 KB & 23 B      \\
+Simple stack caching      &     7825 B  &  1220 B  & \scriptsize   (+944) &  -27.6\%  &  4.4 KB & 34 B      \\
+Popped value caching      &     9057 B  &  2452 B  & \scriptsize  (+1232) &  -33.1\%  &  7.4 KB & 78 B      \\
+Markloop                  &    12337 B  &  5732 B  & \scriptsize  (+3280) &  -33.0\%  & 17.4 KB & 85 B      \\
+Const shift               &    12785 B  &  6180 B  & \scriptsize   (+448) &  -33.8\%  & 18.3 KB & 85 B      \\
+16-bit array index        &    12765 B  &  6160 B  & \scriptsize    (-20) &  -38.2\%  & 16.1 KB & 85 B      \\
+SIMUL                     &    12831 B  &  6226 B  & \scriptsize    (+66) &  -38.7\%  & 16.1 KB & 85 B      \\
+Lightweight methods       &    13367 B  &  6762 B  & \scriptsize   (+536) &  -38.9\%  & 17.4 KB & 85 B      \\
+\bottomrule
+\end{tabular}

@@ -54,7 +54,7 @@ plot "codesizeoverhead-per-benchmark.dat" using 2 title 'Bubble sort'   with lin
      "codesizeoverhead-per-benchmark.dat" using 13 title 'HeatCalib'     with linespoints dashtype 12 lw 3 ps 1.5, \
      "codesizeoverhead-per-benchmark.dat" using 14 title 'HeatDetect'    with linespoints dashtype 13 lw 3 ps 1.5
 
-set output "../performance-per-opcode-category.eps"
+set output "../codesizeoverhead-per-opcode-category.eps"
 plot "codesizeoverhead-per-opcode-category.dat" using 2 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category.dat" using 4 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
