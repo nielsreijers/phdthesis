@@ -1,0 +1,22 @@
+% UPDATED 20180213
+
+\begin{table}[]
+ \centering
+ \caption{Overhead for the fill array benchmark as a percentage of native C}
+ \label{tbl-fill-array-results}
+\begin{tabular}{lrrr}
+\toprule
+%benchmark & unsafe overhead & safe overhead \\
+%\midrule
+%8-bit  byte  & 210\% & 566\% \\
+%16-bit short & 182\% & 452\% \\
+%32-bit int   & 155\% & 336\% \\
+Benchmark & Unsafe & Safe & Increase due to \\
+ & overhead & overhead & safety checks \\
+\midrule
+8-bit  bytes  & 210.1\% & 566.4\% & 356.3\% \\
+16-bit shorts & 182.8\% & 451.5\% & 268.7\% \\
+32-bit ints   & 155.3\% & 335.6\% & 180.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -89,26 +89,7 @@ Our benchmark is implemented as a simple loop as shown in Listing \ref{lst-fill-
 	\label{lst-fill-array}
 \end{listing}
 
-\begin{table}[]
- \centering
- \caption{Overhead for the fill array benchmark as a percentage of native C}
- \label{tbl-fill-array-results}
-\begin{tabular}{lrrr}
-\toprule
-%benchmark & unsafe overhead & safe overhead \\
-%\midrule
-%8-bit  byte  & 210\% & 566\% \\
-%16-bit short & 182\% & 452\% \\
-%32-bit int   & 155\% & 336\% \\
-Benchmark & Unsafe & Safe & Increase due to \\
- & overhead & overhead & safety checks \\
-\midrule
-8-bit  bytes  & 210\% & 566\% & 356\% \\
-16-bit shorts & 182\% & 452\% & 270\% \\
-32-bit ints   & 155\% & 336\% & 181\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{771-tbl-evaluation-safety-fillarray}
 
 The resulting overhead is shown in Table \ref{tbl-fill-array-results}. We implemented our benchmark for arrays of bytes, shorts and ints. Unfortunately the Harbor paper does not mention the size of elements in their buffer, nor whether this will make a difference for their overhead. For our VM, the worst case is filling a byte array because here the relative overhead from address calculation and safety checks is highest.
 
