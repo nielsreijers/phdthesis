@@ -1,2 +1,25 @@
 \section{Other platforms}
 \label{sec-evaluation-other-platforms}
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\myfiguresizeperformance]{cachesize-performance-per-opcode-category.eps}
+    \caption{Performance for different stack cache sizes (in pairs of registers)}
+    \label{fig-performance-per-opcode-category-per-cachesize}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\myfiguresizeperformance]{8_16_32_bit.eps}
+    \caption{Performance for different data sizes}
+    \label{fig-8_16_32_bit}
+\end{figure}
+
+
+\input{780-tbl-evaluation-cachesize-performance}
+\input{781-tbl-evaluation-8-16-32-bit}
+
+
+%TODO explain why outlier32u is slower than 16: Mismatch between Proguard and the infuser. The infuser replaces integer opcodes with short versions where it can. ProGuard works on the original Java source and tries to reduce the number of variable slots by using the same slot for two variables if their live ranges do not overlap. In this case a short and int variable where mapped to the same slot which means to the infuser both now look like ints, so operations on the short variable, which is heavily used in the inner loop are now much more expensive. Again, this is another example where performance could be improved by combining the compiler, optimiser and infuser in a single optimising Java to MyVM bytecode compiler.
