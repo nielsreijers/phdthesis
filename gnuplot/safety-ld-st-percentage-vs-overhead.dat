@@ -1,0 +1,17 @@
+#UPDATED 20160216
+
+#Array element/object field STORES   Overhead of safe writes vs unsafe VM    Array element/object field LOADS    Overhead of safe reads and writes vs safe writes only
+                             18.0  ,                                  72.7  ,                              18.0 ,                                                    72.8
+                              7.8  ,                                  34.7  ,                              15.9 ,                                                    71.0
+                              0.0  ,                                   0.0  ,                               7.1 ,                                                    52.4
+                              2.9  ,                                   6.7  ,                               8.6 ,                                                    20.2
+                              4.5  ,                                  10.0  ,                               6.2 ,                                                    13.7
+                              1.5  ,                                   2.3  ,                               6.4 ,                                                     9.4
+                              6.1  ,                                  10.8  ,                               6.9 ,                                                    12.3
+                              5.8  ,                                  30.0  ,                              10.7 ,                                                    55.9
+                              3.6  ,                                  18.1  ,                               7.9 ,                                                    39.1
+                              2.6  ,                                  13.7  ,                              11.7 ,                                                    39.5
+                              6.6  ,                                  21.6  ,                              18.9 ,                                                    60.3
+                              1.4  ,                                   2.6  ,                               4.1 ,                                                     7.7
+                              4.7  ,                                  10.3  ,                               9.8 ,                                                    20.5
+                              5.0  ,                                  19.9  ,                              10.2 ,                                                    40.4

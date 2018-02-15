@@ -32,8 +32,8 @@ plot "performance-per-benchmark.dat" using 2 title 'Bubble sort'   with linespoi
 set output "../performance-per-opcode-category.eps"
 plot "performance-per-opcode-category.dat" using 2 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5, \
      "performance-per-opcode-category.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
-     "performance-per-opcode-category.dat" using 4 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
-     "performance-per-opcode-category.dat" using 5 title 'load/store' with linespoints dashtype 4 lw 3 ps 1.5, \
+     "performance-per-opcode-category.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "performance-per-opcode-category.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
      "performance-per-opcode-category.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
 
 
@@ -60,9 +60,9 @@ plot "codesizeoverhead-per-benchmark.dat" using 2 title 'Bubble sort'   with lin
 set output "../codesizeoverhead-per-opcode-category.eps"
 plot "codesizeoverhead-per-opcode-category.dat" using 2 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
-     "codesizeoverhead-per-opcode-category.dat" using 4 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
-     "codesizeoverhead-per-opcode-category.dat" using 5 title 'load/store' with linespoints dashtype 4 lw 3 ps 1.5, \
-     "codesizeoverhead-per-opcode-category.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
+     "codesizeoverhead-per-opcode-category.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "codesizeoverhead-per-opcode-category.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
+     "codesizeoverhead-per-opcode-category.dat" using 6 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5
 
 
 
@@ -89,8 +89,8 @@ plot "cachesize-performance-per-benchmark.dat" using 2 title 'Bubble sort'   wit
 set output "../cachesize-performance-per-opcode-category.eps"
 plot "cachesize-performance-per-opcode-category.dat" using 2 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5, \
      "cachesize-performance-per-opcode-category.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
-     "cachesize-performance-per-opcode-category.dat" using 4 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
-     "cachesize-performance-per-opcode-category.dat" using 5 title 'load/store' with linespoints dashtype 4 lw 3 ps 1.5, \
+     "cachesize-performance-per-opcode-category.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "cachesize-performance-per-opcode-category.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
      "cachesize-performance-per-opcode-category.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
 
 
@@ -102,8 +102,8 @@ set xtics ("1" 0, "2" 1, "3" 2, "4" 3, "5" 4, "6" 5, "7" 6)
 set output "../pinnedregs-performance-xxtea.eps"
 plot "pinnedregs-performance-xxtea.dat" using 2 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5, \
      "pinnedregs-performance-xxtea.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
-     "pinnedregs-performance-xxtea.dat" using 4 title 'mov(w)'     with linespoints dashtype 3 lw 3 ps 1.5, \
-     "pinnedregs-performance-xxtea.dat" using 5 title 'load/store' with linespoints dashtype 4 lw 3 ps 1.5, \
+     "pinnedregs-performance-xxtea.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "pinnedregs-performance-xxtea.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
      "pinnedregs-performance-xxtea.dat" using 6 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5
      
 

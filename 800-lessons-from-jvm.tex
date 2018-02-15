@@ -2,6 +2,7 @@
 \begin{table}
     \centering
     \caption{Point requiring attention in future sensor node VMs}
+    \scriptsize
     \label{tbl-issues}
     \input{800-tbl-issues}
 \end{table}
@@ -276,8 +277,7 @@ These features also cause a performance penalty, which is significant when Ahead
 \subsection{Threads}
 As shown in Table \ref{tab-vm-size}, support for threads costs about 10\% of the VM size, if we exclude the string library. In addition, there is the question of allocating a stack for each thread. If we allocate a fixed block, it must be large enough to avoid stack overflows, but too large a block wastes precious RAM. Darjeeling allocates each stack as a linked list of frames on the heap. This is memory efficient, but allocating on the heap is slower and occasionally triggers the GC.
 
-We therefore argue a more cooperative concurrency model is more appropriate where lightweight threads voluntarily yield the CPU and share a single stack.
-
+We therefore argue a more cooperative concurrency model is more appropriate where lightweight tasks voluntarily yield the CPU and share a single stack, which is the approach to concurrency chosen by many native code systems, including \emph{t-kernel} and nesC \cite{Gu:2005un, Gay:2003up, Hester:2016je}.
 
 \subsection{Exceptions}
 In terms of code size, exceptions are not very expensive to implement in an interpreter, but again, they are harder to implement in an AOT compiler. We also feel the advantage of having exceptions is much lower than the other features mentioned in this section. They could be easily replaced with return values to signal errors.

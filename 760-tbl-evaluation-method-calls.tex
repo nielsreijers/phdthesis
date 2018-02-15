@@ -3,7 +3,7 @@
 \begin{table*}[]
 \centering
 \caption{Methods per benchmark and relative performance for normal, lightweight invocation, and inlining. Highlights indicate changes from the versions used to obtain the results in the previous sections.}
-\label{tbl-benchmark-methods}
+\label{tbl-evaluation-method-calls}
 \scriptsize
 \begin{tabular}{lllllll}
 \toprule
@@ -26,19 +26,19 @@ others (<16 calls each)      & \multicolumn{1}{r}{39}       & normal            
 \\
 % The cycles from the simulation are for 50 iterations. Just divide by 50 here so the cycle count + the number of invokes produces the right overhead. An actual simulation run with 1 iteration is a bit slower, but only a few % so it's not significant enough to worry about here.
 %                                                                                 coremk                          coremk_lw                         coremk_fn
-\emph{cycles}                &                              &                   & \multicolumn{1}{r}{3373037}   & \multicolumn{1}{r}{3543531}     & \multicolumn{1}{r}{4844211}     \\
+\emph{cycles}                &                              &                   & \multicolumn{1}{r}{3,373,037} & \multicolumn{1}{r}{3,543,531}   & \multicolumn{1}{r}{4,844,211}   \\
 \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{98.1\%}    & \multicolumn{1}{r}{108.1\%}     & \multicolumn{1}{r}{184.5\%}     \\
-\emph{code size}             &                              &                   & \multicolumn{1}{r}{9182}      & \multicolumn{1}{r}{9228}        & \multicolumn{1}{r}{9512}        \\
+\emph{code size}             &                              &                   & \multicolumn{1}{r}{9,182}     & \multicolumn{1}{r}{9,228}       & \multicolumn{1}{r}{9,512}       \\
 \\
 \hline
 \\
 FFT \\
-FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight (JVM) & \tblhighlight normal            \\
+FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight(JVM)  & \tblhighlight normal            \\
 \\
 %                                                                                 fft                             fft_lw                            fft_fn
-\emph{cycles}                &                              &                   & \multicolumn{1}{r}{179818}    & \multicolumn{1}{r}{222826}      & \multicolumn{1}{r}{661486}      \\
-\emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{17.7\%}    & \multicolumn{1}{r}{45.9\%}      & \multicolumn{1}{r}{333.1\%}     \\
-\emph{code size}             &                              &                   & \multicolumn{1}{r}{1342}      & \multicolumn{1}{r}{1426}        & \multicolumn{1}{r}{1530}        \\
+\emph{cycles}                &                              &                   & \multicolumn{1}{r}{179,818}   & \multicolumn{1}{r}{215,146}     & \multicolumn{1}{r}{661,486}     \\
+\emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{17.7\%}    & \multicolumn{1}{r}{40.9\%}      & \multicolumn{1}{r}{333.1\%}     \\
+\emph{code size}             &                              &                   & \multicolumn{1}{r}{1,342}     & \multicolumn{1}{r}{1,338}       & \multicolumn{1}{r}{1,426}       \\
 \\
 \hline
 \\
@@ -47,13 +47,13 @@ SWAP                         & \multicolumn{1}{r}{1642}     & \#define          
 siftDown                     & \multicolumn{1}{r}{383}      & normal            & lightweight                   & \tblhighlight manually inlined  & \tblhighlight normal            \\
 \\
 %                                                                                 hsort16                         hsort16_cht                       hsort16_fn
-\emph{cycles}                &                              &                   & \multicolumn{1}{r}{208239}    & \multicolumn{1}{r}{184071}      & \multicolumn{1}{r}{437264}      \\
+\emph{cycles}                &                              &                   & \multicolumn{1}{r}{208,239}   & \multicolumn{1}{r}{184,071}     & \multicolumn{1}{r}{437,264}     \\
 \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{88.5\%}    & \multicolumn{1}{r}{66.6\%}      & \multicolumn{1}{r}{295.8\%}     \\
 \emph{code size}             &                              &                   & \multicolumn{1}{r}{596}       & \multicolumn{1}{r}{662}         & \multicolumn{1}{r}{602}         \\
 % TODO: check why this is so different for hsort32 compared to hsort8. Old data for hsort32:
-% \emph{cycles}                &                              &                   & \multicolumn{1}{r}{289845}    & \multicolumn{1}{r}{286749}      & \multicolumn{1}{r}{563967}      \\ 
-% \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{66.5\%}    & \multicolumn{1}{r}{64.7\%}      & \multicolumn{1}{r}{223.9\%}     \\ 
-% \emph{code size}             &                              &                   & \multicolumn{1}{r}{738}       & \multicolumn{1}{r}{926}         & \multicolumn{1}{r}{758}         \\ 
+% \emph{cycles}                &                              &                   & \multicolumn{1}{r}{289,268}   & \multicolumn{1}{r}{286,200}     & \multicolumn{1}{r}{568,889}     \\ 
+% \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{66.2\%}    & \multicolumn{1}{r}{64.4\%}      & \multicolumn{1}{r}{226.8\%}     \\ 
+% \emph{code size}             &                              &                   & \multicolumn{1}{r}{702}       & \multicolumn{1}{r}{890}         & \multicolumn{1}{r}{722}         \\ 
 \bottomrule
 \end{tabular}
 \end{table*}

@@ -1,26 +1,14 @@
 \section{Limitations and the cost of using a VM}
 \label{sec-evaluation-limitations}
- - recursive
- - threads
- - lots of tiny objects
- - no multidimensional arrays
- - performance depends more on the choices made by developer. Implementation choices impact performance for both C and Java, but more for Java. For example, functions that need to return more than one value can do so by creating and returning an object, which would be the most natural way to do this in Java. However, creating an object is expensive, so if this function is called in a loop, it is faster to create the object before the loop starts and reuse it for each iteration, for example as done in the LEC benchmark.
+The quantitative evaluation in the previous sections has shown that AOT compilation techniques can reduce the performance overhead of using a VM to within a range that will be acceptable for many applications. However, this is not the only cost associated with using a VM. This section will discuss the limitations of MyVM, and the cost of using a VM compared to native approaches.
 
+Since MyVM is based on Darjeeling, we share many of it's limitations. Like Darjeeling, MyVM does not support multidimensional arrays, reflection, constant data, 64-bit or floating point data types \cite{Brouwers:2009cj}. In addition, MyVM drops support for exceptions and threads since they are much harder to implement in an AOT compiler than in an interpreter. As we will argue in Chapter \ref{sec-lessons-from-jvm}, we feel that if the goal is to provide useful, platform independent, safe, reprogramming of sensor node with adequate performance, instead of simply porting Java to a sensor node, many of Java's more advanced features, especially those that are expensive to implement should be replaced by more lightweight alternatives.
 
-summarise cost of vm in terms of code size, performance, memory usage, reduced flexibility
-Refer back to Suganuma, who on page two mentions Java code typically results in many short method calls. This is bad for us.
+Besides these unsupported features, there are other costs to using MyVM when compared to native code. One of the most important concerns is size. While our optimisations reduce the code size overhead significantly, AOT compiled code is still larger than native C and the VM itself also takes up space. In terms of RAM, the heap adds a 5 byte overhead to each object or array, and we have seen that Java cannot represent complex structures like MoteTrack's RSSI signature efficiently. For code that only uses a limited number of large objects or arrays like the heat detection benchmark, this overhead will be acceptable, but for code using many tiny objects like the MoteTrack this overhead is significant.
 
-% better merge the worst case examples in this section, maybe as a subsection
-%\section{Worst case benchmarks}
-%to do
+In terms of performance, a weakness is that our lightweight methods cannot support recursive function calls. However, we have not found such code in any benchmark, and the limited amount of RAM on a sensor node means it would be a bad choice in most cases.
 
-% many come from the type 3 instruction set overhead. example: storing to the array for the rc5 benchmark
-% also note that a some of these are a result of directly translating C code, which is the only way to get a comparison that doesn't depend on arbitrary choices by me. but someone writing in Java, especially someone with knowledge of the VM, would probably write it differently
-% also state very clearly that here we only show sythetic, isolated worst-case scenarios and any real algorithm might contain some code like this, but the overhead will be mixed with code that produces far less overhead
+When optimising code for performance, small choices can often have unexpected consequences. However, we found this to be much more significant when writing Java code for our VM, than when writing the same algorithms in C where \mycode{avr-gcc}'s optimisations often mean two different approaches in C result in similar binary code. An optimising combined compiler and infuser will help a Java developer by doing some of the same optimisations, but there are many examples where the most natural way to solve a problem in Java may not result in the best performance. For example, Suganuma \cite{Suganuma:2000vl} notes that Java code typically results in many small methods and invocations, which can result in a serious performance penalty if they cannot be made lightweight or eliminated by automatic inlining, and allocating many temporary objects hurts performance while creating them once and reusing them usually results in slightly unnatural code. While this is also true for C, the impact of C function calls and allocating temporary objects on the stack is much smaller.
 
-% try to make some general statements about what the VM is good at and what it's bad at.
+The next chapter will look at some of these limitations and propose ideas on how to improve them in future sensor node VMs.
 
-% good: variable bit shifts: they do the same loop as avr-gcc emits
-% bad:  consecutive array access (needs to recalculate the address each time)
-%       safety: the more array and object writes we do, the worse the performance will be. show 8,16,32 bit write benchmarks. both loop and unrolled.
-%       6 bit shifts

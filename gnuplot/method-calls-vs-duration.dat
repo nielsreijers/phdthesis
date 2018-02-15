@@ -1,0 +1,19 @@
+#UDPATED 20180216
+
+#exec  ,  cyc/exec        ,                             method
+    1  ,   3543519        ,  
+    2  ,   1770225        ,  
+    3  ,   1034259        ,  
+  111  ,     23066        ,  
+  223  ,     11460        ,  
+    4  ,    320347        ,  
+    4  ,    304799        ,  
+ 1024  ,       756        ,    CoreState.core\\_state\\_transition
+  292  ,       774        ,                    CoreUtil.crcu16
+  584  ,       341        ,                     CoreUtil.crcu8
+  206  ,       929        ,       CoreListJoinA.core\\_list\\_find
+ 3920  ,        39        ,   CoreState.ee\\_isdigit
+   16  ,      7845        ,  
+   64  ,      1679        ,  
+  208  ,       160        ,       CoreListJoinA$CmpIdx.compare
+    8  ,      3438        ,  

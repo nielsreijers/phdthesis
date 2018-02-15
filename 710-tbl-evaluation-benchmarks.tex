@@ -27,6 +27,15 @@ Benchmark                & Used as a                                & Source and
 \emph{RC5}               &                                          & LibTomCrypt \cite{libtomcrypt}                                                                             & single function  & no \\
                          &                                          & \emph{Input:} first test case in libtomcrypt sources (64 bit)                                              &                  & \\
 
+\emph{FFT}               & \cite{Kumar:2007ge}                      & fixed point FFT using the widespread fix\_fft.c \cite{sos-operating-system}                                & single function  & yes \\
+                         &                                          & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                              &                  & \\
+
+\emph{Outlier detection} & \cite{Kumar:2007ge}                      & our implementation of the algorithm described in \cite{Kumar:2007ge}                                       & single function  & yes \\
+                         &                                          & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11. &                  & \\
+
+\emph{LEC}               &                                          & our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                      & single function  & yes \\
+                         &                                          & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.             &                  & \\
+
 \emph{CoreMark 1.0}      &                                          & EEMBC \cite{coremark}                                                                                      & full application & no \\
                          &                                          & \emph{Input:} defined in CoreMark source.                                                                  &                  & \\
 
@@ -36,15 +45,7 @@ Benchmark                & Used as a                                & Source and
 \emph{Heat detection}    &                                          & adapted from code used in our group to track objects using an 8x8 pixel heat sensor                        & full application & yes \\
                          &                                          & \emph{Input:} 101 frames of 8x8 16-bit values for calibration, 30 frames for detection.                    &                  & \\
 
-\emph{LEC}               &                                          & our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                      & single function  & yes \\
-                         &                                          & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.             &                  & \\
-
-\emph{FFT}               & \cite{Kumar:2007ge}                      & fixed point FFT using the widespread fix\_fft.c \cite{sos-operating-system}                                & single function  & yes \\
-                         &                                          & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                              &                  & \\
-
-\emph{Outlier detection} & \cite{Kumar:2007ge}                      & our implementation of the algorithm described in \cite{Kumar:2007ge}                                       & single function  & yes \\
-                         &                                          & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11. &                  & \\
-
 \bottomrule
 \end{tabular}  
 \end{table}
+

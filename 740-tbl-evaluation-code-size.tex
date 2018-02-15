@@ -2,7 +2,7 @@
 
 \begin{tabular}{lrrrrrrrrrrrrrrr}
 \toprule
-                                    & B.sort     &  H.sort    & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
+                                    & B.sort     & H.sort     & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
 \midrule
 \multicolumn{10}{l}{CODE SIZE (BYTES)} \\
 % Take JVM, Native C and AOT original from results_0BASE_R___P__C0_A0_S0_G1 (Java interpeter for JVM)
@@ -23,8 +23,8 @@
 \xxt Impr. peephole                 &      -67.7 &      -55.0 &      -45.3 &      -38.5 &      -54.3 &      -64.2 &      -33.2 &      -75.7 &      -37.1 &      -24.7 &      -21.7 &      -14.4 &      -49.0 &                   &     -44.7 \\
 \xxt Stack caching                  &      -22.1 &      -22.8 &      -21.9 &      -56.1 &      -78.7 &     -105.5 &      -18.6 &      -30.6 &      -38.2 &      -24.9 &      -24.2 &      -14.2 &      -43.8 &                   &     -38.6 \\
 \xxt Pop. val. caching              &      -16.9 &      -37.6 &       -6.8 &       -6.2 &      -18.7 &      -18.7 &      -13.8 &       -5.2 &      -19.3 &      -11.6 &      -24.1 &       -8.1 &      -20.0 &                   &     -15.9 \\
-\xxt Mark loops                     &        1.7 &       10.1 &       21.9 &        5.9 &       -1.2 &       -2.6 &       -4.2 &      -16.4 &        2.5 &        1.7 &       -7.4 &       -2.5 &       -6.0 &                   &       0.3 \\
-\xxt Const shift                    &        0.0 &       -3.4 &       -6.9 &        1.7 &        2.8 &      -16.0 &       -4.6 &       -2.6 &       -1.8 &       -1.1 &        0.0 &       -1.7 &       -0.7 &                   &      -2.7 \\
+\xxt Mark loops                     &       +1.7 &      +10.1 &      +21.9 &       +5.9 &       -1.2 &       -2.6 &       -4.2 &      -16.4 &       +2.5 &       +1.7 &       -7.4 &       -2.5 &       -6.0 &                   &       0.3 \\
+\xxt Const shift                    &        0.0 &       -3.4 &       -6.9 &       +1.7 &       +2.8 &      -16.0 &       -4.6 &       -2.6 &       -1.8 &       -1.1 &        0.0 &       -1.7 &       -0.7 &                   &      -2.7 \\
 \xxt 16-bit array index             &      -27.2 &      -22.8 &       -8.2 &      -11.6 &       -5.1 &      -16.7 &      -11.6 &      -25.8 &      -10.7 &       -7.4 &      -14.0 &       -2.2 &      -10.7 &                   &     -13.4 \\
 \xxt SIMUL                          &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &       -9.9 &        0.0 &        0.0 &       -3.5 &        0.0 &        0.0 &        0.0 &                   &      -1.0 \\
 \multicolumn{10}{l}{CODE SIZE OVERHEAD AFTER OPTIMISATIONS (\% of nat. C)} \\

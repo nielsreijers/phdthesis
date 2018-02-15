@@ -1,8 +1,29 @@
-\section{Other platforms}
+\section{Expected perfomance on other platforms}
 \label{sec-evaluation-other-platforms}
+Platform independence is one of the main advantages of using a VM. The AVR family of CPUs is widely used in low power embedded systems, and we implemented our VM for the ATmega128 CPU. However, our approach does not depend on any AVR specific properties and the approach described in this thesis can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
 
+While it is impossible to determine exactly what the resulting performance would be on different platforms without porting our VM, we present some results here that indicate it is likely to be worse than the results we see on the ATMEGA.
 
+Two parameter that are of important influence to our VM are the number of available registers and the size of the registers. Table \ref{tbl-atmega-msp430-m0-registers} lists these parameter for the ATMEGA, and two other common families of embedded CPUS, the Texas Instruments MSP430 and ARM Cortex-M0. These CPUs are similar in many ways, including the amount of RAM and Flash memory typically available, but differ in the number of registers and word size.
 
+\begin{table}
+\centering
+\caption{Number or registers and word size for the ATMEGA, MSP430, and Cortex M0}
+\label{tbl-atmega-msp430-m0-registers}
+\begin{tabular}{lrrr}
+\toprule
+                                       & ATMEGA       & MSP430     & Cortex M0 \\
+                                       & \cite{Atmel:ATMEGA128Datasheet, Atmel:AVRInstructionSetManual}
+                                       &  \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide}
+                                       & \cite{ARM:2009vz} \\
+\midrule
+Number of general purpose registers    & 32           & 12         & 13        \\
+Word size                              & 8-bit        & 16-bit     & 32-bit    \\
+Total register file size (bytes)       & 32           & 24         & 52        \\
+\end{tabular}
+\end{table}
+
+\subsection{Number of registers}
 \begin{figure}
     \centering
     \includegraphics[width=\myfiguresizeperformance]{cachesize-performance-per-opcode-category.eps}
@@ -10,16 +31,72 @@
     \label{fig-performance-per-opcode-category-per-cachesize}
 \end{figure}
 
+\input{780-tbl-evaluation-cachesize-performance}
+
+We will first look at the impact of the number of available registers. The ATMEGA has 32 8-bit registers available, which we manage as 16 pairs since our VM stores data in 16-bit slots.
+
+Looking at the MSP430, it only has 12 registers, but they are 16-bit. We reserved 5 register pairs on the ATMEGA, leaving us with 11 pairs available for stack caching. If we can achieve the same by reserving 5 16-bit registers on the MSP430, 7 registers will be available to the stack cache.
+
+To evaluate the effect of a smaller number of registers on the stack cache, we reran all our benchmarks while restricting the number of registers the cache manage may use. Since we need a minimum of 4 pairs for our approach to work, we vary the number of register from 4 to 11.
+
+The results are shown in Figure \ref{fig-performance-per-opcode-category-per-cachesize} and Table \ref{tbl-performance-per-opcode-category-per-cachesize}. As is common with caching techniques, the first few registers have the most impact, with half of the performance gain already realised when adding the first two additional registers. Ignoring all other difference for the moment, the effect of reducing the number of register pairs from 11 to 7 is an increase in overhead by 20.8\%, to 92\%.
+
+The Cortex M0 has one general purpose register more than the MSP430, and at 8 register pairs the overhead drops to 84.1\%. In addition, the M0's registers are 32-bit, which means in cases where mostly 32-bit values are used, the stack size is effectively doubled since values can be stored in a single register instead of two pairs o 8-bit registers.
+
+A final interesting thing to note in Figure \ref{fig-performance-per-opcode-category-per-cachesize} is the fact the increasing the cache size mostly reduces the load/store overhead. Using only 4 pairs, stack caching has already removed most of the push/pop overhead, which only drops slightly when more registers are used. However, these extra registers reduce load/store overhead significantly since more registers are available for the markloop optimisation, and using more registers it increases the chance that an old, popped value may still be present, allowing popped value caching to eliminate more loads.
+
+\subsection{Word size}
 \begin{figure}
     \centering
     \includegraphics[width=\myfiguresizeperformance]{8_16_32_bit.eps}
     \caption{Performance for different data sizes}
-    \label{fig-8_16_32_bit}
+    \label{fig-performance-8-16-32-bit}
 \end{figure}
 
-
-\input{780-tbl-evaluation-cachesize-performance}
 \input{781-tbl-evaluation-8-16-32-bit}
 
+A second important difference between the CPUs in Table \ref{tbl-atmega-msp430-m0-registers} is the size of the registers. Our main measure has been the overhead compared to native C performance or code size. While having a large register size is good for absolute performance, we expect it to hurt the \emph{relative} performance of our VM.
 
-%TODO explain why outlier32u is slower than 16: Mismatch between Proguard and the infuser. The infuser replaces integer opcodes with short versions where it can. ProGuard works on the original Java source and tries to reduce the number of variable slots by using the same slot for two variables if their live ranges do not overlap. In this case a short and int variable where mapped to the same slot which means to the infuser both now look like ints, so operations on the short variable, which is heavily used in the inner loop are now much more expensive. Again, this is another example where performance could be improved by combining the compiler, optimiser and infuser in a single optimising Java to MyVM bytecode compiler.
+A number of our benchmarks can be implemented using different data sizes. As mentioned in Section \ref{sec-evaluation-benchmarks}, we used 16-bit data for all of these benchmarks. In Figure \ref{fig-performance-8-16-32-bit} and Table \ref{tbl-performance-8-16-32-bit} we show the resulting performance for 8, 16, and 32-bit versions of these benchmarks (no 32-bit version of the \mycode{fix\_fft.c} code was available).
+
+% TODO: add fillarray to graph and table
+In almost all cases, a smaller data size results in a slower performance. The reason is that larger data sizes increase the time spent in the code that both C and AOT versions execute. Taking bubble sort as an example, both versions do the same number of array loads, comparisons, and array stores. When operating on 32-bit data, this takes twice as long as for 16-bit data. In addition the AOT version introduces overhead, in bubble sort's case primarily from calculating array element locations (see Section \ref{sec-evaluation-bubble-sort}). 32-bit array access takes 17 cycles, 8 of which are spent on the actual load or store, but for 16-bit array access this is only 4 out of 13 cycles.
+
+This effect is even clearer for more complex operations like multiplication. 16x16 to 16-bit multiplication can be implemented in a few instructions and only takes 10 cycles on the ATMEGA. 16x16 to 32-bit multiplication is implement by calling \mycode{avr-gcc}'s \mycode{\_\_mulhisi3} function and takes about 50 cycles, while full 32x32 to 32-bit multiplication using \mycode{\_\_mulsi3} takes 85 to 100 cycles.
+
+Thus, working with 16-bit or 32-bit data on an 8-bit CPU helps our AOT compiler's relative performance by introducing a larger common component that both C and AOT compiled versions have to execute. On the 16-bit MSP430 or 32-bit M0 this effect will be reduced or eliminated. The exact impact of this is hard to estimate, since using 8-bit data in our VM incurs some an extra overhead because the VM internally stores data as 16-bit values, but it is likely to be in the order of tens of percents of extra overhead.
+
+In Table \ref{tbl-performance-8-16-32-bit} we see the outlier detection benchmark performs worse for 32-bit data compared to 16-bit data. This is due to a mismatch between the infuser and ProGuard. In JVM byte code, local variables are stored in 32-bit slots. The code generated by \mycode{javac} uses a separate slot for each variable, but ProGuard attempts to reduce memory consumption by mapping multiple variables to the same slot if their live ranges do not overlap. The infuser processes the ProGuard optimised code, as shown in Figure \ref{fig-translation-process}, and replaces the JVM's 32-bit operations by 16-bit versions where possible. In the 32-bit outlier detection benchmark, ProGuard mapped a 32-bit and 16-bit variable to the same slot, which prevents the infuser from using 16-bit operations for this variable. This once again highlights the need for a unified, optimising compiler, combining the tasks of \mycode{javac}, ProGuard and the Darjeeling infuser.
+
+The large difference in performance for FFT is mostly due to bit shifts. The 8-bit version does many shifts of a 16-bit value by exactly 6 bits. Our VM simply emits 6 single-bit shifts, while \mycode{avr-gcc} has a special optimised version for this case, which we considered too specific to include in our VM. The 32-bit version spends about half of its time shifting a 32-bit value by 15 bits, which both \mycode{avr-gcc} and our VM implement using the same loop.
+
+
+%JVM_GETARRAY_I                                                  554880  18.2%  35.3%C      32640  17.0 |    1    24   7.8%  15.8%C 4->4:Int 
+%1        movw r30, r6    -> 0x010E2E: movw r30, r6                32640                     32640
+%1        add r30, r30    -> 0x010E30: add r30, r30                32640                     32640
+%1        adc r31, r31    -> 0x010E32: adc r31, r31                32640                     32640
+%1        add r30, r30    -> 0x010E34: add r30, r30                32640                     32640
+%1        adc r31, r31    -> 0x010E36: adc r31, r31                32640                     32640
+%1        add r30, r4     -> 0x010E38: add r30, r4                 32640                     32640
+%1        adc r31, r5     -> 0x010E3A: adc r31, r5                 32640                     32640
+%2        adiw r30, 3     -> 0x010E3C: adiw r30, 3                 65280                     32640
+%
+%2        ldpi r22, Z     -> 0x010E3E: ldpi r22, Z                 65280                     32640
+%2        ldpi r23, Z     -> 0x010E40: ldpi r23, Z                 65280                     32640
+%2        ldpi r20, Z     -> 0x010E42: ldpi r20, Z                 65280                     32640
+%2        ld r21, Z       -> 0x010E44: ld r21, Z                   65280                     32640
+%overhead: 9, load 8
+%
+%JVM_GETARRAY_S                                                  359040  18.2%  36.6%C      32640  11.0 |    1    16   6.2%  13.6%C 4->2:Short 
+%1        movw r30, r6    -> 0x010DF2: movw r30, r6                32640                     32640
+%1        add r30, r30    -> 0x010DF4: add r30, r30                32640                     32640
+%1        adc r31, r31    -> 0x010DF6: adc r31, r31                32640                     32640
+%1        add r30, r4     -> 0x010DF8: add r30, r4                 32640                     32640
+%1        adc r31, r5     -> 0x010DFA: adc r31, r5                 32640                     32640
+%2        adiw r30, 3     -> 0x010DFC: adiw r30, 3                 65280                     32640
+%
+%2        ldpi r24, Z     -> 0x010DFE: ldpi r24, Z                 65280                     32640
+%2        ld r25, Z       -> 0x010E00: ld r25, Z                   65280                     32640
+%
+%overhead: 7, load 4
+

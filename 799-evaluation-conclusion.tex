@@ -7,8 +7,8 @@ Taking unsafe and platform specific native C as a baseline, we first note that e
 
 On the safety side, Safe TinyOS achieves safety with relatively little overhead, but this depends on a trusted host. t-kernel and Harbor provide safety independent of the host, but at the cost of a significant increase in code size, or performance overhead respectively. Non of these approaches provide platform independence.
 
-Finally, we see our VM provides both platform independence and safety, at a cost, both in terms of code size and performance, that is lower than or comparable to previous work.
+Finally, we see our VM provides both platform independence and safety, at a cost in terms of both code size and performance, that is lower than or comparable to previous work.
 
 Coming back to the question of whether a VM is a good way to provide security, we first note that since to the best of our knowledge only two such systems exists, we cannot exclude the possibility that native code approaches could be further optimised to achieve better performance.
 
-However our results show that currently our approach is on-par with or faster than the two existing native code approaches, and provides platform independence at the same time. We also note that if we require a platform independent way of reprogramming our nodes, making it safe comes at a relatively low extra cost, with our safe VM only 18\% slower than the unsafe version.
+However our results show that currently our approach is on-par with or faster than the two existing native code approaches, and provides platform independence at the same time. We also note that if we require a platform independent way of reprogramming our nodes, making it safe comes at a relatively low extra cost, with our safe VM only 19.9\% slower than the unsafe version.

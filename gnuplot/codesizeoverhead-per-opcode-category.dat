@@ -1,6 +1,6 @@
 # UPDATED 20180212
 
-#X                  , total  , push/pop  ,  load/store   ,   mov(w)   ,   vm+other
+#X                  , total  , push/pop  ,  load/store   ,   mov(w)   ,      other
    Simple peephole  , 193.7  ,     83.3  ,        59.7   ,      1.9   ,       48.7
     Impr. peephole  ,   149  ,     25.9  ,        59.7   ,     14.9   ,       48.5
        Stack cache  , 110.4  ,     -0.8  ,        59.7   ,      3.1   ,       48.5
