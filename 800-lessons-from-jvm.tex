@@ -29,12 +29,7 @@ A minimum Java APIs for resource constrained devices, the Connected Limited Devi
 
 The largest mismatch comes from the CLDC's string support, which takes up over 8KB. While string support is one of the most basic features one would expect to find in the standard library of any general purpose language, it is rarely required within sensor node applications that typically don't have a UI and only communicate with the outside world through radio messages.
 
-%TODO: include this?
-% Communication with peripheral hardware is often by means of a stream of bytes. To facilitate such code it would be of benefit to support constant strings at the programming language level (which could be converted to byte arrays under the hood).
-
 On the other hand, the standard library should include abstractions for typical sensor node operations that are missing from the CLDC. The CLDC \mycode{Stream} abstraction is intended to facilitate file, network and memory operations. The abstraction is not well suited for communication protocols required by WSN applications, such as I$^{2}$C and SPI. In CLDC, connections between devices can be initiated by specifying URI-like strings. However, processing these is relatively expensive, and WSN nodes often identify other nodes using a 16 or 32-bit identifier.
-
-%Other CLDC features that are not required within WSN applications include dynamic class loading, calendar and timezone support. It is clear from the specification that resource constrained WSN applications were not the intended target devices.
 
 We argue that a tailored library should be designed from the ground-up specifically for sensor node applications. Such a library would include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
 
@@ -92,7 +87,6 @@ Besides the need to support constant data, the MoteTrack benchmark exposes anoth
 
 Listing \ref{lst-motetrack-data-structure} shows the main \mycode{RefSignature} data structure used in MoteTrack. This structure consists of a location, which is a simple struct of 3 shorts, and a signature, which has an id, and an array of 18 signals. A signal is defined by a source ID, and an array of 2 elements with RSSI values.
 
-%TODO: consistent font size for all listings
 \begin{listing}[H]
 \small
 \centering
@@ -186,7 +180,7 @@ In these situations we often found that our code would be much easier to maintai
 At a minimum, we should have a way to define simple aliases for primitive types, similar to C's \mycode{typedef}. A more advanced option that fits more naturally with Java, would be to have a strict \mycode{typedef} which also does type checking, so that a value of one user defined integer type cannot be accidentally assigned to a variable of another type, without an explicit cast.
 
 
-%TODO HIER BEN IK
+
 
 \section{Explicit and efficient inlining}
 \label{sec-inlining}

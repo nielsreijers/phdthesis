@@ -47,8 +47,7 @@ Thus, the run-time overhead is determined by the number of object or array acces
 \paragraph{Safe reads}
 Next we consider read safety. Up to this point our VM only checks the application cannot \emph{write} to memory it's not supposed to write to, however, it may still read from any location.
 
-The recently published Meltdown and Spectre vulnerabilities in desktop CPUs can be exploited by malicious code to read from anywhere in memory, exposing both kernel's and other applications private data, which may contain sensitive information such as authentication tokens, passwords, etc. This sent OS vendors rushing to release patches, which early report suggest may cause a performance penalty of 5-30\% \cite{register-spectre-meltdown}.
-% TODO is that number still accurate?
+The recently published Meltdown and Spectre vulnerabilities in desktop CPUs can be exploited by malicious code to read from anywhere in memory, exposing both kernel's and other applications private data, which may contain sensitive information such as authentication tokens, passwords, etc. This sent OS vendors rushing to release patches, which early report suggest may cause a performance penalty of up to 11\% \cite{Simakov:2018wp}.
 
 Whether this is also a problem on a sensor node depends on the scenario. If the VM or other tasks contain sensitive information, then this may need to be protected. However, in many sensor node applications the node may only be running a single application, and our VM does not contain any state that would be useful to an attacker. In these cases, only providing write safety will be sufficient.
 

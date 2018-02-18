@@ -1,8 +1,6 @@
 \chapter{MyVM}
 
-This chapter we introduce MyVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATMEGA, cannot do.
-
-%TODO add a picture somewhere showing there's no OS, but the VM runs directly on the hardware.
+This chapter we introduce MyVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. MyVM runs directly on the hardware, without any OS layer in between, and has complete control over the device. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATMEGA, cannot do.
 
 \section{Goals}
 \label{sec-myvm-goals}
@@ -31,8 +29,6 @@ We summarise our goals and constraints below:
   \caption{Java to native AVR compilation}
   \label{fig-translation-process}
 \end{figure}
-
-% TODO: clarify two terms: compile-time (javac/proguard/infuser) and translation-time (the VM)
 
 The complete process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}. Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes. We then use ProGuard \cite{proguard} to do some simple optimisations, but these are very basic steps like removing dead code, and overlapping local variable slots where possible, etc.
 
@@ -179,16 +175,6 @@ We will discuss the cost of using our VM more in more detail in Chapter \ref{sec
 
 
 \section{Target platforms}
-We implemented our VM for the ATmega128 CPU. The AVR family of CPUs is widely used in low power embedded systems. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
+We implemented our VM for the ATmega128 CPU \cite{Atmel:ATMEGA128Datasheet}. The AVR family of CPUs is widely used in low power embedded systems. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
 
-The ATmega128 has 32 8-bit registers. We expect the Cortex M0, with 12 32-bit general purpose registers, or the MSP430, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well. In Chapter \ref{sec-evaluation} we will examine the expected impact of the number of registers and of using a 16 or 32-bit architecture.
-
-%TODO refer to evaluation 8/16/32 bit and number of regs
-%TODO references for M0 and MSP430?
-
-
-
-
-
-
-
+The ATmega128 has 32 8-bit registers. We expect the Cortex M0 \cite{ARM:2009vz}, with 13 32-bit general purpose registers, or the MSP430 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well. In Section \ref{sec-evaluation-other-platforms} we will examine the expected impact of the number of registers and of using a 16 or 32-bit architecture.

@@ -51,7 +51,6 @@ The LEC algorithm is described in detailed pseudo code in \cite{Marcelloni:2009j
 
 
 \subsubsection{FFT}
-%TODO: change Kumar reference to reference to SOS source code
 Both 8-bit and 16-bit versions of the \mycode{fix\_fft.c} exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
 
 Both versions contain a table of precalculated sine wave values. For the 8-bit version this is a 256 element byte array, which we implemented in Java. For the 16-bit version, the array is a 1024 element array of shorts, which fits in memory, but the JVM code to initialise it becomes too large for flash memory, again highlighting the problem current sensor node VMs have with constant data. The 16-bit version uses a native C call prior to starting the benchmark to initialise the array directly from Flash memory.

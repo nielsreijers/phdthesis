@@ -90,11 +90,7 @@ The second way the return address could be corrupted is if the native stack over
 
 We add a check during non-lightweight invokes that the stack frame for the called method, plus it's maximum integer stack size, does not grow into the heap. (\ref{chk-no-nativestack-overflow}) Lightweight calls do not add to the stack, since space for their local variables, stack, and return address was already allocated in the caller's frame.
 
-While running, a method may make calls to the VM or libc functions, causing the stack to grow further. We can determine the maximum stack growth for calls our AOT generated code may make. Therefore we add a certain safety margin between the stack and heap.
-
-%, which we have currently set conservatively, but could be reduced by adding extra stack checks in vm functions that cause the most stack growth.
-%TODO: find reference about max stack size
-%TODO: t-kernel also has a 128 byte safety gap between heap and stack. is it for the same reason? get source or hope for reply from Lin Gu
+While running, a method may make calls to the VM or libc functions, causing the stack to grow further. We can determine the maximum stack growth for calls our AOT generated code may make. Therefore we add a certain safety margin between the stack and heap. \emph{t-kernel} \cite{Gu:2005un} also reserves a similar gap of 128 bytes between the stack and kernel heap, although it is not clear from the paper whether this is for the same reason.
 
 \section{Memory safety}
 \begin{figure}[]

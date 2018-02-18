@@ -275,4 +275,4 @@ The terms \emph{wireless sensor networks}, \emph{cyber-physical systems} and \em
 
 When reprogramming these devices, the code is expected to be sent by a more powerful device in charge of configuring the network. These more powerful devices outside or on the edge of wireless sensor network are refered to in literature by various names, including \emph{server}, \emph{gateway}, \emph{master}, \emph{controller}, or \emph{host}. While these names have slightly different accents or refer to different roles, this is not relevant for the work in this thesis. We will use \emph{host} to refer to the source of the code that is uploaded to the sensor node, possibly over multiple hops in the network, and assume the host to be a more powerful device with desktop-class processing capabilities.
 
-
+Since our VM is an ahead-of-time compiler, the Java source code is transformed into native code in two steps. We will use \emph{compile time} to refer to the compilation of Java code into Java byte code on the host, and \emph{translation time} to refer to the translation of this byte code into native code on the device.

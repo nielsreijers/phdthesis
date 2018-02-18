@@ -14,7 +14,7 @@ Two parameter that are of important influence to our VM are the number of availa
 \toprule
                                        & ATMEGA       & MSP430     & Cortex M0 \\
                                        & \cite{Atmel:ATMEGA128Datasheet, Atmel:AVRInstructionSetManual}
-                                       &  \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide}
+                                       & \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide}
                                        & \cite{ARM:2009vz} \\
 \midrule
 Number of general purpose registers    & 32           & 12         & 13        \\
@@ -60,7 +60,6 @@ A second important difference between the CPUs in Table \ref{tbl-atmega-msp430-m
 
 A number of our benchmarks can be implemented using different data sizes. As mentioned in Section \ref{sec-evaluation-benchmarks}, we used 16-bit data for all of these benchmarks. In Figure \ref{fig-performance-8-16-32-bit} and Table \ref{tbl-performance-8-16-32-bit} we show the resulting performance for 8, 16, and 32-bit versions of these benchmarks (no 32-bit version of the \mycode{fix\_fft.c} code was available).
 
-% TODO: add fillarray to graph and table
 In almost all cases, a smaller data size results in a slower performance. The reason is that larger data sizes increase the time spent in the code that both C and AOT versions execute. Taking bubble sort as an example, both versions do the same number of array loads, comparisons, and array stores. When operating on 32-bit data, this takes twice as long as for 16-bit data. In addition the AOT version introduces overhead, in bubble sort's case primarily from calculating array element locations (see Section \ref{sec-evaluation-bubble-sort}). 32-bit array access takes 17 cycles, 8 of which are spent on the actual load or store, but for 16-bit array access this is only 4 out of 13 cycles.
 
 This effect is even clearer for more complex operations like multiplication. 16x16 to 16-bit multiplication can be implemented in a few instructions and only takes 10 cycles on the ATMEGA. 16x16 to 32-bit multiplication is implement by calling \mycode{avr-gcc}'s \mycode{\_\_mulhisi3} function and takes about 50 cycles, while full 32x32 to 32-bit multiplication using \mycode{\_\_mulsi3} takes 85 to 100 cycles.
