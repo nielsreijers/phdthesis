@@ -221,19 +221,20 @@ We will see that in fact Java, in its current form, is nearly unusable for serio
 \section{Research questions and contributions}
 \label{sec-introduction-research-questions}
 The main focus of this thesis is on assessing the suitability of VMs as a means to programme sensor node devices. The main research questions we will answer are:
-\begin{itemize}
-	\item How close can an AOT compiling sensor node VM come to native C performance?
-	\item What are the tradeoffs?
+\begin{enumerate}
+	\item How close can an AOT compiling sensor node VM come to native C performance, and what are the tradeoffs?
 	\item Can a VM be an efficient way to provide a safe, sandboxed execution environment on a sensor node?
 	\item Is Java a suitable language for a sensor node VM, and how may it be improved?
-\end{itemize}
+\end{enumerate}
 
 Specifically, this thesis makes the following contributions:
 \begin{itemize}
 	\item We identify the major sources of overhead when using the baseline approach to AOT compilation, as described by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}.
 	\item Using the results of this analysis, we propose a set of optimisations to address each source of overhead, including a lightweight alternative to Java method invocation to reduce method call overhead.
+	% Performance/size overhead in main_summary__0BASE_R___P__C0_A0_S0_G1_NOLW: 372.3 / 194.4
+	% Performance/size overhead in main_summary__4MARK_R11_P7_C1_A1_S1_G1     :  71.2 /  77.7
 	\item These optimisations eliminate most of the performance overhead caused by the JVM's stack-based architecture, and over 80\% of performance overhead overall.
-	\item They also reduce the code size overhead by 56\%, and show that the increase in VM size is quickly compensated for, thus mitigating a drawback of the previous AOT approach.
+	\item They also reduce the code size overhead by 60\%, and show that the increase in VM size is quickly compensated for, thus mitigating a drawback of the previous AOT approach.
 	\item We show that besides these improvements to the AOT technique, better optimisation in the Java to JVM bytecode compiler is critical to achieving good performance.
 	\item We describe a number of checks that are sufficient for the VM to provide our desired safety guarantees, and show how most of these checks can be easily done at load time, reducing the overhead of run-time checks.
 	\item We provide a comprehensive evaluation to analyse the overhead and the impact of each optimisation, and to show these results hold for a set of benchmarks with very different characteristics, including the commonly used CoreMark benchmark \cite{coremark}, and a number of benchmarks with typical sensor node code.
@@ -262,9 +263,9 @@ Chapter 9 concludes this work.
 This dissertation is based on previously published technical reports or conference proceedings. The material presented in the subsequent chapters is based on the content of these publications.
 
 \begin{itemize}
-	\item N. Reijers, K. J. Lin, Y. C. Wang, C. S. Shih, and J. Y. Hsu, “Design of an Intelligent Middleware for Flexible Sensor Configuration in M2M Systems”, 2nd International Conference on Sensor Networks (SENSORNETS), Feb. 2013.
-	\item N. Reijers and C.-S. Shih, “Ahead-of-Time Compilation of Stack-Based JVM Bytecode on Resource-Constrained Devices”, International Conference on Embedded Wireless Systems and Networks (EWSN), Feb. 2017.
-	\item N. Reijers and C.-S. Shih, “Improved Ahead-of-Time Compilation of Stack-Based JVM Bytecode on Resource-Constrained Devices,” arXiv:1712.05590, Dec. 2017.
+	\item N. Reijers, K. J. Lin, Y. C. Wang, C. S. Shih, and J. Y. Hsu, “Design of an Intelligent Middleware for Flexible Sensor Configuration in M2M Systems”, 2nd International Conference on Sensor Networks (SENSORNETS), February 2013.
+	\item N. Reijers and C.-S. Shih, “Ahead-of-Time Compilation of Stack-Based JVM Bytecode on Resource-Constrained Devices”, International Conference on Embedded Wireless Systems and Networks (EWSN), February 2017.
+	\item N. Reijers and C.-S. Shih, “Improved Ahead-of-Time Compilation of Stack-Based JVM Bytecode on Resource-Constrained Devices”, arXiv:1712.05590, December 2017.
 \end{itemize}
 
 \section{Naming}

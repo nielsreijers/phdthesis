@@ -1,28 +1,39 @@
 \chapter{Conclusion}
-A major problem for sensor node VMs has been performance. Most interpreters are between one to two orders of magnitude slower than native code, leading to both lower maximum throughput and increased energy consumption.
+This dissertation described the MyVM sensor node virtual machine. MyVM extends the state of the art by combining the desirable features of platform independent reprogramming and a safe execution environment with acceptable performance. We evaluated MyVM using a set of benchmarks, including small benchmarks to highlight specific behaviours, and five examples of real sensor node applications.
 
-Previous work on AOT translation to native code by Ellul and Martinez \cite{Ellul:2010iw} improves performance, but still a significant overhead remains, and the tradeoff is that the resulting native code takes up much more space, limiting the size of programmes that can be loaded onto a device. For the CoreMark benchmark, the performance is 9x slower than native C, and the code 3.5 times larger.
+To come back to the research questions stated in Section \ref{sec-introduction-research-questions}, we can conclude the following:
 
-In this paper, we presented the complete set of techniques we developed to mitigate this code size overhead and to further improve performance. We evaluated their effectiveness using a set of benchmarks, some with specific characteristics to highlight the results in more extreme conditions, and include the larger CoreMark benchmark to represent the average behaviour of larger sensor node applications. Combined, our optimisations result in a compiler that produces code that is on average only 1.7 times slower and 1.9 times larger than optimised C.
+\begin{enumerate}
+	\item
+	After identifying the sources of overhead in previous work on ahead-of-time compilers for sensor nodes, MyVM introduced a number of optimisations to reduce the performance overhead by over 80\%, and the code size overhead by 60\%, resulting in an average performance overhead of 105\%, and the code size overhead of 82\% compared to native C.
 
-These optimisations do increase the size of our VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node. This leads us to believe that these optimisations will be useful in many scenarios, and make using a VM a viable option for a wider range of applications.
+	The optimisations introduced by MyVM do increase the size of our VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node.
 
-Many opportunities for future work remain. In this paper we focus on techniques for the sensor node side, but a future VM should come with a better optimising infuser on the host to prepare better quality bytecode. This infuser should also support inlining small methods as efficiently as manual inlining, and in most cases automatically determine which methods should be made lightweight.
+	The price to pay for platform independence and a safe execution environment comes in three forms. We believe the remaining performance overhead will be acceptable for many applications, but the increase in code size, and the space taken by the VM do limit the size of applications we can load onto a device. In addition, the overhead in memory usage was a problem for a number of benchmarks.
 
-For the mark loops optimisation, a heuristic is needed to make a better decision on the number of registers to pin, and we can consider applying this optimisation to other blocks that have a single point of entry and exit as well. Since supporting preemptive threads is expensive to implement without the interpreter loop as a place to switch threads, we believe a cooperative concurrency model where threads explicitly yield control is more suitable for sensor nodes using AOT, and we are working on building this on top of Darjeeling's existing thread support.
+	\item
+	MyVM's second contribution is providing a safe execution environment. Compared to native binary code, the higher level of abstraction of MyVM's bytecode allowed us to develop a relatively simple set of safety checks.
+	
+	This results in a modest overhead in terms of VM size, and the fact that most checks are performed at translation time means the additional overhead for providing safety is limited to a 35\% slowdown and 6\% increase in code size, again relative to native C.
 
-A more general question is what the most suitable architecture and instruction set is for a VM on tiny devices. Hsieh et al. note that the performance problem lies in the mismatch between the VM and the native machine architecture \cite{Hsieh:1996cy}. In this paper we presented a number of modifications to the bytecode format to make it better suited for use on a sensor now, but ultimately we believe JVM is not the best choice for a sensor node VM. It has some advanced features, such as exceptions, preemptive threads, and garbage collection, which add complexity but may not be necessary on a tiny device. At the same time, there is no support for constant data, which is common in embedded code: a table with sine wave values in the fft benchmark is represented as a normal array at run-time, using up valuable memory.
-% In the case of CoreMark this forced us to convert some arrays of constant data used to check the benchmark results, into a function with a large \mycode{switch} statement that returns the right value.
-We may also consider extending the bytecode with instructions to express common operations more efficiently. For example, an instruction to loop over an array such as the one found in Lua \cite{Lua:2005} would allow us to generate more efficient code and eliminate most of the remaining overhead in the bubble sort benchmark.
-% TODO Suganuma seems to propose something similar
+	\item
+	Regarding the question of whether Java is a suitable language for a sensor node VM, we can conclude some aspects of it are a good match. An advantage of its simple stack-based instruction set is that it can be implemented in a small VM, and while we showed the stack-based architecture introduces significant overhead, most of this overhead is eliminated by our optimisations.
+	
+	However, our benchmarks also exposed several problems that ultimately make standard Java a poor choice. Specifically, the lack of support for constant data, and the inefficient use of memory for benchmarks containing many small objects meant some benchmarks could not be ported directly from C to Java. We proposed several improvements, but conclude that more work is necessary to come to a more sensor node specific language and make sensor node VMs truly useful in a wide range of real-world projects.
+\end{enumerate}
 
+\input{900-tbl-comparison-to-related-work}
 
-Our reason to use JVM is the availability of a lot of infrastructure to build on. Like Hsieh et al., we do not claim that Java is the best answer for a sensor node VM, but we believe the techniques presented here will be useful in developing better sensor node VMs, regardless of the exact instruction set used.
+Finally, we conclude by comparing our approach to existing work on both improve sensor node VM performance and safe execution environments in Table \ref{tbl-contribution-comparison}.
 
-One important question that should be considered is whether that instruction set should be stack-based or register-based. Many modern bytecode formats are register-based, and a number of publications report on the advantages of this approach \cite{Zhang:2012wf, Shi:2005ba}. However, these tradeoffs are quite different for a powerful JIT compiler, and a resource-constrained VM. When working with tiny devices, an important advantage of a stack-based architecture is its simplicity, and our results here show that much of the overhead associated with the stack-based approach can be eliminated during the translation process.
+Taking unsafe and platform specific native C as a baseline, we first note that existing interpreting sensor node VM's are typically not safe, and suffer from a 1 to 2 orders of magnitude slowdown. The performance overhead was reduced drastically by Ellul's work on Ahead-of-Time compilation, but still a significant overhead remains and this approach increases code size, reducing the size of programmes we can load onto a device.
 
+On the safety side, Safe TinyOS achieves safety with relatively little overhead, but this depends on a trusted host. \emph{T-kernel} and Harbor provide safety independent of the host, but at the cost of a significant increase in code size, or performance overhead respectively. Non of these approaches provide platform independence.
 
+Finally, we see our VM provides both platform independence and safety, at a cost in terms of both code size and performance that is lower than or comparable to previous work.
 
-%TODO Mention CoreMark on desktop numbers here. Nice point to end the paper on (although it's not a fair comparison since the desktop version does things like bounds checking)
+Coming back to the question of whether a VM is a good way to provide security, we first note that since to the best of our knowledge only two such systems exists, we cannot exclude the possibility that native code approaches could be further optimised to achieve better performance.
 
-%TODO point to make somewhere: more complex techniques could possibly improve results further, but will cost more. 2x slowdown seems acceptable. there's always a tradeoff and we needs several datapoints to make a choice. this work shows we can achieve a lot with very little, but we may be able to achieve even more at a greater cost.
+However our results show that our approach is on-par with or faster than the two existing native code approaches, and provides platform independence at the same time. We also note that if we require a platform independent way of reprogramming our nodes, making it safe comes at a relatively low extra cost, with our safe VM only 19.9\% slower than the unsafe version.
+
+%TODO: put this somewhere: We may also consider extending the bytecode with instructions to express common operations more efficiently. For example, an instruction to loop over an array such as the one found in Lua \cite{Lua:2005} would allow us to generate more efficient code and eliminate most of the remaining overhead in the bubble sort benchmark.
