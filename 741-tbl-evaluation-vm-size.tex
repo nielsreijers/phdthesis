@@ -1,6 +1,5 @@
-% UPDATED 20180213
+% UPDATED 20180218
 
-% TODO: UDPATE THIS AGAN, since the tiny fix in lightweight methods (20180216) will have added a few bytes. It only affects the fft16_lw benchmark, and the performance data for that has already been updated.
 \begin{tabular}{lrrrrrr}
 \toprule
                           & size vs     & size vs  &                      & AOT code  &   break & memory    \\
@@ -14,6 +13,6 @@ Markloop                  &    12337 B  &  5732 B  & \scriptsize  (+3280) &  -33
 Const shift               &    12785 B  &  6180 B  & \scriptsize   (+448) &  -33.8\%  & 18.3 KB & 85 B      \\
 16-bit array index        &    12765 B  &  6160 B  & \scriptsize    (-20) &  -38.2\%  & 16.1 KB & 85 B      \\
 SIMUL                     &    12831 B  &  6226 B  & \scriptsize    (+66) &  -38.7\%  & 16.1 KB & 85 B      \\
-Lightweight methods       &    13367 B  &  6762 B  & \scriptsize   (+536) &  -38.9\%  & 17.4 KB & 85 B      \\
+Lightweight methods       &    13379 B  &  6774 B  & \scriptsize   (+548) &  -38.9\%  & 17.4 KB & 85 B      \\
 \bottomrule
 \end{tabular}

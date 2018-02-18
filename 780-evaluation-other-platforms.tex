@@ -46,6 +46,7 @@ The Cortex M0 has one general purpose register more than the MSP430, and at 8 re
 A final interesting thing to note in Figure \ref{fig-performance-per-opcode-category-per-cachesize} is the fact the increasing the cache size mostly reduces the load/store overhead. Using only 4 pairs, stack caching has already removed most of the push/pop overhead, which only drops slightly when more registers are used. However, these extra registers reduce load/store overhead significantly since more registers are available for the markloop optimisation, and using more registers it increases the chance that an old, popped value may still be present, allowing popped value caching to eliminate more loads.
 
 \subsection{Word size}
+\label{sec-evaluation-other-platforms-word-size}
 \begin{figure}
     \centering
     \includegraphics[width=\myfiguresizeperformance]{8_16_32_bit.eps}
