@@ -12,9 +12,9 @@ In this paper we propose MyVM, a sensor node JVM based on the Darjeeling VM, and
 
 MyVM uses Ahead-of-Time compilation to native code to improve performance and introduces a range of optimisations to eliminate most of the overhead still present in previous work on sensor node AOT compilers. Safety is guaranteed by a set of run-time and translation-time checks. The simplicity of the JVM's instruction set allows us to perform most of these checks when the bytecode is translated to native code, reducing the need for expensive run-time checks.
 
-Using a set of 8 benchmarks with varying characteristic, including the well known CoreMark benchmark, we show this results in an average performance roughly 2x slower than unsafe native code. Without safety checks, this drops to 1.7x. Thus, MyVM combines the desirable properties of existing work on both safety and virtual machines for sensor networks, while delivering performance and code size overhead comparable or better than existing solutions.
+Using a set of 12 benchmarks with varying characteristic, including the standard CoreMark benchmark, and a number of real sensor node applications, we show this results in an average performance roughly 2.1x slower than unsafe native code. Without safety checks, this drops to 1.7x. Thus, MyVM combines the desirable properties of existing work on both safety and virtual machines for sensor networks, while delivering performance and code size overhead comparable or better than existing solutions.
 \bigbreak
-\noindent \textbf{Keywords:}{\, \makeatletter \@keywordsen \makeatother}
+\noindent \textbf{Keywords: wireless sensor networks, Internet of Things, Java, virtual machines, ahead-of-time compilation, software fault isolation}{\, \makeatletter \@keywordsen \makeatother}
 \end{abstracten}
 
 \begin{comment}
