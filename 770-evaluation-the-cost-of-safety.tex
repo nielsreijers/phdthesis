@@ -5,14 +5,7 @@ The advantage of using a VM to provide safety is that the necessary checks are e
 
 % would be nice to get code size for Harbor and t-kernel.
 
-\begin{landscape}
-\begin{table*}[]
- \centering
- \caption{Cost of safety guarantees}
- \label{tbl-safety-cost}
- \input{770-tbl-safety-cost}
-\end{table*}
-\end{landscape}
+\input{770-tbl-safety-cost}
 
 
 \subsection{Run-time cost}
@@ -105,8 +98,6 @@ While our VM is currently faster than Harbor, the comparison is not entirely fai
 
 The difference is due to Harbor's more fine grained protection, which allows it to grant access to any aligned block of 8 bytes to the application, while our VM's protection is more coarse. If Harbor could be modified to use a check similar to ours, it's overhead could potentially be reduced to $1230 / 65 * 22 \approx 416\%$. This puts it in the middle of our three versions in terms of total overhead. However, it is not clear from the paper whether Harbor's architecture could support such a coarse-grained check since it requires all application data that needs run-time write checks to be in a single segment.
 
- While this shows our approach achieves a performance comparable to even an optimised version of Harbor, it does not highlight the advantage of using a VM to provide safety since both approaches much check each write to an array. However, our approach can verify writes to local and static variables to be safe at translation time, eliminating the need for a run-time check, while we can tell from the Harbor sources \cite{sos-operating-system} that its verifier requires \emph{all} stores to go through its write access check.
+While this shows our approach achieves a performance comparable to even an optimised version of Harbor, it does not highlight the advantage of using a VM to provide safety since both approaches much check each write to an array. However, our approach can verify writes to local and static variables to be safe at translation time, eliminating the need for a run-time check, while we can tell from the Harbor sources \cite{sos-operating-system} that its verifier requires \emph{all} stores to go through its write access check. The authors do note that static analysis of the code could reduce the number of checks, but that this would come at the cost of a significantly more complex verifier.
 
- This means our approach should have a distinct advantage for code with more frequent writes to local variables. The Harbor paper also contains an FFT benchmark, and we use the same code from the Harbor sources for our FFT benchmark. In Harbor's case this results in an overhead of 380\%. Even with the faster memory access check, this would still result in an overhead of $380 / 65 * 22 \approx 129\%$, while our VM is significantly faster at only 30.4\%.
-
-%TODO: say something about Harbor's claim to reduce checks at the cost of more complexity
+This means our approach should have a distinct advantage for code with more frequent writes to local variables. The Harbor paper also contains an FFT benchmark, and we use the same code from the Harbor sources for our FFT benchmark. In Harbor's case this results in an overhead of 380\%. Even with the faster memory access check, this would still result in an overhead of $380 / 65 * 22 \approx 129\%$, while our VM is significantly faster at only 30.4\%.

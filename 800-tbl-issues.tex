@@ -1,18 +1,23 @@
-\begin{tabular}{llll}
-\toprule
-\bfseries Section           & \bfseries Issue                               & \bfseries in          & \bfseries affects \\
-\midrule
-\ref{sec-std-lib}           & A tailored standard library                   & Standard library      & VM size \\
-\ref{sec-const-data}        & Support for constant data                     & Source language, VM   & memory usage, application size \\
-\ref{sec-nested-data}       & Support for nested data structures            & Source language, VM   & memory usage, performance \\
-% \ref{sec-small-datatypes}   & Better lang. support for shorts and bytes     & Source language       & memory usage, source maintainability \\
-\ref{sec-small-datatypes}   & Better lang. support for shorts and bytes     & Source language       & memory usage, \\
-                            &                                               &                       & ~~  source maintainability\\
-\ref{sec-typedef}           & Simple type definitions                       & Source language       & source maintainability \\
-\ref{sec-inlining}          & Explicit and efficient inlining               & Source language       & performance \\
-\ref{sec-optimising-javac}  & An optimising compiler                        & Compiler              & performance \\
-\ref{sec-no-gc}             & Allocating objects on stack                   & Source language, VM   & (predictable) performance \\
-\ref{sec-advanced-features} & Reconsidering adv. language features          & Source language, VM   & VM size, complexity, \\
-                            & ~~OO, GC, threads, exceptions                 &                       & ~~ and performance \\
-\bottomrule
-\end{tabular}
+\begin{table}
+\caption{Point requiring attention in future sensor node VMs}
+\label{tbl-issues}
+    \begin{tabular}{llll}
+    \toprule
+    \bfseries Section           & \bfseries Issue                               & \bfseries in          & \bfseries affects \\
+    \midrule
+    \midrule
+    \ref{sec-std-lib}           & A tailored standard library                   & Standard library      & VM size \\
+    \ref{sec-const-data}        & Support for constant data                     & Source language, VM   & memory usage, application size \\
+    \ref{sec-nested-data}       & Support for nested data structures            & Source language, VM   & memory usage, performance \\
+    % \ref{sec-small-datatypes}   & Better lang. support for shorts and bytes     & Source language       & memory usage, source maintainability \\
+    \ref{sec-small-datatypes}   & Better lang. support for shorts and bytes     & Source language       & memory usage, \\
+                                &                                               &                       & ~~  source maintainability\\
+    \ref{sec-typedef}           & Simple type definitions                       & Source language       & source maintainability \\
+    \ref{sec-inlining}          & Explicit and efficient inlining               & Source language       & performance \\
+    \ref{sec-optimising-javac}  & An optimising compiler                        & Compiler              & performance \\
+    \ref{sec-no-gc}             & Allocating objects on stack                   & Source language, VM   & (predictable) performance \\
+    \ref{sec-advanced-features} & Reconsidering adv. language features          & Source language, VM   & VM size, complexity, \\
+                                & ~~OO, GC, threads, exceptions                 &                       & ~~ and performance \\
+    \bottomrule
+    \end{tabular}
+\end{table}

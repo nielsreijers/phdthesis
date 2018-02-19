@@ -1,7 +1,11 @@
-\begin{tabular}{lrrcr}
+\begin{table}
+\caption{Size of Darjeeling VM components}
+\label{tab-vm-size}
+    \begin{tabular}{lrrcr}
     \toprule
     \bfseries Component   & \bfseries std.lib & \bfseries VM & & \bfseries total \\
                           & (bytes)                   & (bytes)              & & (bytes)  \\
+    \midrule
     \midrule
     Core vm               &  3529                     &  7006                & &           10535 \\
     Strings               &  8467                     &  1942                & &           10409 \\
@@ -13,4 +17,5 @@
     IO                    &   530                     &   680                & &            1210 \\
     Total                 & 15075                     & 28004                & &           43079 \\
     \bottomrule
-\end{tabular}
+    \end{tabular}
+\end{table}

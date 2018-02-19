@@ -1,53 +1,59 @@
 % UPDATED 20180212
 
-\begin{tabular}{lrrrrrrrrrrrrrrr}
-\toprule
-                                    & B.sort     &  H.sort    & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
-\midrule
-\multicolumn{10}{l}{EXECUTED JVM INSTRUCTIONS (\%)} \\
-% Take this from results_0BASE_R___P__C0_A1_S0_G1 (16-bit array index enabled), otherwise we will get a lot of S2I conversions since the code uses shorts.
-\xxt Load/Store                     &       79.8 &       71.7 &       58.1 &       44.9 &       43.3 &       41.1 &       61.3 &       69.0 &       59.9 &       54.2 &       67.7 &       51.8 &       47.8 &                   &      57.7 \\
-\xxt Constant load                  &        0.2 &        8.1 &       11.0 &       12.5 &       19.1 &       17.6 &        6.4 &        0.6 &        7.8 &       10.0 &        5.6 &       10.1 &       17.3 &                   &       9.7 \\
-\xxt Processing                     &        8.0 &        7.8 &       14.8 &       32.4 &       28.9 &       36.6 &       17.9 &       13.0 &       12.6 &       14.0 &        5.0 &       17.9 &       11.1 &                   &      16.9 \\
-  \xxxt   math                      & \xt    8.0 & \xt    5.5 & \xt   10.3 & \xt   10.1 & \xt   12.5 & \xt   10.7 & \xt   11.6 & \xt   13.0 & \xt    7.0 & \xt    8.2 & \xt    5.0 & \xt    3.7 & \xt    9.9 & \xt               & \xt   8.9 \\
-  \xxxt   bit shift                 & \xt    0.0 & \xt    2.2 & \xt    4.5 & \xt    8.1 & \xt    5.4 & \xt    8.0 & \xt    6.0 & \xt    0.0 & \xt    3.8 & \xt    2.2 & \xt    0.0 & \xt    8.5 & \xt    1.2 & \xt               & \xt   3.8 \\
-  \xxxt   bit logic                 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   14.2 & \xt   11.0 & \xt   17.9 & \xt    0.3 & \xt    0.0 & \xt    1.8 & \xt    3.6 & \xt    0.0 & \xt    5.7 & \xt    0.0 & \xt               & \xt   4.2 \\
-\xxt Branches                       &       12.0 &       10.9 &       15.5 &        4.0 &        5.8 &        2.3 &        5.1 &       17.4 &       10.4 &       15.9 &       15.3 &       14.7 &       19.9 &                   &      11.5 \\
-\xxt Invoke                         &        0.0 &        0.5 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.4 &        1.2 &        0.3 &        0.0 &                   &       0.2 \\
-\xxt Others                         &        0.0 &        1.0 &        0.6 &        0.2 &        2.5 &        2.4 &        9.4 &        0.0 &        7.0 &        4.3 &        2.8 &        4.2 &        3.9 &                   &       2.9 \\
-\xxt Total                          &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &                   &     100.0 \\
-% Take this from results_0BASE_R___P__C0_A1_S0_G1 as well.
-\multicolumn{10}{l}{STACK (bytes)} \\
-\xxt Max. stack                     &          6 &          8 &          4 &         24 &         20 &         14 &         10 &          6 &         18 &         16 &         12 &         22 &         16 &                   &      13.5 \\
-\xxt Avg. stack                     &       2.08 &       2.37 &       2.14 &      11.76 &       6.30 &       6.77 &       3.38 &       1.89 &       2.74 &       3.15 &       2.25 &       4.83 &       3.06 &                   &       4.1 \\
-\midrule
-\multicolumn{10}{l}{PERFORMANCE OVERHEAD BEFORE OPTIMISATIONS (\% of nat. C)} \\
-% Take this from performance-table.xlsx 
-\xxt Total                          &      657.3 &      490.2 &      471.8 &      250.7 &      226.1 &      123.2 &      122.8 &      488.1 &      278.4 &      350.3 &      315.0 &      180.9 &      200.9 &                   &     319.7 \\
-  \xxxt push/pop                    & \xt  266.9 & \xt  203.6 & \xt  202.2 & \xt  168.0 & \xt  106.0 & \xt   61.3 & \xt   57.5 & \xt  205.5 & \xt  110.9 & \xt  127.0 & \xt   98.7 & \xt   80.9 & \xt   78.7 & \xt               & \xt 135.9 \\
-  \xxxt load/store                  & \xt  240.3 & \xt  183.0 & \xt  191.0 & \xt   42.5 & \xt   43.9 & \xt   28.5 & \xt   25.9 & \xt  190.4 & \xt  115.4 & \xt   91.3 & \xt  123.8 & \xt   68.5 & \xt   43.5 & \xt               & \xt 106.8 \\
-  \xxxt mov(w)                      & \xt   16.6 & \xt    8.1 & \xt    0.6 & \xt    2.4 & \xt    1.7 & \xt   -1.7 & \xt    3.6 & \xt    3.6 & \xt    4.4 & \xt    3.7 & \xt    6.0 & \xt   -3.5 & \xt    7.8 & \xt               & \xt   4.1 \\
-  \xxxt other                       & \xt  133.5 & \xt   95.5 & \xt   78.1 & \xt   37.7 & \xt   74.6 & \xt   35.1 & \xt   35.7 & \xt   88.8 & \xt   46.6 & \xt  103.6 & \xt   73.1 & \xt   35.0 & \xt   66.5 & \xt               & \xt  69.5 \\
-  \xxxt vm                          & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   -0.1 & \xt    1.1 & \xt   24.7 & \xt   13.4 & \xt    0.0 & \xt    4.4 & \xt               & \xt   3.3 \\
-\multicolumn{10}{l}{PERFORMANCE OVERHEAD REDUCTION PER OPTIMISATION (\% of nat. C)} \\
-\xxt Impr. peephole                 &     -233.5 &     -159.3 &     -149.4 &      -61.8 &      -51.7 &      -23.2 &      -37.1 &     -178.2 &      -59.7 &      -60.7 &      -45.8 &      -35.7 &      -51.8 &                   &     -88.3 \\
-\xxt Stack caching                  &      -33.4 &      -48.3 &      -53.3 &      -97.2 &      -54.2 &      -38.6 &      -15.3 &      -32.1 &      -66.2 &      -39.8 &      -30.1 &      -40.9 &      -26.2 &                   &     -44.3 \\
-\xxt Pop. val. caching              &     -133.1 &      -93.3 &      -67.4 &       -6.8 &      -12.9 &       -8.8 &      -10.9 &      -51.0 &      -28.8 &      -25.9 &      -28.8 &      -15.5 &      -11.6 &                   &     -38.1 \\
-\xxt Mark loops                     &     -102.9 &      -51.5 &      -85.4 &       +5.0 &      -10.9 &       -8.0 &       -7.9 &     -114.9 &      -18.0 &      -40.0 &      -38.7 &      -39.4 &      -24.2 &                   &     -41.3 \\
-\xxt Const shift                    &        0.0 &      -14.5 &      -35.4 &      -18.4 &      -45.2 &      -20.9 &       -3.8 &        0.0 &       -9.6 &      -10.2 &        0.0 &      -17.2 &       -4.1 &                   &     -13.8 \\
-\xxt 16-bit array index             &      -53.2 &      -35.0 &      -15.7 &      -13.9 &       -5.5 &       -4.2 &       -2.8 &      -36.2 &       -9.6 &      -39.0 &       -6.2 &       -1.7 &       -9.6 &                   &     -17.8 \\
-\xxt SIMUL                          &        0.0 &       +0.2 &        0.0 &        0.0 &        0.0 &        0.0 &      -27.3 &        0.0 &        0.0 &      -36.6 &        0.0 &        0.0 &        0.0 &                   &      -4.9 \\
-\multicolumn{10}{l}{PERFORMANCE OVERHEAD AFTER OPTIMISATIONS (\% of nat. C)} \\
-\xxt Total                          &      101.2 &       88.5 &       65.2 &       57.6 &       45.7 &       19.5 &       17.7 &       75.7 &       86.5 &       98.1 &      165.4 &       30.5 &       73.4 &                   &      71.2 \\
-  \xxxt push/pop                    & \xt    0.0 & \xt   -2.8 & \xt    0.0 & \xt   37.4 & \xt    0.1 & \xt    2.9 & \xt    2.0 & \xt   -0.2 & \xt  -13.7 & \xt    4.4 & \xt   19.8 & \xt    5.6 & \xt    2.0 & \xt               & \xt   4.4 \\
-  \xxxt load/store                  & \xt    1.0 & \xt   29.3 & \xt   27.0 & \xt   -2.3 & \xt   20.3 & \xt    4.3 & \xt    2.8 & \xt    4.5 & \xt   57.9 & \xt   17.6 & \xt   60.0 & \xt    2.7 & \xt   14.5 & \xt               & \xt  18.4 \\
-  \xxxt mov(w)                      & \xt   10.0 & \xt    9.4 & \xt   11.8 & \xt    5.6 & \xt    1.5 & \xt    0.1 & \xt    2.9 & \xt    6.8 & \xt    7.9 & \xt    9.7 & \xt    8.4 & \xt    5.1 & \xt    3.8 & \xt               & \xt   6.4 \\
-  \xxxt other                       & \xt   90.2 & \xt   52.5 & \xt   26.4 & \xt   16.9 & \xt   23.8 & \xt   12.2 & \xt    9.9 & \xt   64.7 & \xt   33.2 & \xt   41.8 & \xt   64.0 & \xt   17.0 & \xt   48.7 & \xt               & \xt  38.6 \\
-  \xxxt vm                          & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   -0.1 & \xt    1.1 & \xt   24.7 & \xt   13.2 & \xt    0.0 & \xt    4.4 & \xt               & \xt   3.3 \\
-\midrule
-                                    & B.sort     &  H.sort    & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
-\bottomrule
-\end{tabular}   
-
+\begin{landscape}
+\begin{table}
+\caption{Performance data per benchmark}
+\label{tbl-performance-per-benchmark}
+    \begin{tabular}{lrrrrrrrrrrrrrrr}
+    \toprule
+                                        & B.sort     &  H.sort    & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
+    \midrule
+    \midrule
+    \multicolumn{10}{l}{EXECUTED JVM INSTRUCTIONS (\%)} \\
+    % Take this from results_0BASE_R___P__C0_A1_S0_G1 (16-bit array index enabled), otherwise we will get a lot of S2I conversions since the code uses shorts.
+    \xxt Load/Store                     &       79.8 &       71.7 &       58.1 &       44.9 &       43.3 &       41.1 &       61.3 &       69.0 &       59.9 &       54.2 &       67.7 &       51.8 &       47.8 &                   &      57.7 \\
+    \xxt Constant load                  &        0.2 &        8.1 &       11.0 &       12.5 &       19.1 &       17.6 &        6.4 &        0.6 &        7.8 &       10.0 &        5.6 &       10.1 &       17.3 &                   &       9.7 \\
+    \xxt Processing                     &        8.0 &        7.8 &       14.8 &       32.4 &       28.9 &       36.6 &       17.9 &       13.0 &       12.6 &       14.0 &        5.0 &       17.9 &       11.1 &                   &      16.9 \\
+      \xxxt   math                      & \xt    8.0 & \xt    5.5 & \xt   10.3 & \xt   10.1 & \xt   12.5 & \xt   10.7 & \xt   11.6 & \xt   13.0 & \xt    7.0 & \xt    8.2 & \xt    5.0 & \xt    3.7 & \xt    9.9 & \xt               & \xt   8.9 \\
+      \xxxt   bit shift                 & \xt    0.0 & \xt    2.2 & \xt    4.5 & \xt    8.1 & \xt    5.4 & \xt    8.0 & \xt    6.0 & \xt    0.0 & \xt    3.8 & \xt    2.2 & \xt    0.0 & \xt    8.5 & \xt    1.2 & \xt               & \xt   3.8 \\
+      \xxxt   bit logic                 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   14.2 & \xt   11.0 & \xt   17.9 & \xt    0.3 & \xt    0.0 & \xt    1.8 & \xt    3.6 & \xt    0.0 & \xt    5.7 & \xt    0.0 & \xt               & \xt   4.2 \\
+    \xxt Branches                       &       12.0 &       10.9 &       15.5 &        4.0 &        5.8 &        2.3 &        5.1 &       17.4 &       10.4 &       15.9 &       15.3 &       14.7 &       19.9 &                   &      11.5 \\
+    \xxt Invoke                         &        0.0 &        0.5 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.4 &        1.2 &        0.3 &        0.0 &                   &       0.2 \\
+    \xxt Others                         &        0.0 &        1.0 &        0.6 &        0.2 &        2.5 &        2.4 &        9.4 &        0.0 &        7.0 &        4.3 &        2.8 &        4.2 &        3.9 &                   &       2.9 \\
+    \xxt Total                          &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &      100.0 &                   &     100.0 \\
+    % Take this from results_0BASE_R___P__C0_A1_S0_G1 as well.
+    \multicolumn{10}{l}{STACK (bytes)} \\
+    \xxt Max. stack                     &          6 &          8 &          4 &         24 &         20 &         14 &         10 &          6 &         18 &         16 &         12 &         22 &         16 &                   &      13.5 \\
+    \xxt Avg. stack                     &       2.08 &       2.37 &       2.14 &      11.76 &       6.30 &       6.77 &       3.38 &       1.89 &       2.74 &       3.15 &       2.25 &       4.83 &       3.06 &                   &       4.1 \\
+    \midrule
+    \multicolumn{10}{l}{PERFORMANCE OVERHEAD BEFORE OPTIMISATIONS (\% of nat. C)} \\
+    % Take this from performance-table.xlsx 
+    \xxt Total                          &      657.3 &      490.2 &      471.8 &      250.7 &      226.1 &      123.2 &      122.8 &      488.1 &      278.4 &      350.3 &      315.0 &      180.9 &      200.9 &                   &     319.7 \\
+      \xxxt push/pop                    & \xt  266.9 & \xt  203.6 & \xt  202.2 & \xt  168.0 & \xt  106.0 & \xt   61.3 & \xt   57.5 & \xt  205.5 & \xt  110.9 & \xt  127.0 & \xt   98.7 & \xt   80.9 & \xt   78.7 & \xt               & \xt 135.9 \\
+      \xxxt load/store                  & \xt  240.3 & \xt  183.0 & \xt  191.0 & \xt   42.5 & \xt   43.9 & \xt   28.5 & \xt   25.9 & \xt  190.4 & \xt  115.4 & \xt   91.3 & \xt  123.8 & \xt   68.5 & \xt   43.5 & \xt               & \xt 106.8 \\
+      \xxxt mov(w)                      & \xt   16.6 & \xt    8.1 & \xt    0.6 & \xt    2.4 & \xt    1.7 & \xt   -1.7 & \xt    3.6 & \xt    3.6 & \xt    4.4 & \xt    3.7 & \xt    6.0 & \xt   -3.5 & \xt    7.8 & \xt               & \xt   4.1 \\
+      \xxxt other                       & \xt  133.5 & \xt   95.5 & \xt   78.1 & \xt   37.7 & \xt   74.6 & \xt   35.1 & \xt   35.7 & \xt   88.8 & \xt   46.6 & \xt  103.6 & \xt   73.1 & \xt   35.0 & \xt   66.5 & \xt               & \xt  69.5 \\
+      \xxxt vm                          & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   -0.1 & \xt    1.1 & \xt   24.7 & \xt   13.4 & \xt    0.0 & \xt    4.4 & \xt               & \xt   3.3 \\
+    \multicolumn{10}{l}{PERFORMANCE OVERHEAD REDUCTION PER OPTIMISATION (\% of nat. C)} \\
+    \xxt Impr. peephole                 &     -233.5 &     -159.3 &     -149.4 &      -61.8 &      -51.7 &      -23.2 &      -37.1 &     -178.2 &      -59.7 &      -60.7 &      -45.8 &      -35.7 &      -51.8 &                   &     -88.3 \\
+    \xxt Stack caching                  &      -33.4 &      -48.3 &      -53.3 &      -97.2 &      -54.2 &      -38.6 &      -15.3 &      -32.1 &      -66.2 &      -39.8 &      -30.1 &      -40.9 &      -26.2 &                   &     -44.3 \\
+    \xxt Pop. val. caching              &     -133.1 &      -93.3 &      -67.4 &       -6.8 &      -12.9 &       -8.8 &      -10.9 &      -51.0 &      -28.8 &      -25.9 &      -28.8 &      -15.5 &      -11.6 &                   &     -38.1 \\
+    \xxt Mark loops                     &     -102.9 &      -51.5 &      -85.4 &       +5.0 &      -10.9 &       -8.0 &       -7.9 &     -114.9 &      -18.0 &      -40.0 &      -38.7 &      -39.4 &      -24.2 &                   &     -41.3 \\
+    \xxt Const shift                    &        0.0 &      -14.5 &      -35.4 &      -18.4 &      -45.2 &      -20.9 &       -3.8 &        0.0 &       -9.6 &      -10.2 &        0.0 &      -17.2 &       -4.1 &                   &     -13.8 \\
+    \xxt 16-bit array index             &      -53.2 &      -35.0 &      -15.7 &      -13.9 &       -5.5 &       -4.2 &       -2.8 &      -36.2 &       -9.6 &      -39.0 &       -6.2 &       -1.7 &       -9.6 &                   &     -17.8 \\
+    \xxt SIMUL                          &        0.0 &       +0.2 &        0.0 &        0.0 &        0.0 &        0.0 &      -27.3 &        0.0 &        0.0 &      -36.6 &        0.0 &        0.0 &        0.0 &                   &      -4.9 \\
+    \multicolumn{10}{l}{PERFORMANCE OVERHEAD AFTER OPTIMISATIONS (\% of nat. C)} \\
+    \xxt Total                          &      101.2 &       88.5 &       65.2 &       57.6 &       45.7 &       19.5 &       17.7 &       75.7 &       86.5 &       98.1 &      165.4 &       30.5 &       73.4 &                   &      71.2 \\
+      \xxxt push/pop                    & \xt    0.0 & \xt   -2.8 & \xt    0.0 & \xt   37.4 & \xt    0.1 & \xt    2.9 & \xt    2.0 & \xt   -0.2 & \xt  -13.7 & \xt    4.4 & \xt   19.8 & \xt    5.6 & \xt    2.0 & \xt               & \xt   4.4 \\
+      \xxxt load/store                  & \xt    1.0 & \xt   29.3 & \xt   27.0 & \xt   -2.3 & \xt   20.3 & \xt    4.3 & \xt    2.8 & \xt    4.5 & \xt   57.9 & \xt   17.6 & \xt   60.0 & \xt    2.7 & \xt   14.5 & \xt               & \xt  18.4 \\
+      \xxxt mov(w)                      & \xt   10.0 & \xt    9.4 & \xt   11.8 & \xt    5.6 & \xt    1.5 & \xt    0.1 & \xt    2.9 & \xt    6.8 & \xt    7.9 & \xt    9.7 & \xt    8.4 & \xt    5.1 & \xt    3.8 & \xt               & \xt   6.4 \\
+      \xxxt other                       & \xt   90.2 & \xt   52.5 & \xt   26.4 & \xt   16.9 & \xt   23.8 & \xt   12.2 & \xt    9.9 & \xt   64.7 & \xt   33.2 & \xt   41.8 & \xt   64.0 & \xt   17.0 & \xt   48.7 & \xt               & \xt  38.6 \\
+      \xxxt vm                          & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   -0.1 & \xt    1.1 & \xt   24.7 & \xt   13.2 & \xt    0.0 & \xt    4.4 & \xt               & \xt   3.3 \\
+    \midrule
+                                        & B.sort     &  H.sort    & BinSearch  & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+\end{landscape}
 
  

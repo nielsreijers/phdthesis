@@ -17,40 +17,40 @@ Another decade of miniaturisation since the start of WSN research has allowed us
 These devices have capabilities similar to that of desktop PCs only a few generations ago. They can run a normal operating system like Linux and all the standard protocols and tools that come with it. Compared to the traditional resource-constrained sensor nodes, the can perform much more complex tasks, but the smallest devices in this class are still significantly larger than the smallest sensor nodes, more expensive, and most importantly, consume significantly more power.
 %TODO add this reference http://ieeexplore.ieee.org/document/7969879/
 
-Since devices in this class are capable of running normal, well established VMs, we do not consider them in this thesis, but instead focus on the second class of devices: sensor nodes.
+Since devices in this class are capable of running normal, well established VMs, we do not consider them in this dissertation, but instead focus on the second class of devices: sensor nodes.
 
 \subsection{Resource-constrained sensor nodes}
 The second class of devices, wireless sensor nodes, are distinctly less powerful. They are designed to be deployed at low cost and potentially in large numbers, and are capable of running for weeks or months on a single battery charge. As a typical example, the MICAz node \cite{CrossbowTechnology} uses only 30mA when active and 16uA in sleep mode. More recently, the Arduino family of devices, based on similar hardware, has led to a very active community of both research and hobby projects.
 
-While an enormous number of different hardware platforms have been developed, the components they use come from a limited set. Two of the most popular families of CPUs used in these platforms are the Atmel AVR and Texas Instruments MSP430. Both families of CPUs come in a large number of variations with different amounts of memory, IO ports, and physical packages, but the underlying architecture is similar for all. Table \ref{tbl-atmega128-msp430f1611} lists the main characteristics for two popular member for both families, the ATMEGA128 and the MSP430F1611. Below we will describe the most important properties for this class of devices that are relevant to the work in this thesis.
+While an enormous number of different hardware platforms have been developed, the components they use come from a limited set. Two of the most popular families of CPUs used in these platforms are the Atmel AVR and Texas Instruments MSP430. Both families of CPUs come in a large number of variations with different amounts of memory, IO ports, and physical packages, but the underlying architecture is similar for all. Table \ref{tbl-atmega128-msp430f1611} lists the main characteristics for two popular member for both families, the ATMEGA128 and the MSP430F1611. Below we will describe the most important properties for this class of devices that are relevant to the work in this dissertation.
 
-\begin{table*}[]
-\centering
+\begin{table}
 \caption{Main characteristics of the ATMEGA128 and MSP430F1611 CPUs.}
 \label{tbl-atmega128-msp430f1611}
-\begin{threeparttable}
-\begin{tabular}{lrr}
-\toprule
-                                       & ATMEGA128 \cite{Atmel:ATMEGA128Datasheet, Atmel:AVRInstructionSetManual}   & MSP430F1611 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide} \\
-\midrule
-Number of registers                    & 32           & 12            \\
-Register size                          & 8-bit        & 16-bit        \\
-RAM                                    & 4KB          & 10KB          \\
-Flash                                  & 128KB        & 48KB          \\
-Frequency                              & up to 16MHz  & up to 8MHz    \\
-Simple instruction cost                & 1 cycle      & 1 cycle       \\
-Memory access cost                     & 2 cycles     & 2 to 6 cycles \\
-Branch cost (taken/non-taken)          & 2 / 1 cycles & 2 cycles      \\
-Active power consumption\tnote{a}      & 7.5mA        & 4.0mA         \\
-Deep sleep power consumption           & 0.3uA        & 0.2uA         \\
-Execute code from                      & Flash        & Flash and RAM \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-	\item[a] at 8MHz and 2.7V
-\end{tablenotes}
-\end{threeparttable}
-\end{table*}
+    \begin{threeparttable}
+    \begin{tabular}{lrr}
+    \toprule
+                                           & ATMEGA128 \cite{Atmel:ATMEGA128Datasheet, Atmel:AVRInstructionSetManual}   & MSP430F1611 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide} \\
+    \midrule
+    \midrule
+    Number of registers                    & 32           & 12            \\
+    Register size                          & 8-bit        & 16-bit        \\
+    RAM                                    & 4KB          & 10KB          \\
+    Flash                                  & 128KB        & 48KB          \\
+    Frequency                              & up to 16MHz  & up to 8MHz    \\
+    Simple instruction cost                & 1 cycle      & 1 cycle       \\
+    Memory access cost                     & 2 cycles     & 2 to 6 cycles \\
+    Branch cost (taken/non-taken)          & 2 / 1 cycles & 2 cycles      \\
+    Active power consumption\tnote{a}      & 7.5mA        & 4.3mA         \\ % MSP430 current calculation: 8*(600+(210*(2.7-3)))=4296 uA
+    Deep sleep power consumption           & 0.3uA        & 0.2uA         \\
+    Execute code from                      & Flash        & Flash and RAM \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}
+        \item[a] at 8MHz and 2.7V
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
 
 \paragraph{Memory}
 Memory is split into persistent Flash memory for code, and volatile RAM for data. The MSP430 CPUs have a von Neumann architecture and can execute code from both, while the AVR's Harvard architecture can only execute code from Flash. Flash memory is typically in the range of 16KB to 256KB, while RAM, which consumes energy even in sleep mode, is restricted to up to 10KB. There are no caches, and since both memories are on chip, access times are constant and take only a few cycles.
@@ -72,8 +72,8 @@ The first public release of Java was in 1995. It consists of two separate but re
 
 It was quickly adopted by web browsers to run interactive \emph{applets}. Two key properties of Java contributed to this success:
 \begin{itemize}
-	\item Implementations of the JVM could be built for any hardware platform, so the same applet could be run in any browser, regardless of the hardware it was running on.
-	\item It allowed users to safely run applets from untrusted sources since the virtual machine ran applets in a 'sandboxed' environment with access to only those system resources explicitly allowed by the user.
+    \item Implementations of the JVM could be built for any hardware platform, so the same applet could be run in any browser, regardless of the hardware it was running on.
+    \item It allowed users to safely run applets from untrusted sources since the virtual machine ran applets in a 'sandboxed' environment with access to only those system resources explicitly allowed by the user.
 \end{itemize}
 
 For stand alone desktop applications Java also became popular because was an easy to learn, object oriented, garbage-collected language that allowed for a higher level of programming than C or C++, all of which boosted developer productivity.
@@ -82,15 +82,15 @@ For stand alone desktop applications Java also became popular because was an eas
 Compared to other widespread desktop VMs such as Lua, Python and .Net, Java's bytecode is very simple. Java is a \emph{stack-based} virtual machine, as opposed to a \emph{register-based} virtual machine: almost all operations take their operands from an operand stack, and push their results back onto it. For example, Listing \ref{lst-basic-jvm-bytecode-example} shows how the statement \mycode{a=b+c;} may be translated into JVM bytecode. First, \mycode{a} and \mycode{b} are loaded onto the stack, the \mycode{IADD} instruction then pops these operands from the operand stack and pushes the sum back onto it, and finally \mycode{ISTORE} stores the result back into a local variable.
 
 \begin{listing}[H]
-	\centering
-	\begin{minted}[fontsize=\scriptsize]{java}
+    \centering
+    \begin{minted}{java}
 JVM instruction       JVM stack
 
 ILOAD_1               a
 ILOAD_2               a   ,   b
 IADD                  a+b
 ISTORE_0
-	\end{minted}
+    \end{minted}
 \caption{JVM bytecode for \mycode{a=b+c;}}
 \label{lst-basic-jvm-bytecode-example}
 \end{listing}
@@ -103,9 +103,9 @@ Each JVM bytecode is encoded as a single byte. Some are followed by some operand
 \label{sec-background-jvm-memory}
 The JVM stores information in three different places:
 \begin{itemize}
-	\item The heap: objects and arrays are stored here, and automatically garbage-collected when no longer used.
-	\item The stack frame: each method's stack frame contains a section for that method's operand stack, and for its local variables.
-	\item Global variables: static variables that are allocated globally when a class is loaded (we ignore \mycode{ThreadLocal} variables since they are not supported in our VM).
+    \item The heap: objects and arrays are stored here, and automatically garbage-collected when no longer used.
+    \item The stack frame: each method's stack frame contains a section for that method's operand stack, and for its local variables.
+    \item Global variables: static variables that are allocated globally when a class is loaded (we ignore \mycode{ThreadLocal} variables since they are not supported in our VM).
 \end{itemize}
 
 \begin{figure}[]
@@ -133,7 +133,7 @@ The main reason is all early implementations of the JVM were interpreters. An in
 
 \begin{listing}[H]
     \centering
-    \begin{minted}[fontsize=\scriptsize]{C}
+    \begin{minted}{C}
     while (true) {
         opcode = bytecode[pc];
         pc++;
@@ -157,7 +157,6 @@ Borrowing the term from Proebsting et al., Way-Ahead-of-Time (WAT) compilers tra
 Regardless of which approach is chosen, the result is a native binary for the target platform, rather than JVM bytecode. The advantage of this approach is that ample time and resources are available during at compilation time so highly optimised code can be produced. However, the downside is that the resulting code is no longer platform independent or guaranteed to be properly sandboxed.
 
 \paragraph{Load time}
-%TODO: add reference for ART
 A second group of compilers translate bytecode to native code at load time. In these cases the entire application is translated to native code, before it is run. Therefore, they are usually called Ahead-of-Time (AOT) compilers. An example of this approach is early versions of Android's ART runtime, which translates an app the moment it is downloaded onto a device (although it since has mixed in JIT techniques as well, discussed below).
 
 The advantage is that it combines the advantage of WAT, being able to spend considerable resources on optimisation, with platform independence and a guaranteed sandbox, since the translation is now fully under control of the device running the application, rather than the device compiling it. A downside is that the initial translation adds to the time it takes to load or install an application.

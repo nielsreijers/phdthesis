@@ -74,34 +74,33 @@ Even after considerable effort optimising this process, this requires roughly 55
 \label{sec-optimisations-java-source}
 Having identified these sources of overhead, we will use the next three sections to describe the set of optimisations we use to address them. Table \ref{tbl-optimisations-overview} lists each optimisation, and the source of overhead it aims to reduce. The following sections will discuss each optimisation in detail.
 
-\begin{table*}[hbt]
-\centering
+\begin{table}
 \caption{List of optimisations per overhead source}
 \label{tbl-optimisations-overview}
-\small
-\begin{tabular}{lll}
-\toprule
-& Source of overhead & Optimisation \\
-\hline
-Section \ref{sec-optimisations-manual-java-source-optimisation} &
-Lack of optimisations in \mycode{javac}        & Manual optimisation of Java source code \\
+    \begin{tabular}{lll}
+    \toprule
+    & Source of overhead & Optimisation \\
+    \midrule
+    \midrule
+    Section \ref{sec-optimisations-manual-java-source-optimisation} &
+    Lack of optimisations in \mycode{javac}        & Manual optimisation of Java source code \\
 
-Section \ref{sec-optimisations-aot-translation-overhead} &
-AOT translation overhead                       & \\
-&\hspace{.5cm} Push/pop overhead                & Improved peephole optimiser \\
-&                                               & Stack caching \\
-&\hspace{.5cm} Load/store overhead              & Popped value caching \\
-&                                               & Mark loops \\
-&\hspace{.5cm} JVM instruction set limitations  & \mycode{SIMUL} instruction \\
-&                                               & \mycode{GET/PUTFIELD\_A\_FIXED} instructions \\
-&                                               & constant bit shift optimisation \\
-&                                               & 16-bit array indexes \\
+    Section \ref{sec-optimisations-aot-translation-overhead} &
+    AOT translation overhead                       & \\
+    &\hspace{.5cm} Push/pop overhead                & Improved peephole optimiser \\
+    &                                               & Stack caching \\
+    &\hspace{.5cm} Load/store overhead              & Popped value caching \\
+    &                                               & Mark loops \\
+    &\hspace{.5cm} JVM instruction set limitations  & \mycode{SIMUL} instruction \\
+    &                                               & \mycode{GET/PUTFIELD\_A\_FIXED} instructions \\
+    &                                               & constant bit shift optimisation \\
+    &                                               & 16-bit array indexes \\
 
-Section \ref{sec-optimisations-method-calls} &
-Method call overhead                           & \mycode{INVOKELIGHT} instruction \\
-\bottomrule
-\end{tabular}
-\end{table*}
+    Section \ref{sec-optimisations-method-calls} &
+    Method call overhead                           & \mycode{INVOKELIGHT} instruction \\
+    \bottomrule
+    \end{tabular}
+\end{table}
 
 
 

@@ -1,26 +1,27 @@
 \section{Expected perfomance on other platforms}
 \label{sec-evaluation-other-platforms}
-Platform independence is one of the main advantages of using a VM. The AVR family of CPUs is widely used in low power embedded systems, and we implemented our VM for the ATmega128 CPU. However, our approach does not depend on any AVR specific properties and the approach described in this thesis can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
+Platform independence is one of the main advantages of using a VM. The AVR family of CPUs is widely used in low power embedded systems, and we implemented our VM for the ATmega128 CPU. However, our approach does not depend on any AVR specific properties and the approach described in this dissertation can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
 
 While it is impossible to determine exactly what the resulting performance would be on different platforms without porting our VM, we present some results here that indicate it is likely to be worse than the results we see on the ATMEGA.
 
 Two parameter that are of important influence to our VM are the number of available registers and the size of the registers. Table \ref{tbl-atmega-msp430-m0-registers} lists these parameter for the ATMEGA, and two other common families of embedded CPUS, the Texas Instruments MSP430 and ARM Cortex-M0. These CPUs are similar in many ways, including the amount of RAM and Flash memory typically available, but differ in the number of registers and word size.
 
 \begin{table}
-\centering
 \caption{Number or registers and word size for the ATMEGA, MSP430, and Cortex M0}
 \label{tbl-atmega-msp430-m0-registers}
-\begin{tabular}{lrrr}
-\toprule
-                                       & ATMEGA       & MSP430     & Cortex M0 \\
-                                       & \cite{Atmel:ATMEGA128Datasheet, Atmel:AVRInstructionSetManual}
-                                       & \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide}
-                                       & \cite{ARM:2009vz} \\
-\midrule
-Number of general purpose registers    & 32           & 12         & 13        \\
-Word size                              & 8-bit        & 16-bit     & 32-bit    \\
-Total register file size (bytes)       & 32           & 24         & 52        \\
-\end{tabular}
+    \begin{tabular}{lrrr}
+    \toprule
+                                           & ATMEGA       & MSP430     & Cortex M0 \\
+                                           & \cite{Atmel:ATMEGA128Datasheet, Atmel:AVRInstructionSetManual}
+                                           & \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide}
+                                           & \cite{ARM:2009vz} \\
+    \midrule
+    \midrule
+    Number of general purpose registers    & 32           & 12         & 13        \\
+    Word size                              & 8-bit        & 16-bit     & 32-bit    \\
+    Total register file size (bytes)       & 32           & 24         & 52        \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 \subsection{Number of registers}

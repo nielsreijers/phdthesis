@@ -16,10 +16,10 @@ The two metrics we compromise on are load time and code size. Compiling to nativ
 
 We summarise our goals and constraints below:
 \begin{itemize}
-	\item Improve performance to within half of native optimised code.
-	\item Provide the option to run applications in a safe, sandboxed environment.
-	\item Keep memory consumption to around 100 bytes to allow concurrent tasks to keep running and maintain their state as new code is loaded onto the device.
-	\item Limit code size overhead so the approach is feasible on mid-range sensor node devices: at least 64KB of programme memory for 8-bit Atmel CPUs.
+  \item Improve performance to within half of native optimised code.
+  \item Provide the option to run applications in a safe, sandboxed environment.
+  \item Keep memory consumption to around 100 bytes to allow concurrent tasks to keep running and maintain their state as new code is loaded onto the device.
+  \item Limit code size overhead so the approach is feasible on mid-range sensor node devices: at least 64KB of programme memory for 8-bit Atmel CPUs.
 \end{itemize}
 
 \section{Compilation process}
@@ -49,40 +49,39 @@ The first column shows a fragment of JVM code which does a shift right of variab
 
 The example has been slightly simplified for readability. Since the AVR is an 8-bit CPU, in the real code many instructions are duplicated for loading the high and low bytes of a short. The cycle count is based on the actual number of generated instructions, and for a single iteration.
 
-\begin{table}[]
-\centering
+\begin{table}
 \caption{Translation of \mycode{ do\{A{>}{>}{>}=1;\} while(A>B);}}
 \label{tbl-basic-translation}
-\small
-\begin{tabular}{llll}
-\toprule
-JVM & AOT compiler & AVR & cycles \\
-\hline
-0: BRTARGET(0)   & \sccomment{record current addr} &                &   \\
-1: SLOAD\_0      & emit\_LDD(R1,Y+0)        & LDD R1,Y+0     & 4 \\
-                 & emit\_PUSH(R1)           & PUSH R1        & 4 \\
-2: SCONST\_1     & emit\_LDI(R1,1)          & LDI R1,1       & 2 \\
-                 & emit\_PUSH(R1)           & MOV R2,R1      & 1 \\
-3: SUSHR         & emit\_POP(R2)            &                &   \\
-                 & emit\_POP(R1)            & POP R1         & 4 \\
-                 & emit\_RJMP(+2)           & RJMP +2        & 2 \\
-                 & emit\_LSR(R1)            & LSR R1         & 2 \\
-                 & emit\_DEC(R2)            & DEC R2         & 2 \\
-                 & emit\_BRPL(-2)           & BRPL -2        & 3 \\
-                 & emit\_PUSH(R1)           &                &   \\
-4: SSTORE\_0     & emit\_POP(R1)            &                &   \\
-                 & emit\_STD(Y+0,R1)        & STD Y+0,R1     & 4 \\
-5: SLOAD\_0      & emit\_LDD(R1,Y+0)        & LDD R1,Y+0     & 4 \\
-                 & emit\_PUSH(R1)           & PUSH R1        & 4 \\
-6: SLOAD\_1      & emit\_LDD(R1,Y+2)        & LDD R1,Y+2     & 4 \\
-                 & emit\_PUSH(R1)           &                &   \\
-7: IF\_SCMPGT 0: & emit\_POP(R1)            &                &   \\
-                 & emit\_POP(R2)            & POP R2         & 4 \\
-                 & emit\_CP(R1,R2)          & CP R1,R2       & 2 \\
-                 & emit\_branchtag(GT,0)    & BRGT 0:        & 2 (taken), \\
-                 &                          &                & or 1 (not taken) \\
-\bottomrule
-\end{tabular}
+    \begin{tabular}{llll}
+    \toprule
+    JVM & AOT compiler & AVR & cycles \\
+    \midrule
+    \midrule
+    0: BRTARGET(0)   & \sccomment{record current addr} &                &   \\
+    1: SLOAD\_0      & emit\_LDD(R1,Y+0)        & LDD R1,Y+0     & 4 \\
+                     & emit\_PUSH(R1)           & PUSH R1        & 4 \\
+    2: SCONST\_1     & emit\_LDI(R1,1)          & LDI R1,1       & 2 \\
+                     & emit\_PUSH(R1)           & MOV R2,R1      & 1 \\
+    3: SUSHR         & emit\_POP(R2)            &                &   \\
+                     & emit\_POP(R1)            & POP R1         & 4 \\
+                     & emit\_RJMP(+2)           & RJMP +2        & 2 \\
+                     & emit\_LSR(R1)            & LSR R1         & 2 \\
+                     & emit\_DEC(R2)            & DEC R2         & 2 \\
+                     & emit\_BRPL(-2)           & BRPL -2        & 3 \\
+                     & emit\_PUSH(R1)           &                &   \\
+    4: SSTORE\_0     & emit\_POP(R1)            &                &   \\
+                     & emit\_STD(Y+0,R1)        & STD Y+0,R1     & 4 \\
+    5: SLOAD\_0      & emit\_LDD(R1,Y+0)        & LDD R1,Y+0     & 4 \\
+                     & emit\_PUSH(R1)           & PUSH R1        & 4 \\
+    6: SLOAD\_1      & emit\_LDD(R1,Y+2)        & LDD R1,Y+2     & 4 \\
+                     & emit\_PUSH(R1)           &                &   \\
+    7: IF\_SCMPGT 0: & emit\_POP(R1)            &                &   \\
+                     & emit\_POP(R2)            & POP R2         & 4 \\
+                     & emit\_CP(R1,R2)          & CP R1,R2       & 2 \\
+                     & emit\_branchtag(GT,0)    & BRGT 0:        & 2 (taken), \\
+                     &                          &                & or 1 (not taken) \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 \subsection{Branches}
@@ -119,37 +118,36 @@ A \mycode{push} directly followed by a \mycode{pop} are either eliminated or rep
 When the push and pop instructions target different registers, this results in multiple \mycode{mov} instructions. Two \mycode{mov} instructions with consecutive registers can be further optimised using the \mycode{movw} instruction to copy a register pair to another register pair in a single cycle.
 
 
-\begin{table}[]
-\centering
+\begin{table}
 \caption{MyVM's peephole optimisations}
 \label{tbl-myvm-peephole}
-\begin{threeparttable}
-\begin{tabular}{lrrlrr}
-\toprule
-Before & Cycles & Length & After & Cycles & Length \\
-Instructions      & & (bytes) & Instructions      &  & (bytes) \\
-\midrule
-\midrule
-\mycode{PUSH Rx}           & 4      & 4      &                            & 0      & 0 \\
-\mycode{POP Rx}            &        &        &                            &        & \\
-\midrule
-\mycode{PUSH Rx}           & 4      & 4      & \mycode{MOV Ry, Rx}        & 1      & 2 \\
-\mycode{POP Ry}            &        &        &                            &        & \\
-\midrule
-\mycode{ST X+, Rx}         & 4      & 4      &                            & 0      & 0 \\
-\mycode{LD -X, Rx}         &        &        &                            &        & \\
-\midrule
-\mycode{ST X+, Rx}         & 4      & 4      & \mycode{MOV Ry, Rx}        & 1      & 2 \\
-\mycode{LD -X, Ry}         &        &        &                            &        & \\
-\midrule
-\mycode{MOV Ry, Rx}        & 2      & 4      & \mycode{MOVW Ry, Rx}       & 1      & 2 \\
-\mycode{MOV Ry+1, Rx+1}    &        &        &                            &        & \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item The X register is used as the reference stack pointer.
-\end{tablenotes}
-\end{threeparttable}
+    \begin{threeparttable}
+    \begin{tabular}{lrrlrr}
+    \toprule
+    Before & Cycles & Length & After & Cycles & Length \\
+    Instructions      & & (bytes) & Instructions      &  & (bytes) \\
+    \midrule
+    \midrule
+    \mycode{PUSH Rx}           & 4      & 4      &                            & 0      & 0 \\
+    \mycode{POP Rx}            &        &        &                            &        & \\
+    \midrule
+    \mycode{PUSH Rx}           & 4      & 4      & \mycode{MOV Ry, Rx}        & 1      & 2 \\
+    \mycode{POP Ry}            &        &        &                            &        & \\
+    \midrule
+    \mycode{ST X+, Rx}         & 4      & 4      &                            & 0      & 0 \\
+    \mycode{LD -X, Rx}         &        &        &                            &        & \\
+    \midrule
+    \mycode{ST X+, Rx}         & 4      & 4      & \mycode{MOV Ry, Rx}        & 1      & 2 \\
+    \mycode{LD -X, Ry}         &        &        &                            &        & \\
+    \midrule
+    \mycode{MOV Ry, Rx}        & 2      & 4      & \mycode{MOVW Ry, Rx}       & 1      & 2 \\
+    \mycode{MOV Ry+1, Rx+1}    &        &        &                            &        & \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}
+    \item The X register is used as the reference stack pointer.
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
 
 
@@ -158,13 +156,13 @@ Instructions      & & (bytes) & Instructions      &  & (bytes) \\
 We made several modifications to the infuser and bytecode format to support our AOT compiler and improve performance. These changes will be introduced in more detail in the following sections, but for completeness we also list them here:
 
 \begin{itemize}
-	\item The new \mycode{BRTARGET} opcode marks targets of branch instructions, and all branch instructions are modified to target a \mycode{BRTARGET} id instead of a bytecode offset.
-	\item The new \mycode{MARKLOOP} opcode marks inner loops and the variables they use.
-	\item \mycode{\_FIXED} versions of the {GETFIELD\_A} and \mycode{PUTFIELD\_A} opcodes are used to access an object's reference fields when the offset is known at compile time (the offset it always known at compile time for integer fields).
-	\item The new \mycode{SIMUL} opcode does 16x16-bit to 32-bit multiplication.
-	\item Array access opcodes now use 16-bit indexes.
-	\item New \mycode{\_CONST} versions of all (variable) bit shift opcodes to support shift by a constant number of bits.
-	\item The new \mycode{INVOKELIGHT} opcode for an optimised 'lightweight' way of calling methods.
+  \item The new \mycode{BRTARGET} opcode marks targets of branch instructions, and all branch instructions are modified to target a \mycode{BRTARGET} id instead of a bytecode offset.
+  \item The new \mycode{MARKLOOP} opcode marks inner loops and the variables they use.
+  \item \mycode{\_FIXED} versions of the {GETFIELD\_A} and \mycode{PUTFIELD\_A} opcodes are used to access an object's reference fields when the offset is known at compile time (the offset it always known at compile time for integer fields).
+  \item The new \mycode{SIMUL} opcode does 16x16-bit to 32-bit multiplication.
+  \item Array access opcodes now use 16-bit indexes.
+  \item New \mycode{\_CONST} versions of all (variable) bit shift opcodes to support shift by a constant number of bits.
+  \item The new \mycode{INVOKELIGHT} opcode for an optimised 'lightweight' way of calling methods.
 \end{itemize}
 
 

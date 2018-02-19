@@ -1,15 +1,4 @@
-\begin{landscape}
-\begin{table}[]
- \centering
- \caption{Code size data per benchmark}
- \label{tbl-codesize-per-benchmark}
- \small
- \scriptsize
- \setlength{\tabcolsep}{4pt}
- \input{740-tbl-evaluation-code-size}
- \setlength{\tabcolsep}{6pt}
-\end{table}
-\end{landscape}
+\input{740-tbl-evaluation-code-size}
 
 \section{AOT translation: code size}
 \label{sec-evaluation-aot-translation-code-size}
@@ -50,14 +39,7 @@ As is often the case, there is a tradeoff between size and performance. The inte
 
 For the smallest devices, or if we want to be able to load especially large programmes, we may decide to use only a selection of optimisations to limit the VM size and still get both a reasonable performance, and most of the code size reduction. For example, dropping the markloop and constant shift optimisations would reduce the size of the VM by 3.5KB while maintaining most of the reduction in generated code size, while performance overhead would increase to about 126\%.
 
-\begin{table}[]
-% Memory consumption is based on using only 11 element arrays. Current implementation is lazy and just uses a 16 byte array, but we never use the first two and last three, since they're not used for stack caching.
-\centering
-\caption{Code size and memory consumption}
-\label{tbl-code-size-and-memory-consumption}
-\small
 \input{741-tbl-evaluation-vm-size}
-\end{table}
 
 \subsection{VM memory consumption} The last column in Table \ref{tbl-code-size-and-memory-consumption} shows the amount of data that needs to be kept in memory while translating a method. We would like our VM to be able to load new code while other tasks are running concurrently. Here we only list the data that the VM would need to maintain in between receiving messages with new code over the air since this indicates the amount of memory that needs to be reserved and would not be available to other tasks during this process. Of course while a message with new code is being processed, more stack memory is used, but this is freed again after a message has been processed and can be reused by other applications.
 

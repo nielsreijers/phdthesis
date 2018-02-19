@@ -1,51 +1,49 @@
-\begin{table}[h]
-\centering
+\begin{table}
 \caption{Benchmarks used in the evaluation}
 \label{tbl-benchmarks}
-\scriptsize
-\begin{tabular}{llp{.40\textwidth}ll}
-\toprule
-Benchmark                & Used as a                                & Source and input data                                                                                      & Size             & Typical sensor \\
-                         & benchmark in                             &                                                                                                            &                  & node code \\
-\midrule
-\midrule
-\emph{Bubble sort}       & \cite{Brouwers:2009cj, Ellul:2012thesis} & Darjeeling sources                                                                                         & single function  & no \\
-                         &                                          & \emph{Input:} 256 16-bit numbers sorted in reverse order, as in the original source.                       &                  & \\
+    \begin{tabular}{llp{.40\textwidth}ll}
+    \toprule
+    Benchmark                & Used as a                                & Source and input data                                                                                      & Size             & Typical sensor \\
+                             & benchmark in                             &                                                                                                            &                  & node code \\
+    \midrule
+    \midrule
+    \emph{Bubble sort}       & \cite{Brouwers:2009cj, Ellul:2012thesis} & Darjeeling sources                                                                                         & single function  & no \\
+                             &                                          & \emph{Input:} 256 16-bit numbers sorted in reverse order, as in the original source.                       &                  & \\
 
-\emph{Heap sort}         &                                          & Standard heap sort taken from \cite{heapsort}                                                              & two functions    & no \\
-                         &                                          & \emph{Input:} 256 16-bit numbers sorted in reverse order.                                                  &                  & \\
+    \emph{Heap sort}         &                                          & Standard heap sort taken from \cite{heapsort}                                                              & two functions    & no \\
+                             &                                          & \emph{Input:} 256 16-bit numbers sorted in reverse order.                                                  &                  & \\
 
-\emph{Binary search}     & \cite{Ellul:2012thesis}                  & TakaTuka \cite{Aslam:2008} sources                                                                         & single function  & no \\
-                         &                                          & \emph{Input:} worst case (not found) search in 100 16-bit values, as in \cite{Ellul:2012thesis}.           &                  & \\
+    \emph{Binary search}     & \cite{Ellul:2012thesis}                  & TakaTuka \cite{Aslam:2008} sources                                                                         & single function  & no \\
+                             &                                          & \emph{Input:} worst case (not found) search in 100 16-bit values, as in \cite{Ellul:2012thesis}.           &                  & \\
 
-\emph{XXTEA}             &                                          & Wheeler and Needham \cite{Wheeler:1998}                                                                    & single function  & no \\
-                         &                                          & \emph{Input:} 32 32-bit numbers. Contents do not affect performance.                                       &                  & \\
+    \emph{XXTEA}             &                                          & Wheeler and Needham \cite{Wheeler:1998}                                                                    & single function  & no \\
+                             &                                          & \emph{Input:} 32 32-bit numbers. Contents do not affect performance.                                       &                  & \\
 
-\emph{MD5}               & \cite{Brouwers:2009cj, Ellul:2012thesis} & Darjeeling sources                                                                                         & single function  & no \\
-                         &                                          & \emph{Input:} the string 'message digest' as in the original source.                                       &                  & \\ % (actual content doesn't matter)
+    \emph{MD5}               & \cite{Brouwers:2009cj, Ellul:2012thesis} & Darjeeling sources                                                                                         & single function  & no \\
+                             &                                          & \emph{Input:} the string 'message digest' as in the original source.                                       &                  & \\ % (actual content doesn't matter)
 
-\emph{RC5}               &                                          & LibTomCrypt \cite{libtomcrypt}                                                                             & single function  & no \\
-                         &                                          & \emph{Input:} first test case in libtomcrypt sources (64 bit)                                              &                  & \\
+    \emph{RC5}               &                                          & LibTomCrypt \cite{libtomcrypt}                                                                             & single function  & no \\
+                             &                                          & \emph{Input:} first test case in libtomcrypt sources (64 bit)                                              &                  & \\
 
-\emph{FFT}               & \cite{Kumar:2007ge}                      & fixed point FFT using the widespread fix\_fft.c \cite{sos-operating-system}                                & single function  & yes \\
-                         &                                          & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                              &                  & \\
+    \emph{FFT}               & \cite{Kumar:2007ge}                      & fixed point FFT using the widespread fix\_fft.c \cite{sos-operating-system}                                & single function  & yes \\
+                             &                                          & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                              &                  & \\
 
-\emph{Outlier detection} & \cite{Kumar:2007ge}                      & our implementation of the algorithm described in \cite{Kumar:2007ge}                                       & single function  & yes \\
-                         &                                          & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11. &                  & \\
+    \emph{Outlier detection} & \cite{Kumar:2007ge}                      & our implementation of the algorithm described in \cite{Kumar:2007ge}                                       & single function  & yes \\
+                             &                                          & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11. &                  & \\
 
-\emph{LEC}               &                                          & our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                      & single function  & yes \\
-                         &                                          & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.             &                  & \\
+    \emph{LEC}               &                                          & our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                      & single function  & yes \\
+                             &                                          & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.             &                  & \\
 
-\emph{CoreMark 1.0}      &                                          & EEMBC \cite{coremark}                                                                                      & full application & no \\
-                         &                                          & \emph{Input:} defined in CoreMark source.                                                                  &                  & \\
+    \emph{CoreMark 1.0}      &                                          & EEMBC \cite{coremark}                                                                                      & full application & no \\
+                             &                                          & \emph{Input:} defined in CoreMark source.                                                                  &                  & \\
 
-\emph{MoteTrack}         &                                          & Lorincz \cite{Lorincz:2006fc, motetrack}                                                                   & full application & yes \\
-                         &                                          & \emph{Input:} defined in MoteTrack source.                                                                 &                  & \\
+    \emph{MoteTrack}         &                                          & Lorincz \cite{Lorincz:2006fc, motetrack}                                                                   & full application & yes \\
+                             &                                          & \emph{Input:} defined in MoteTrack source.                                                                 &                  & \\
 
-\emph{Heat detection}    &                                          & adapted from code used in our group to track objects using an 8x8 pixel heat sensor                        & full application & yes \\
-                         &                                          & \emph{Input:} 101 frames of 8x8 16-bit values for calibration, 30 frames for detection.                    &                  & \\
+    \emph{Heat detection}    &                                          & adapted from code used in our group to track objects using an 8x8 pixel heat sensor                        & full application & yes \\
+                             &                                          & \emph{Input:} 101 frames of 8x8 16-bit values for calibration, 30 frames for detection.                    &                  & \\
 
-\bottomrule
-\end{tabular}  
+    \bottomrule
+    \end{tabular}  
 \end{table}
 

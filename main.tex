@@ -15,7 +15,7 @@
 \usepackage{pdflscape}
 \usepackage{enumitem}
 \usepackage{minted}
-\setminted{frame=lines,linenos=true,baselinestretch=1}
+\setminted{frame=lines,linenos=true,baselinestretch=1,fontsize=\footnotesize}
 \setmonofont{Courier}
 
 %%%%%%%%%%%% MY COMMANDS
@@ -34,6 +34,15 @@
 \newcommand{\xxxt}[0] { \makebox[5mm]{} \tiny }
 \newcommand{\tblhighlight}[0] {\cellcolor{yellow!20}}
 \newcommand{\mycode}[1]{\texttt{#1}}
+
+\let\originaltable\table
+\let\endoriginaltable\endtable
+\renewenvironment{table}[1][ht]{%
+  \originaltable[#1]
+  \centering
+  \footnotesize}%
+  {\endoriginaltable}
+
 %%%%%%%%%%%% END MY COMMANDS
 
 % Using the tex-text mapping for ligatures etc.
@@ -118,8 +127,10 @@
 %TODO: consistent placement of label for figures and tables and listings
 %TODO: consistent spelling and caps for bytecode runtime, compilation time, translation time, load time, atmega, etc.
 %TODO: consistent usage of compile-time (Java->bytecode) and translation-time (bytecode->native code)
-%TODO: consistent font size for all listings
+%TODO: consistent emphasis for benchmark names
 %TODO: consistent use of 'runtime'
+%TODO: consistent use of xALOAD and GETARRAY_x. We renamend xALOAD to GETARRAY_x but Darjeeling bytecode should still use ALOAD? Also we should mention that somewhere.
+%TODO: papers to read again: LooCI, Suganuma
 
 \appendix
 \chapter{LEC benchmark source code}

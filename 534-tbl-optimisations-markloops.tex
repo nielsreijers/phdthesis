@@ -1,37 +1,34 @@
-\begin{table*}[hbt]
-\centering
+\begin{table}
 \caption{Mark loops}
 \label{tbl-markloop}
-\scriptsize
-\addtolength{\tabcolsep}{-2pt}
-\begin{tabular}{llll|c|c|c|c}
-\toprule
-JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1       & cache state R2       & cache state R3       & cache state R4       \\
-\hline
-0: MARKLOOP(0,1)   & \sccomment{emit markloop prologue:}                  & LDD R1,Y+0          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-                   & \sccomment{LS0 and LS1 are live}                     & LDD R2,Y+2          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-1: BRTARGET(0)     & \sccomment{record current address}                   &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-2: SLOAD\_0        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-3: SCONST\_1       & operand\_1 = sc\_getfreereg()                        &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
-                   & emit\_LDI(operand\_1,1)                              & LDI R3,1            & 2      & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
-                   & sc\_push(operand\_1)                                 &                     &        & \sce{Int2}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{Int1}{CS1}{   } & \sce{    }{   }{   } \\
-4: SUSHR           & operand\_1 = sc\_pop\_destructive()                  &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
-                   & operand\_2 = sc\_pop\_destructive()                  & MOV R4,R1           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
-                   & emit\_JMP(+2)                                        & JMP +2              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
-                   & emit\_LSR(operand\_2)                                & LSR R4              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
-                   & emit\_DEC(operand\_1)                                & DEC R3              & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
-                   & emit\_BRPL(-2)                                       & BRPL -2             & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
-                   & sc\_push(operand\_2)                                 &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{Int1}{   }{   } \\
-5: SSTORE\_0       & \sccomment{emit MOV, update cache state}             & MOV R1,R4           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-6: SLOAD\_0        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-7: SLOAD\_1        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{Int2}{LS0}{PIN} & \sce{Int1}{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-8: IF\_SCMPGT(BT:0)& operand\_1 = sc\_pop\_nondestructive()               &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-                   & operand\_2 = sc\_pop\_nondestructive()               &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-                   & emit\_CP(operand\_1, operand\_2);                    & CP R2,R1            & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-                   & emit\_branchtag(GT, 0);                              & BRGT 1:             & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-9: MARKLOOP(end)   & \sccomment{emit markloop epilogue: LS0 is live}      & STD Y+0,R1          & 4      & \sce{    }{LS0}{   } & \sce{    }{LS1}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
-\bottomrule
-\end{tabular}
-\addtolength{\tabcolsep}{2pt}
-\end{table*}
+    \begin{tabular}{llll|c|c|c|c}
+    \toprule
+    JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1       & cache state R2       & cache state R3       & cache state R4       \\
+    \midrule
+    \midrule
+    0: MARKLOOP(0,1)   & \sccomment{emit markloop prologue:}                  & LDD R1,Y+0          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                       & \sccomment{LS0 and LS1 are live}                     & LDD R2,Y+2          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    1: BRTARGET(0)     & \sccomment{record current address}                   &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    2: SLOAD\_0        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    3: SCONST\_1       & operand\_1 = sc\_getfreereg()                        &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
+                       & emit\_LDI(operand\_1,1)                              & LDI R3,1            & 2      & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
+                       & sc\_push(operand\_1)                                 &                     &        & \sce{Int2}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{Int1}{CS1}{   } & \sce{    }{   }{   } \\
+    4: SUSHR           & operand\_1 = sc\_pop\_destructive()                  &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
+                       & operand\_2 = sc\_pop\_destructive()                  & MOV R4,R1           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
+                       & emit\_JMP(+2)                                        & JMP +2              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
+                       & emit\_LSR(operand\_2)                                & LSR R4              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
+                       & emit\_DEC(operand\_1)                                & DEC R3              & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
+                       & emit\_BRPL(-2)                                       & BRPL -2             & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{\use}{   }{   } \\
+                       & sc\_push(operand\_2)                                 &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{Int1}{   }{   } \\
+    5: SSTORE\_0       & \sccomment{emit MOV, update cache state}             & MOV R1,R4           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    6: SLOAD\_0        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    7: SLOAD\_1        & \sccomment{skip codegen, update cache state}         &                     &        & \sce{Int2}{LS0}{PIN} & \sce{Int1}{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    8: IF\_SCMPGT(BT:0)& operand\_1 = sc\_pop\_nondestructive()               &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                       & operand\_2 = sc\_pop\_nondestructive()               &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                       & emit\_CP(operand\_1, operand\_2);                    & CP R2,R1            & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+                       & emit\_branchtag(GT, 0);                              & BRGT 1:             & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    9: MARKLOOP(end)   & \sccomment{emit markloop epilogue: LS0 is live}      & STD Y+0,R1          & 4      & \sce{    }{LS0}{   } & \sce{    }{LS1}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
+    \bottomrule
+    \end{tabular}
+\end{table}
 

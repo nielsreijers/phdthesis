@@ -1,11 +1,6 @@
 \chapter{Lessons from JVM}
-\begin{table}
-    \centering
-    \caption{Point requiring attention in future sensor node VMs}
-    \scriptsize
-    \label{tbl-issues}
-    \input{800-tbl-issues}
-\end{table}
+
+\input{800-tbl-issues}
 
 \label{sec-lessons-from-jvm}
 
@@ -17,13 +12,8 @@ In this chapter we discuss the most pressing issues we encountered, summarised i
 
 \section{A tailored standard library}
 \label{sec-std-lib}
-\begin{table}
-    \centering
-    \caption{Size of Darjeeling VM components}
-    \scriptsize
-    \label{tab-vm-size}
-    \input{800-tbl-vm-size} 
-\end{table}
+
+\input{800-tbl-vm-size} 
 
 A minimum Java APIs for resource constrained devices, the Connected Limited Device Configuration (CLDC) specification, was proposed by Sun Microsystems \cite{CLDC}. The CLDC was primarily intended for devices larger than typical sensor nodes, and not tailored to the characteristics of typical sensor node code. Providing support for the full CLDC specification would require a substantial amount of memory and program space for features that are rarely required for sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the original Darjeeling VM.
 
@@ -45,7 +35,7 @@ This is especially important for arrays of constant data, which are common in WS
 
 \begin{listing}
 	\centering
-	\begin{minted}[fontsize=\scriptsize]{c}
+	\begin{minted}{c}
 sspush(256); newarray;                     // create the array
 adup; sconst_0;    sconst_0;   bastore;    // set index 0
 adup; sconst_1;    sconst_3;   bastore;    // set index 1
@@ -62,10 +52,6 @@ There are two problems with this: (i) the array will occupy scarce RAM; and (ii)
 
 Arrays of constant data appear in several of our benchmarks. The LEC benchmark contains two arrays of 17 16-bit and 8-bit, which are small enough to store in RAM. In this case the lack of support for constant data wastes a few bytes of memory, but doesn't prevent us from implementing the algorithm. However, in two other cases it did.
 
-%\paragraph{CoreMark}
-%TODO: check if we can moved this to a 'check' method that will only initialise the array for the duration of the check.
-%The CoreMark benchmark contains a number of constant arrays with the expected outcome of the benchmark. This data is not used in the actual measured benchmark, but only to verify its results are correct. When storing this as normal Java arrays, they took up too much memory to run the benchmark, we transformed them into functions that return the correct value depending on an index passed as a parameter.
-
 \paragraph{FFT}
 The FFT benchmark contains an array of sine wave values that would be too expensive to calculate at run-time. For the 8 bit version, this contains 256 bytes, which is small enough to fit in RAM. However, the 16-bit version contained an array of 1024 16-bit values, which in itself would just fit in memory, but the JVM code to initialise it becomes too large for flash memory, forcing us to use native code to initialise it prior to starting the benchmark.
 
@@ -75,7 +61,6 @@ The MoteTrack benchmark contains a large dictionary of reference RSSI signatures
 At 20560 bytes, this dictionary is small enough to fit in flash memory, but over 5 times larger than the available RAM. Similar to the 16-bit FFT benchmark, the only way to implement this in a VM without support for this kind of constant data, is to store it in flash and use a native method to read the signatures.
 
 \paragraph{Possible solutions}
-% TODO: we renamed xALOAD to GETARRAY_x. Should mention that somewhere and make sure we use it consistently.
 Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{AALOAD}, \mycode{IALOAD}, etc.) to read from them.
 
 
@@ -186,8 +171,8 @@ At a minimum, we should have a way to define simple aliases for primitive types,
 \label{sec-inlining}
 Java method calls are inherently more expensive than C functions. On the desktop, JIT compilers can remove much of this overhead, but a sensor VM does not have the resources for this. We found this often is a problem for small helper functions that are frequently called. As an example, the C version of the XXTEA benchmark contains this macro: 
 
-\begin{minted}[fontsize=\footnotesize]{c}
-  #define MX (((z>>5^y<<2) + (y>>3^z<<4)) \\
+\begin{minted}{c}
+#define MX (((z>>5^y<<2) + (y>>3^z<<4)) \\
              ^ ((sum^y) + (key[(p&3)^e] ^ z)))
 \end{minted}
 
@@ -222,27 +207,27 @@ In code that frequently needs short-lived objects the overhead for allocating th
 
 \begin{listing}[]
 	\centering
-	\begin{minted}[fontsize=\scriptsize]{java}
-    public static short LEC(short[] numbers, Stream stream) {
-        BSI bsi = new BSI();      // Allocate bsi only once
-        for (...) {
-            ...
-            compress(ri, ri_1, stream, bsi);
-            ...
-        }
+	\begin{minted}{java}
+public static short LEC(short[] numbers, Stream stream) {
+    BSI bsi = new BSI();      // Allocate bsi only once
+    for (...) {
+        ...
+        compress(ri, ri_1, stream, bsi);
+        ...
     }
+}
 
-    private static void compress(short ri, short ri_1, Stream stream, BSI bsi) {
-        ...
-        encode(di, bsi);          // Pass bsi to encode to return both value and length
-        ...
-    }
+private static void compress(short ri, short ri_1, Stream stream, BSI bsi) {
+    ...
+    encode(di, bsi);          // Pass bsi to encode to return both value and length
+    ...
+}
 
-    private static void encode(short di, BSI bsi) {
-        ...
-        bsi.value = ...           // return value and length by setting object fields
-        bsi.length = ...
-    }
+private static void encode(short di, BSI bsi) {
+    ...
+    bsi.value = ...           // return value and length by setting object fields
+    bsi.length = ...
+}
 	\end{minted}
 \caption{Avoiding multiple object allocations in the LEC benchmark}
 \label{lst-lec-avoiding-object-allocations}

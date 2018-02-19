@@ -25,8 +25,14 @@ Looking at the code size data in Table \ref{tbl-codesize-per-benchmark}, we see 
 The MoteTrack benchmark is by far the slowest of our benchmarks, at a 165\% overhead compared to native C. MoteTrack stores a database of reference signatures in Flash. In C this is a complex struct containing a number of sub-structures and fixed-sized arrays, while it becomes a collection of objects and arrays in Java, shown in \ref{fig-motetrack-refsignature-objects}.
 
 Since the layout of the complete C structure is known at compile time, the C function to load a reference signature from its database can simply use \mycode{memcpy\_P} to copy a block of 80 bytes from Flash to RAM. For Java, the method to read from Flash must follow multiple pointers to follow several indirections to find the locations to put each value. As a result, reading a single signature takes 1695 cycles in Java, and only 735 cycles in C.
-
 % 68.5% overhead from reading refSignatures from Flash. 68.5 / 1695 * 735 = 29.7
+
+\paragraph{LEC}
+In Section \ref{sec-introduction-performance} we calculated that, the LEC compression algorithm, reduced the energy spent to transmit our sample ECG data by 650 μJ, at the expense of 246 μJ spent on CPU cycles compressing the data, when implemented in C and using the ATmega128 CPU and CC2420 radio.
+
+A compression algorithm like LEC is a good example of an optimisation that may be part of an application loaded onto a sensor node. However, if the overhead of using a VM is too high, the cost of compression may outweight the energy saved on transmission. Table \ref{tbl-performance-per-benchmark} shows that using the baseline AOT approach, the LEC benchmark has an overhead of 278.4\%. Because the CPU has to stay active longer, this means compressing the data would cost $246 \mu J * 3.784 = 930 \mu J$, which is more than the 650 μJ saved on transmission.
+
+After we apply our optimisations, the overhead is reduced to 86.5\%, resulting in $246 \mu J * 1.685 = 459 \mu J$ spent on compression. While the savings are less than when we use native C to compress the data, our optimisations mean we can save on transmission costs by using LEC compression, while using the baseline AOT approach, LEC compression would have resulted in a net loss.
 
 \paragraph{Xxtea and the mark loops optimisation}
 \begin{figure}

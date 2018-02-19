@@ -2,7 +2,7 @@
 \label{sec-safety}
 \input{600-tbl-safety-checks}
 
-The second goal of this thesis is to develop a VM that offers a 'safe' execution environment, and to compare the cost of doing so in a VM to existing native code approaches.
+The second goal of this dissertation is to develop a VM that offers a 'safe' execution environment, and to compare the cost of doing so in a VM to existing native code approaches.
 
 A safe execution environment is one that guarantees an application cannot harm the system it's running on or other applications running on the same system. Specifically, an application cannot:
 \begin{enumerate}
@@ -46,20 +46,20 @@ The first check we do is a basic sanity check on the data in the method headers 
 \section{Control flow safety}
 We will first guarantee control flow safety by considering the effect of each possible JVM instruction and showing they either flow into the start of a legal next instruction, or return control back to the VM. To do so, we group them into four categories, shown in Table \ref{tbl-control-flow-instructions}. Most instructions don't affect the control flow. The ones that do are: various kinds of branches, method invocations, and returns. The state is correct at the start of the programme, since the VM will start it by jumping to the beginning of the first instruction in the main method. We will show the state will be correct after each instruction by looking at these four categories.
 
-\begin{table}[H]
-\centering
+\begin{table}
 \caption{Instructions affecting control flow}
 \label{tbl-control-flow-instructions}
-\begin{tabular}{ll}
-\toprule
-type     & effect on control flow \\
-\midrule
-branches & jump to a location within the method \\
-invokes  & call a method, either through the VM or directly \\
-returns  & return to the address at the top of the stack \\
-others   & fall through to the next JVM instruction \\
-\bottomrule
-\end{tabular}
+    \begin{tabular}{ll}
+    \toprule
+    type     & effect on control flow \\
+    \midrule
+    \midrule
+    branches & jump to a location within the method \\
+    invokes  & call a method, either through the VM or directly \\
+    returns  & return to the address at the top of the stack \\
+    others   & fall through to the next JVM instruction \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 \subsection{Simple instructions}
@@ -107,22 +107,22 @@ Thus, the VM's private data and the application data are mixed in the node's mem
 
 Having ensured control flow safety, we can now rely on the fact that we will always execute complete JVM instructions, and the application cannot skip past an inserted run-time check by jumping to the middle of a generated instruction. This means we can demonstrate memory safety by considering each how each JVM instruction writes to memory, and showing they are all either guaranteed to write to a correct address, or checked at run-time. Again, we group instructions in the categories shown below with respect to their writes to memory, as shown in Table \ref{tbl-memory-write-instructions}, and consider each separately.
 
-\begin{table}[H]
-\centering
+\begin{table}
 \caption{Instructions writing to memory}
 \label{tbl-memory-write-instructions}
-\begin{tabular}{ll}
-\toprule
-type     & writes to \\
-\midrule
-\mycode{STORE}                   & local variable in stack frame \\
-\mycode{PUTSTATIC}               & static variable in infusion \\
-\mycode{PUTARRAY}                & heap \\
-\mycode{PUTFIELD}                & heap \\
-any instruction pushing          & reference or integer stack \\
-~~to the stack                   & \\
-\bottomrule
-\end{tabular}
+    \begin{tabular}{ll}
+    \toprule
+    type     & writes to \\
+    \midrule
+    \midrule
+    \mycode{STORE}                   & local variable in stack frame \\
+    \mycode{PUTSTATIC}               & static variable in infusion \\
+    \mycode{PUTARRAY}                & heap \\
+    \mycode{PUTFIELD}                & heap \\
+    any instruction pushing          & reference or integer stack \\
+    ~~to the stack                   & \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 The stack frame for a method contains space for its local variables and reference stack, as shown in Figure \ref{fig-memlayout}. For normal methods, the VM creates the stack frame based on the method header, so at load time we know how much space will be available at run-time. Lightweight methods don't create their own stack frame. Instead, they depend on the caller's stack frame, so whenever we translate an \mycode{INVOKELIGHT} instruction, we need to verify the stack frame of the current method has reserved enough free space for the lightweight method's locals and stack (\ref{chk-sufficient-locals-at-invokelight} and \ref{chk-sufficient-stack-space-at-invokelight}). To do this, the method header contains both the total number of slots to reserve, and the number the method will use for itself. Any remaining slots are used for lightweight methods.
