@@ -43,7 +43,7 @@ While an enormous number of different hardware platforms have been developed, th
     Branch cost (taken/non-taken)          & 2 / 1 cycles & 2 cycles      \\
     Active power consumption\tnote{a}      & 7.5mA        & 4.3mA         \\ % MSP430 current calculation: 8*(600+(210*(2.7-3)))=4296 uA
     Deep sleep power consumption           & 0.3uA        & 0.2uA         \\
-    Execute code from                      & Flash        & Flash and RAM \\
+    Can execute code from                  & Flash        & Flash and RAM \\
     \bottomrule
     \end{tabular}
     \begin{tablenotes}
@@ -84,12 +84,12 @@ Compared to other widespread desktop VMs such as Lua, Python and .Net, Java's by
 \begin{listing}[H]
     \centering
     \begin{minted}{java}
-JVM instruction       JVM stack
+    //JVM instruction     // JVM stack
 
-ILOAD_1               a
-ILOAD_2               a   ,   b
-IADD                  a+b
-ISTORE_0
+    ILOAD_1               a
+    ILOAD_2               a   ,   b
+    IADD                  a+b
+    ISTORE_0
     \end{minted}
 \caption{JVM bytecode for \mycode{a=b+c;}}
 \label{lst-basic-jvm-bytecode-example}

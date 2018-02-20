@@ -1,9 +1,11 @@
 \begin{table}
 \caption{Mark loops}
 \label{tbl-markloop}
+    \scriptsize\centerline{
     \begin{tabular}{llll|c|c|c|c}
     \toprule
-    JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1       & cache state R2       & cache state R3       & cache state R4       \\
+                       &                                                      &                     &        & \multicolumn{4}{c}{cache state} \\
+    JVM                & AOT compiler                                         & AVR                 & cycles & R1                   & R2                   & R3                   & R4                   \\
     \midrule
     \midrule
     0: MARKLOOP(0,1)   & \sccomment{emit markloop prologue:}                  & LDD R1,Y+0          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
@@ -30,5 +32,6 @@
     9: MARKLOOP(end)   & \sccomment{emit markloop epilogue: LS0 is live}      & STD Y+0,R1          & 4      & \sce{    }{LS0}{   } & \sce{    }{LS1}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     \bottomrule
     \end{tabular}
+    }
 \end{table}
 

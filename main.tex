@@ -15,7 +15,7 @@
 \usepackage{pdflscape}
 \usepackage{enumitem}
 \usepackage{minted}
-\setminted{frame=lines,linenos=true,baselinestretch=1,fontsize=\footnotesize}
+\setminted{frame=lines,linenos=true,baselinestretch=1,fontsize=\scriptsize}
 \setmonofont{Courier}
 
 %%%%%%%%%%%% MY COMMANDS
@@ -29,15 +29,15 @@
 \newcommand{\myfiguresizeperformance}[0] { 6.7cm }
 \newcommand{\myfiguresizecodesize}[0] { 6.7cm }
 \newcommand{\myfiguresizexxtea}[0] { 6.7cm }
-\newcommand{\xt}[0] { \tiny }
+\newcommand{\xt}[0] { \scriptsize }
 \newcommand{\xxt}[0] { \makebox[2mm]{} }
-\newcommand{\xxxt}[0] { \makebox[5mm]{} \tiny }
+\newcommand{\xxxt}[0] { \makebox[5mm]{} \scriptsize }
 \newcommand{\tblhighlight}[0] {\cellcolor{yellow!20}}
 \newcommand{\mycode}[1]{\texttt{#1}}
 
 \let\originaltable\table
 \let\endoriginaltable\endtable
-\renewenvironment{table}[1][ht]{%
+\renewenvironment{table}[1][t]{%
   \originaltable[#1]
   \centering
   \footnotesize}%
@@ -123,7 +123,6 @@
 
 
 %TODO: consistent use of subsubsection and/or paragraph. they look very similar, maybe only use one?
-%TODO: consistent table layout. double midrule to separate header from body
 %TODO: consistent placement of label for figures and tables and listings
 %TODO: consistent spelling and caps for bytecode runtime, compilation time, translation time, load time, atmega, etc.
 %TODO: consistent usage of compile-time (Java->bytecode) and translation-time (bytecode->native code)

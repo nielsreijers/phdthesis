@@ -14,7 +14,7 @@ In 2001 Pister predicted that by 2010, the size of these devices would be reduce
 
 Thus, much of the research into WSN is about achieving useful functionality in as small a space as possible and the tradeoffs involved, gradually exploring the design space between capabilities, accuracy and performance on one side, and their cost in terms of memory and power consumption on the other.
 %
-To make these applications work new protocols were needed at every layer in an application, optimising them for the specific constraints of sensor nodes. This includes lightweight MAC protocols for radio communication trading latency for energy by turning off the radio as much as possible \cite{Ye:2002uv, vanDam:2018tr}, lightweight operating systems and virtual machines trading functionality for size and complexity \cite{Levis:2004ws, Gu:2006ww, Han:2005tha, Levis:2002ku, Brouwers:2009cj}, lightweight routing and data aggregation \cite{Intanogonwiwat:2018wz, Braginsky:2002wg}, lightweight data compression and reprogramming techniques trading CPU cycles for transmitted bits \cite{Marcelloni:2009ja, Reijers:2003ww}, lightweight localisation trading accuracy for complexity \cite{Niculescu:2001bl, Savarese:2002tx, Savvides:2002uf}, etc.
+To make these applications work new protocols were needed at every layer in an application, optimising them for the specific constraints of sensor nodes. This includes lightweight MAC protocols for radio communication trading latency for energy by turning off the radio as much as possible \cite{Ye:2002uv, vanDam:2018tr}, lightweight operating systems and virtual machines trading functionality for size and complexity \cite{Levis:2004ws, Gu:2006ww, Han:2005th, Levis:2002ku, Brouwers:2009cj}, lightweight routing and data aggregation \cite{Intanogonwiwat:2018wz, Braginsky:2002wg}, lightweight data compression and reprogramming techniques trading CPU cycles for transmitted bits \cite{Marcelloni:2009ja, Reijers:2003ww}, lightweight localisation trading accuracy for complexity \cite{Niculescu:2001bl, Savarese:2002tx, Savvides:2002uf}, etc.
 
 What these all have in common is that they revisit classing computer science problems, and adjust them to fit one a sensor node, making trade-offs to optimise for power consumption, either directly by reducing the time the processor or radio is active, or indirectly by reducing code size and memory consumption enough for them to run on the extremely low power, but also very resource-constrained CPUs.
 
@@ -135,15 +135,18 @@ We implemented the LEC compression algorithm and used it to compress a dataset o
 \label{tbl-lec-energy}
     \begin{tabular}{lr}
     \toprule
-    ATMEGA128 energy per cycle            & 2.53 nJ/cycle  \\
-    CC2420 energy per transmitted bit     & 288.2 nJ/bit  \\
-    \midrule
-    LEC compression cycles spent          & 97052 cycles\\
-    LEC compression bits saved            & 2256 bits \\
-    LEC compression cycles per bit        & 43 cycles/bit \\
-    ~~~ energy expended                   & 246 μJ \\
-    ~~~ energy saved                      & 650 μJ \\
-    ~~~ ratio saved/expended              & 2.6x \\
+    Energy consumption \\
+    ~~~ ATMEGA128 per cycle            & 2.53 nJ/cycle  \\
+    ~~~ CC2420 per transmitted bit     & 288.2 nJ/bit  \\
+    \\
+    LEC compression \\
+    ~~~ bits saved                     & 2256 bits \\
+    ~~~ cycles spent                   & 97052 cycles\\
+    ~~~ cycles per bit                 & 43 cycles/bit \\
+    \\
+    Energy saved                       & 650 μJ \\
+    Energy expended                    & 246 μJ \\
+    Ratio saved/expended               & 2.6x \\
     \bottomrule
     \end{tabular}
 \end{table}

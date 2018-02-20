@@ -1,34 +1,35 @@
 \begin{table}
 \caption{Improved peephole optimiser}
 \label{tbl-improved-peephole}
+    \scriptsize
     \begin{tabular}{llll}
     \toprule
-    JVM & AOT compiler & AVR & cycles \\
+    JVM                 & AOT compiler                       & AVR        & cycles \\
     \midrule
     \midrule
-    0: BRTARGET(0)   & \sccomment{record current addr} &                &   \\
-    1: SLOAD\_0      & emit\_LDD(R1,Y+0)        & LDD R1,Y+0     & 4 \\
-                     & emit\_PUSH(R1)           & PUSH R1        & 4 \\
-    2: SCONST\_1     & emit\_LDI(R1,1)          & LDI R1,1       & 2 \\
-                     & emit\_PUSH(R1)           & MOV R2,R1      & 1 \\
-    3: SUSHR         & emit\_POP(R2)            &                &   \\
-                     & emit\_POP(R1)            & POP R1         & 4 \\
-                     & emit\_RJMP(+2)           & RJMP +2        & 2 \\
-                     & emit\_LSR(R1)            & LSR R1         & 2 \\
-                     & emit\_DEC(R2)            & DEC R2         & 2 \\
-                     & emit\_BRPL(-2)           & BRPL -2        & 3 \\
-                     & emit\_PUSH(R1)           &                &   \\
-    4: SSTORE\_0     & emit\_POP(R1)            &                &   \\
-                     & emit\_STD(Y+0,R1)        & STD Y+0,R1     & 4 \\
-    5: SLOAD\_0      & emit\_LDD(R1,Y+0)        & LDD R1,Y+0     & 4 \\
-                     & emit\_PUSH(R1)           & MOV R2, R1     & 1 \\
-    6: SLOAD\_1      & emit\_LDD(R1,Y+2)        & LDD R1,Y+2     & 4 \\
-                     & emit\_PUSH(R1)           &                &   \\
-    7: IF\_SCMPGT 0: & emit\_POP(R1)            &                &   \\
-                     & emit\_POP(R2)            &                &   \\
-                     & emit\_CP(R1,R2)          & CP R1,R2       & 2 \\
-                     & emit\_branchtag(GT,0)    & BRGT 0:        & 2 (taken), \\
-                     &                          &                & or 1 (not taken) \\
+    0: BRTARGET(0)      & \sccomment{record current address} &            & \\
+    1: SLOAD\_0         & emit\_LDD(R1,Y+0)                  & LDD R1,Y+0 & 4 \\
+                        & emit\_PUSH(R1)                     & PUSH R1    & 4 \\
+    2: SCONST\_1        & emit\_LDI(R1,1)                    & LDI R1,1   & 2 \\
+                        & emit\_PUSH(R1)                     & MOV R2,R1  & 1 \\
+    3: SUSHR            & emit\_POP(R2)                      &            & \\
+                        & emit\_POP(R1)                      & POP R1     & 4 \\
+                        & emit\_RJMP(+2)                     & RJMP +2    & 2 \\
+                        & emit\_LSR(R1)                      & LSR R1     & 2 \\
+                        & emit\_DEC(R2)                      & DEC R2     & 2 \\
+                        & emit\_BRPL(-2)                     & BRPL -2    & 3 \\
+                        & emit\_PUSH(R1)                     &            & \\
+    4: SSTORE\_0        & emit\_POP(R1)                      &            & \\
+                        & emit\_STD(Y+0,R1)                  & STD Y+0,R1 & 4 \\
+    5: SLOAD\_0         & emit\_LDD(R1,Y+0)                  & LDD R1,Y+0 & 4 \\
+                        & emit\_PUSH(R1)                     & MOV R2, R1 & 1 \\
+    6: SLOAD\_1         & emit\_LDD(R1,Y+2)                  & LDD R1,Y+2 & 4 \\
+                        & emit\_PUSH(R1)                     &            & \\
+    7: IF\_SCMPGT(BT:0) & emit\_POP(R1)                      &            & \\
+                        & emit\_POP(R2)                      &            & \\
+                        & emit\_CP(R1,R2)                    & CP R1,R2   & 2 \\
+                        & emit\_branchtag(GT,0)              & BRGT 0:    & 2 (taken), \\
+                        &                                    &            & or 1 (not taken) \\
     \bottomrule
     \end{tabular}
 \end{table}

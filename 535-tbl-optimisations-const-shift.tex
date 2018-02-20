@@ -1,9 +1,11 @@
 \begin{table}
 \caption{Constant bit shift optimisation}
 \label{tbl-constshift}
+    \scriptsize\centerline{
     \begin{tabular}{llll|c|c|c|c}
     \toprule
-    JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1       & cache state R2       & cache state R3       & cache state R4       \\
+                       &                                                      &                     &        & \multicolumn{4}{c}{cache state} \\
+    JVM                & AOT compiler                                         & AVR                 & cycles & R1                   & R2                   & R3                   & R4                   \\
     \midrule
     \midrule
     0: MARKLOOP(0,1)   & \sccomment{emit markloop prologue:}                  & LDD R1,Y+0          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
@@ -11,7 +13,7 @@
     1: BRTARGET(0)     & \sccomment{record current address}                   &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     2: SLOAD\_0        & \sccomment{skip codegen, just update cache state}    &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     3: SUSHR\_CONST(1) & \sccomment{operand\_1 = sc\_pop\_destructive()}      & MOV R3,R1           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
-                       & \sccomment{it\_LSR(operand\_1)}                      & LSR R3              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
+                       & \sccomment{emit\_LSR(operand\_1)}                    & LSR R3              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
                        & \sccomment{\_push(operand\_1)}                       &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{Int1}{   }{   } & \sce{    }{   }{   } \\
     4: SSTORE\_0       & \sccomment{emit MOV, update cache state}             & MOV R1,R3           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     5: SLOAD\_0        & \sccomment{skip codegen, just update cache state}    &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
@@ -23,5 +25,6 @@
     8: MARKLOOP(end)   & \sccomment{emit markloop epilogue: LS0 is live}      & STD Y+0,R1          & 4      & \sce{    }{LS0}{   } & \sce{    }{LS1}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     \bottomrule
     \end{tabular}
+    }
 \end{table}
 

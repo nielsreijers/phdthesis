@@ -51,13 +51,13 @@ We will first guarantee control flow safety by considering the effect of each po
 \label{tbl-control-flow-instructions}
     \begin{tabular}{ll}
     \toprule
-    type     & effect on control flow \\
+    Type              & Effect on control flow \\
     \midrule
     \midrule
-    branches & jump to a location within the method \\
-    invokes  & call a method, either through the VM or directly \\
-    returns  & return to the address at the top of the stack \\
-    others   & fall through to the next JVM instruction \\
+    Branches          & Jump to a location within the method \\
+    \mycode{INVOKE}s  & Call a method, either through the VM or directly \\
+    \mycode{RETURN}s  & Return to the address at the top of the stack \\
+    Others            & Fall through to the next JVM instruction \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -112,15 +112,14 @@ Having ensured control flow safety, we can now rely on the fact that we will alw
 \label{tbl-memory-write-instructions}
     \begin{tabular}{ll}
     \toprule
-    type     & writes to \\
+    Type                                 & Writes to \\
     \midrule
     \midrule
-    \mycode{STORE}                   & local variable in stack frame \\
-    \mycode{PUTSTATIC}               & static variable in infusion \\
-    \mycode{PUTARRAY}                & heap \\
-    \mycode{PUTFIELD}                & heap \\
-    any instruction pushing          & reference or integer stack \\
-    ~~to the stack                   & \\
+    \mycode{STORE}s                      & A local variable in the current method's stack frame \\
+    \mycode{PUTSTATIC}s                  & A static variable in an infusion \\
+    \mycode{PUTARRAY}s                   & An array on the heap \\
+    \mycode{PUTFIELD}s                   & An object on the heap \\
+    Any instruction pushing to the stack & The reference or integer stack \\
     \bottomrule
     \end{tabular}
 \end{table}

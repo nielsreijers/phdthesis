@@ -3,29 +3,34 @@
 \begin{table}
 \caption{Effect of manual source optimisation on the CoreMark benchmark}
 \label{tbl-coremark-manual-optimisation}
+    \centerline{
+    \begin{threeparttable}
     \begin{tabular}{lrrrrrrrr}
     \toprule
-                                                                         & \multicolumn{2}{l}{list}     & \multicolumn{2}{l}{matrix}     &  \multicolumn{2}{l}{state}       & \multicolumn{2}{l}{total}     \\
-                                                                         & \tiny time \footnote{in millions of cycles} & \tiny vs nat. C & \tiny time  & \tiny vs nat. C& \tiny time  & \tiny vs nat. C& \tiny time  & \tiny vs nat. C \\
-
-                                                                         
+                                                                          & \multicolumn{2}{l}{list}   & \multicolumn{2}{l}{matrix} & \multicolumn{2}{l}{state}  & \multicolumn{2}{l}{total}     \\
+                                                                          & \scriptsize time \tnote{a} & \scriptsize vs nat. C      & \scriptsize time \tnote{a} & \scriptsize vs nat. C            & \scriptsize time \tnote{a} & \scriptsize vs nat. C  & \scriptsize time \tnote{a} & \scriptsize vs nat. C \\
     \midrule
     \midrule
-    native C                                                             &        17.9 &                &          49.2 &                &            18 &                  &         85.1 &                \\
-    baseline                                                             &       124.3 &       (+594\%) &         360.4 &       (+633\%) &         287.8 &        (+1499\%) &        773.1 &       (+809\%) \\
-    optimised, using original source                                     &        55.9 &       (+212\%) &           232 &       (+372\%) &          75.7 &         (+321\%) &        363.8 &       (+328\%) \\
+    native C                                                              & 17.9                       &                            & 49.2                       &                                  & 18                         &                        & 85.1                       & \\
+    baseline                                                              & 124.3                      & (+594\%)                   & 360.4                      & (+633\%)                         & 287.8                      & (+1499\%)              & 773.1                      & (+809\%) \\
+    optimised, using original source                                      & 55.9                       & (+212\%)                   & 232                        & (+372\%)                         & 75.7                       & (+321\%)               & 363.8                      & (+328\%) \\
     % CHANGE COMPARED TO PREVIOUS, SIMILAR TO MAIN TABLES ON PERF/CODE SIZE
-    \makebox[5mm]{} \tiny manually inline small methods                  & \tiny   0.1 & \tiny   (+1\%) & \tiny     -37 & \tiny  (-75\%) & \tiny   -16.7 & \tiny    (-93\%) & \tiny  -53.8 & \tiny  (-63\%) \\
-    \makebox[5mm]{} \tiny use short array index variables                & \tiny  -0.1 & \tiny   (-1\%) & \tiny  -104.8 & \tiny (-213\%) & \tiny       0 & \tiny      (0\%) & \tiny -104.7 & \tiny (-123\%) \\
-    \makebox[5mm]{} \tiny avoid recalculating expressions in a loop      & \tiny     0 & \tiny    (0\%) & \tiny    -7.5 & \tiny  (-15\%) & \tiny       0 & \tiny      (0\%) & \tiny   -7.5 & \tiny   (-9\%) \\
-    \makebox[5mm]{} \tiny reduce array and object access                 & \tiny     0 & \tiny    (0\%) & \tiny   -18.1 & \tiny  (-37\%) & \tiny    -2.4 & \tiny    (-13\%) & \tiny  -20.5 & \tiny  (-24\%) \\
-    \makebox[5mm]{} \tiny reduce branch cost in crcu8                    & \tiny    -4 & \tiny  (-22\%) & \tiny    -0.5 & \tiny   (-1\%) & \tiny    -3.5 & \tiny    (-19\%) & \tiny     -8 & \tiny   (-9\%) \\
-    using optimised source                                               &        51.9 &       (+190\%) &          64.1 &        (+30\%) &          53.1 &         (+195\%) &        169.3 &        (+99\%) \\
+    \makebox[5mm]{} \scriptsize manually inline small methods             & \scriptsize   0.1          & \scriptsize   (+1\%)       & \scriptsize     -37        & \scriptsize  (-75\%)             & \scriptsize   -16.7        & \scriptsize    (-93\%) & \scriptsize  -53.8         & \scriptsize  (-63\%) \\
+    \makebox[5mm]{} \scriptsize use short array index variables           & \scriptsize  -0.1          & \scriptsize   (-1\%)       & \scriptsize  -104.8        & \scriptsize (-213\%)             & \scriptsize       0        & \scriptsize      (0\%) & \scriptsize -104.7         & \scriptsize (-123\%) \\
+    \makebox[5mm]{} \scriptsize avoid recalculating expressions in a loop & \scriptsize     0          & \scriptsize    (0\%)       & \scriptsize    -7.5        & \scriptsize  (-15\%)             & \scriptsize       0        & \scriptsize      (0\%) & \scriptsize   -7.5         & \scriptsize   (-9\%) \\
+    \makebox[5mm]{} \scriptsize reduce array and object access            & \scriptsize     0          & \scriptsize    (0\%)       & \scriptsize   -18.1        & \scriptsize  (-37\%)             & \scriptsize    -2.4        & \scriptsize    (-13\%) & \scriptsize  -20.5         & \scriptsize  (-24\%) \\
+    \makebox[5mm]{} \scriptsize reduce branch cost in crcu8               & \scriptsize    -4          & \scriptsize  (-22\%)       & \scriptsize    -0.5        & \scriptsize   (-1\%)             & \scriptsize    -3.5        & \scriptsize    (-19\%) & \scriptsize     -8         & \scriptsize   (-9\%) \\
+    using optimised source                                                & 51.9                       & (+190\%)                   & 64.1                       & (+30\%)                          & 53.1                       & (+195\%)               & 169.3                      & (+99\%) \\
     \midrule
     % CHANGE COMPARED TO PREVIOUS, SIMILAR TO MAIN TABLES ON PERF/CODE SIZE
-    \makebox[5mm]{} \tiny (unfair) avoid creating objects                & \tiny   0.8 & \tiny   (+5\%) & \tiny       0 & \tiny    (0\%) & \tiny   -10.4 & \tiny    (-58\%) & \tiny  -10.0 & \tiny  (-11\%) \\
-    \makebox[5mm]{} \tiny (unfair) avoid virtual calls                   & \tiny -22.8 & \tiny (-127\%) & \tiny       0 & \tiny    (0\%) & \tiny       0 & \tiny      (0\%) & \tiny  -23.0 & \tiny  (-27\%) \\
-    after 'unfair' optimisations                                         &        29.9 &        (+67\%) &          64.1 &        (+30\%) &          42.7 &         (+137\%) &        137.0 &        (+61\%) \\
+    \makebox[5mm]{} \scriptsize (unfair) avoid creating objects           & \scriptsize   0.8          & \scriptsize   (+5\%)       & \scriptsize       0        & \scriptsize    (0\%)             & \scriptsize   -10.4        & \scriptsize    (-58\%) & \scriptsize  -10.0         & \scriptsize  (-11\%) \\
+    \makebox[5mm]{} \scriptsize (unfair) avoid virtual calls              & \scriptsize -22.8          & \scriptsize (-127\%)       & \scriptsize       0        & \scriptsize    (0\%)             & \scriptsize       0        & \scriptsize      (0\%) & \scriptsize  -23.0         & \scriptsize  (-27\%) \\
+    after 'unfair' optimisations                                          & 29.9                       & (+67\%)                    & 64.1                       & (+30\%)                          & 42.7                       & (+137\%)               & 137.0                      & (+61\%) \\
     \bottomrule
     \end{tabular}
+    \begin{tablenotes}
+        \item[a] in millions of cycles
+    \end{tablenotes}
+    \end{threeparttable}
+    }
 \end{table}

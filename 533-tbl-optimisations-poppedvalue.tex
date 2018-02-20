@@ -1,9 +1,11 @@
 \begin{table}
 \caption{Popped value caching}
 \label{tbl-poppedvaluecaching}
+    \scriptsize\centerline{
     \begin{tabular}{llll|c|c|c|c}
     \toprule
-    JVM                & AOT compiler                                         & AVR                 & cycles & cache state R1       & cache state R2       & cache state R3       & cache state R4       \\
+                       &                                                      &                     &        & \multicolumn{4}{c}{cache state} \\
+    JVM                & AOT compiler                                         & AVR                 & cycles & R1                   & R2                   & R3                   & R4                   \\
     \midrule
     \midrule
     0: BRTARGET(0)     & \sccomment{record current address}                   &                     &        & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
@@ -32,5 +34,6 @@
                        & emit\_branchtag(GT, 0);                              & BRGT 0:             & 2      & \sce{\use}{LS1}{   } & \sce{\use}{LS0}{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     \bottomrule
     \end{tabular}
+    }
 \end{table}
 

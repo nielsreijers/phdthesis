@@ -232,6 +232,7 @@ Comparing this to a normal method call, we see the cost is much higher, and less
 \begin{table}
 \caption{Approximate cycles of overhead caused by different ways of invoking a method}
 \label{tbl-method-invoke-overhead-comparison}
+	\centerline{
     \begin{tabular}{lccccc}
     \toprule
                                                               & Manual          & ProGuard                & Stack-only                  & Converted Java              & Normal                                              \\
@@ -249,6 +250,7 @@ Comparing this to a normal method call, we see the cost is much higher, and less
                                                               &                 &                         & \emph{8 per word}           & \emph{12 or 16 per word}    & \emph{12 or 16 per word}                            \\
     \bottomrule
     \end{tabular}
+    }
 \end{table}
 
 \subsection{Creating lightweight methods}

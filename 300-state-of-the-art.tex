@@ -142,19 +142,19 @@ Their approach is both simple and effective. To translate JVM bytecode each JVM 
 \label{tbl-ellul-aot-example}
     \begin{tabular}{llll}
     \toprule
-    Bytecode           & Stack before        & Stack after         & Native pseudo assembly code \\
+    Bytecode  & Stack before        & Stack after         & Native pseudo assembly code \\
     \midrule
     \midrule
-    \mycode{ILOAD\_0}  & ...                 & ...                 & \mycode{LOAD r1, a} \\
-                       & ...                 & ..., value1         & \mycode{PUSH r1} \\
-    \mycode{ILOAD\_1}  & ..., value1         & ..., value1         & \mycode{LOAD r1, b} \\
-                       & ..., value1         & ..., value1, value2 & \mycode{PUSH r1} \\
-    \mycode{IADD}      & ..., value1, value2 & ..., value1         & \mycode{POP r1} \\
-                       & ..., value1         & ...                 & \mycode{POP r2} \\
-                       & ...                 & ...                 & \mycode{ADD r1, r2} \\
-                       & ...                 & ..., result         & \mycode{PUSH r1} \\
-    \mycode{ISTORE\_2} & ..., result         & ...                 & \mycode{POP r1} \\
-                       & ...                 & ...                 & \mycode{STORE c, r1} \\
+    ILOAD\_0  & ...                 & ...                 & LOAD r1, a \\
+              & ...                 & ..., value1         & PUSH r1 \\
+    ILOAD\_1  & ..., value1         & ..., value1         & LOAD r1, b \\
+              & ..., value1         & ..., value1, value2 & PUSH r1 \\
+    IADD      & ..., value1, value2 & ..., value1         & POP r1 \\
+              & ..., value1         & ...                 & POP r2 \\
+              & ...                 & ...                 & ADD r1, r2 \\
+              & ...                 & ..., result         & PUSH r1 \\
+    ISTORE\_2 & ..., result         & ...                 & POP r1 \\
+              & ...                 & ...                 & STORE c, r1 \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -170,7 +170,7 @@ To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:
     \begin{threeparttable}
     \begin{tabular}{lrrlrr}
     \toprule
-    Before &  &  & After &  & \\
+    Before            &        &        & After             &        & \\
     Instructions      & Cycles & Length & Instructions      & Cycles & Length \\
     \midrule
     \midrule
