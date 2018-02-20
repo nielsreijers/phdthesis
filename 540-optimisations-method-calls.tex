@@ -129,9 +129,9 @@ A normal method that invokes a possible string of lightweight methods, needs to 
 
 % For each method the number of locals is known by the infuser. If it is a lightweight method that will call another lightweight, one extra slot is reserved for the return address. In addition, each method needs to reserve the maximum number of extra slots required for of any lightweight method it may call. Since we can only call one at a time, they can all use the same space reserved in the caller's stack frame. A similar calculation is done to determine any extra reference stack space needed to accommodate the lightweight methods that may be called.
 
-\begin{figure}[]
+\begin{figure}
   \centering
-  \includegraphics[width=0.80\linewidth]{stack-frame-lightweight-method.eps}
+  \includegraphics[width=0.95\linewidth]{stack-frame-lightweight-method.eps}
   \caption{Stack frame layout for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls lightweight method \mycode{h\_lw}.}
   \label{fig-stack-frame-lightweight-method}
 \end{figure}

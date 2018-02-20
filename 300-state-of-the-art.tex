@@ -31,7 +31,7 @@ LooCI \cite{Hughes:dg} is a component infrastructure middleware for WSNs with st
 A final example that we will look at a bit more detail at is WuKong \cite{Reijers:2013ut, Lin:2013dc}.
 
 
-\begin{figure}[]
+\begin{figure}
   \centering
   \includegraphics[width=0.8\linewidth]{wukong-fbp.png}
   \caption{Example WuKong flow based programme}
@@ -82,7 +82,7 @@ Finally, SensorScheme \cite{Evers:2010ur} implements a fully functioning LISP in
 Since our VM is based on Darjeeling, we will examine it in more detail in this section.
 
 \paragraph{Split VM architecture}
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[width=0.6\linewidth]{darjeeling-infusion-process}
     \caption{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
@@ -93,7 +93,7 @@ Like most other sensor node JVMs, it uses a \emph{split VM architecture} \cite{S
 The infuser changes the bytecode in several ways, replacing named references by a numbering scheme, so that the constant strings with class and method names can be removed from the constant pool, and flattening the Java classes into a list of statically entities. Infusions are typically libraries, such as the \mycode{java.lang} base library, networking protocols, or the application. An infusion can reference code in another infusion using header files, created during the infusion process that allow it to find the numbered identifiers of classes and methods in the referenced infusion. This is shown in Figure \ref{fig-darjeeling-infusion-process}.
 
 \paragraph{16-bit architecture}
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[width=0.6\linewidth]{32bit-vs-16bit-stack}
     \caption{Unused memory for 32 and 16-bit stack width}
@@ -105,7 +105,7 @@ Besides statically linking classes, the infuser also makes several changes to th
 
 
 \paragraph{Double-ended stack}
-\begin{figure}[H]
+\begin{figure}
     \centering
     \includegraphics[width=0.6\linewidth]{darjeeling-split-stack}
     \caption{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
@@ -208,9 +208,9 @@ Regardless of these concerns, there are scenarios that may not be able to tolera
 \label{sec-state-of-the-art-safety}
 With some exceptions \cite{Evers:2010ur}, most current sensor node VMs don't discuss safety, but instead focus on the functionality provided and how this can be implemented on a tiny sensor node. This is unfortunate, because the ability to provide a safety execution environment is both desirable, and easier to implement using a VM than it is using native code.
 
-\begin{figure}[]
+\begin{figure}
   \centering
-  \includegraphics[width=0.8\linewidth]{safe-compilation-process.eps}
+  \includegraphics[width=\linewidth]{safe-compilation-process.eps}
   \caption{Three approaches to provide a safe execution environment}
   \label{fig-safe-compilation-process}
 \end{figure}

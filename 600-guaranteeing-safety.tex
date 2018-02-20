@@ -93,7 +93,7 @@ We add a check during non-lightweight invokes that the stack frame for the calle
 While running, a method may make calls to the VM or libc functions, causing the stack to grow further. We can determine the maximum stack growth for calls our AOT generated code may make. Therefore we add a certain safety margin between the stack and heap. \emph{t-kernel} \cite{Gu:2005un} also reserves a similar gap of 128 bytes between the stack and kernel heap, although it is not clear from the paper whether this is for the same reason.
 
 \section{Memory safety}
-\begin{figure}[]
+\begin{figure}
   \includegraphics[width=\linewidth]{memlayout.eps}
   \caption{Global memory layout and the areas accessible to the application}
   \label{fig-memlayout}
