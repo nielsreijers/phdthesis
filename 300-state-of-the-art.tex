@@ -32,10 +32,10 @@ A final example that we will look at a bit more detail at is WuKong \cite{Reijer
 
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.8\linewidth]{wukong-fbp.png}
-  \caption{Example WuKong flow based programme}
-  \label{fig-wukong-fbp}
+\centering
+\includegraphics[width=0.8\linewidth]{wukong-fbp.png}
+\caption{Example WuKong flow based programme}
+\label{fig-wukong-fbp}
 \end{figure}
 
 
@@ -83,10 +83,10 @@ Since our VM is based on Darjeeling, we will examine it in more detail in this s
 
 \paragraph{Split VM architecture}
 \begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{darjeeling-infusion-process}
-    \caption{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
-    \label{fig-darjeeling-infusion-process}
+\centering
+\includegraphics[width=0.6\linewidth]{darjeeling-infusion-process}
+\caption{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
+\label{fig-darjeeling-infusion-process}
 \end{figure}
 Like most other sensor node JVMs, it uses a \emph{split VM architecture} \cite{Simon:2006wd}. The actual virtual machine running on the node does not use standard JVM class files, but these class files first have to be transformed by an offline tool into a format more suitable for a sensor node. In Darjeeling's case this tool is called the \emph{infuser}, which takes several Java classes and statically links them into a single \emph{infusion}.
 
@@ -94,10 +94,10 @@ The infuser changes the bytecode in several ways, replacing named references by 
 
 \paragraph{16-bit architecture}
 \begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{32bit-vs-16bit-stack}
-    \caption{Unused memory for 32 and 16-bit stack width}
-    \label{fig-32bit-vs-16bit-stack}
+\centering
+\includegraphics[width=0.6\linewidth]{32bit-vs-16bit-stack}
+\caption{Unused memory for 32 and 16-bit stack width}
+\label{fig-32bit-vs-16bit-stack}
 \end{figure}
 
 Besides statically linking classes, the infuser also makes several changes to the bytecode format. Since references on sensor nodes are usually 16-bit, and the use of 8-bit and 16-bit integer variable are commonly used in sensor node code to save memory, storing all data in 32-bit slots as the JVM does would lead to significant overhead, as shown in Figure \ref{fig-32bit-vs-16bit-stack}. Therefore, Darjeeling stack and variable slots are 16-bit wide, using two slots for 32-bit ints, similar to how the normal JVM uses two 32-bit slots for 64-bit longs. This means Darjeeling's bytecode also introduces 16-bit versions of many opcodes, for example \mycode{SADD} adds two 16-bit shorts, while \mycode{IADD} adds two 32-bit ints. The infuser analyses the type of expressions, and replaces the 32-bit instructions found in normal JVM bytecode with the 16-bit variants where possible.
@@ -106,10 +106,10 @@ Besides statically linking classes, the infuser also makes several changes to th
 
 \paragraph{Double-ended stack}
 \begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{darjeeling-split-stack}
-    \caption{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
-    \label{fig-darjeeling-split-stack}
+\centering
+\includegraphics[width=0.6\linewidth]{darjeeling-split-stack}
+\caption{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
+\label{fig-darjeeling-split-stack}
 \end{figure}
 
 A second important modification is that Darjeeling splits the operand stack into separate reference and integer stacks, as shown in Figure \ref{fig-darjeeling-split-stack}. Each stack frame still allocates the same amount of space for it's operand stack, but Darjeeling places references on one side, and integers on the other. At the expense of having to keep track of two operand stack pointer, this reduces the complexity of the garbage collector significantly. When the garbage collector runs, it needs to find the \emph{root set} of all live objects, which includes objects with references on the stack but not stored elsewhere. Since the type of the values on the operand stack changes continuously, it would be hard to determine which values are references and which are integers in a single stack, but using Darjeeling's split stack design, it can simply place all values on the reference stack in the root set. For the same reason, Darjeeling also groups the slots allocated for local, static and instance variables into an integer and reference group.
@@ -209,10 +209,10 @@ Regardless of these concerns, there are scenarios that may not be able to tolera
 With some exceptions \cite{Evers:2010ur}, most current sensor node VMs don't discuss safety, but instead focus on the functionality provided and how this can be implemented on a tiny sensor node. This is unfortunate, because the ability to provide a safety execution environment is both desirable, and easier to implement using a VM than it is using native code.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{safe-compilation-process.eps}
-  \caption{Three approaches to provide a safe execution environment}
-  \label{fig-safe-compilation-process}
+\centering
+\includegraphics[width=\linewidth]{safe-compilation-process.eps}
+\caption{Three approaches to provide a safe execution environment}
+\label{fig-safe-compilation-process}
 \end{figure}
 
 Several non-VM systems exists to provide various levels of safety for sensor nodes. They fall into two distinct categories, as shown in Figure \ref{fig-safe-compilation-process}. If we trust the host, it can verify the code and add runtime safety checks where needed, before sending it to the node. If the node could receive untrusted code from untrusted sources, for example to support mobile agents as in Agilla \cite{Fok:2005bh}, it needs to guarantee safety independent of whatever code it may receive from the host to guard against malicious attack.

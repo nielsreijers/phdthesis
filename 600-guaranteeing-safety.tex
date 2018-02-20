@@ -93,10 +93,11 @@ We add a check during non-lightweight invokes that the stack frame for the calle
 While running, a method may make calls to the VM or libc functions, causing the stack to grow further. We can determine the maximum stack growth for calls our AOT generated code may make. Therefore we add a certain safety margin between the stack and heap. \emph{t-kernel} \cite{Gu:2005un} also reserves a similar gap of 128 bytes between the stack and kernel heap, although it is not clear from the paper whether this is for the same reason.
 
 \section{Memory safety}
+
 \begin{figure}
-  \includegraphics[width=\linewidth]{memlayout.eps}
-  \caption{Global memory layout and the areas accessible to the application}
-  \label{fig-memlayout}
+\includegraphics[width=\linewidth]{memlayout.eps}
+\caption{Global memory layout and the areas accessible to the application}
+\label{fig-memlayout}
 \end{figure}
 
 Figure \ref{fig-memlayout} shows the global layout of the VM's memory. At the bottom are the internal state of by the VM, stored in a number of global variables, and a block with static variables for each infusion. The infusion blocks are actually allocated on the heap at application startup time, but this part of the heap is then separated from the range the application may use to protect them from bad heap writes. This is followed by the application heap, which contains Java objects and arrays.
@@ -180,7 +181,7 @@ If we align the top and bottom boundaries of the heap at 256 bytes, this would e
 
 Finally, we can save 8 cycles if we keep the bounds in registers instead of memory, which would remove the need for the \mycode{LDS} instructions. However this reduces the performance of the stack cache since it means these registers are not available for stack caching. Which of these affects performance more depends on the code. We evaluate the difference in Section \ref{sec-evaluation-run-time-cost}. Since the option to have the bounds in registers is more complex to implement, thus increasing VM size, we choose to keep the bounds in registers.
 
-\begin{listing}[]
+\begin{listing}
 	\centering
  	\begin{minted}{c-objdump}
     heapcheck:

@@ -10,20 +10,34 @@ The mark loops optimisation moves loads and stores for pinned variables outside 
 
 For each value that is live at the beginning of the loop, we need to emit the load before the mark loop block, so in terms of code size we only benefit if it is loaded more than once, and may actually lose some if it is then popped destructively, since we would need to emit a \mycode{mov}. Stores follow a similar argument. Also, for small methods the extra registers used may mean we have to save more call-saved registers in the method prologue. Finally, we get the performance advantage for each run-time iteration, but the effect on code size, whether positive or negative, only once.
 
+% \begin{figure}
+%  \centering
+%  \begin{minipage}{0.45\textwidth}
+%   \centering
+%   \includegraphics[width=\mygraphsize]{codesizeoverhead-per-opcode-category.eps}
+%   \caption{Code size overhead per category}
+%   \label{fig-codesize-per-opcode-category}
+%  \end{minipage}\hfill
+%  \begin{minipage}{0.45\textwidth}
+%   \centering
+%   \includegraphics[width=\mygraphsize]{codesizeoverhead-per-benchmark.eps}
+%   \caption{Code size overhead per benchmark}
+%   \label{fig-codesize-per-benchmark}
+%  \end{minipage}
+% \end{figure}
+
 \begin{figure}
- \centering
- \begin{minipage}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\myfiguresizecodesize]{codesizeoverhead-per-opcode-category.eps}
-  \caption{Code size overhead per category}
-  \label{fig-codesize-per-opcode-category}
- \end{minipage}\hfill
- \begin{minipage}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\myfiguresizecodesize]{codesizeoverhead-per-benchmark.eps}
-  \caption{Code size overhead per benchmark}
-  \label{fig-codesize-per-benchmark}
- \end{minipage}
+\centering
+\includegraphics[width=\mygraphsize]{codesizeoverhead-per-opcode-category.eps}
+\caption{Code size overhead per category}
+\label{fig-codesize-per-opcode-category}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\mygraphsize]{codesizeoverhead-per-benchmark.eps}
+\caption{Code size overhead per benchmark}
+\label{fig-codesize-per-benchmark}
 \end{figure}
 
 The constant shift optimisation unrolls the loop that is normally generated for bit shifts. This significantly improves performance, but the effect on the code size depends on the number of bits to shift by. The constant load and loop take at least 5 instructions. In most cases the unrolled shifts will be smaller, but MD5 and XXTEA show a small increase in code size since they contains shifts by a large number of bits.

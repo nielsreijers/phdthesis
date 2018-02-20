@@ -24,10 +24,11 @@ We summarise our goals and constraints below:
 
 \section{Compilation process}
 \label{sec-compilation-process}
+
 \begin{figure}
-  \includegraphics[width=\linewidth]{compilation-process.eps}
-  \caption{Java to native AVR compilation}
-  \label{fig-translation-process}
+\includegraphics[width=\linewidth]{compilation-process.eps}
+\caption{Java to native AVR compilation}
+\label{fig-translation-process}
 \end{figure}
 
 The complete process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}. Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes. We then use ProGuard \cite{proguard} to do some simple optimisations, but these are very basic steps like removing dead code, and overlapping local variable slots where possible, etc.
@@ -96,11 +97,12 @@ This is an example of something we often see: an optimisation may take a few hun
 
 \subsection{Darjeeling split-stack architecture}
 \label{sec-darjeeling-split-architecure}
+
 \begin{figure}
-  \centering
-  \includegraphics[width=0.6\linewidth]{object-and-stack-frame-layout.eps}
-  \caption{Object and stack frame layout}
-  \label{fig-object-and-stack-frame-layout}
+\centering
+\includegraphics[width=0.6\linewidth]{object-and-stack-frame-layout.eps}
+\caption{Object and stack frame layout}
+\label{fig-object-and-stack-frame-layout}
 \end{figure}
 
 When Darjeeling's garbage collection runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This is then iteratively expanded to also cover all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be garbage collected.

@@ -35,21 +35,21 @@ A compression algorithm like LEC is a good example of an optimisation that may b
 After we apply our optimisations, the overhead is reduced to 86.5\%, resulting in $246 \mu J * 1.685 = 459 \mu J$ spent on compression. While the savings are less than when we use native C to compress the data, our optimisations mean we can save on transmission costs by using LEC compression, while using the baseline AOT approach, LEC compression would have resulted in a net loss.
 
 \paragraph{Xxtea and the mark loops optimisation}
+
 \begin{figure}
- \centering
- \begin{minipage}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\myfiguresizexxtea]{pinnedregs-performance-xxtea.eps}
-  \caption{Xxtea performance overhead for different number of pinned register pairs}
-  \label{fig-performance-pinnedregs-xxtea-per-opcode-category}
- \end{minipage}\hfill
- \begin{minipage}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\myfiguresizexxtea]{pinnedregs-performance-all-benchmarks.eps}
-  \caption{Per benchmark performance overhead different number of pinned register pairs}
-  \label{fig-performance-pinnedregs-per-benchmark}
- \end{minipage}
+\centering
+\includegraphics[width=\mygraphsize]{pinnedregs-performance-xxtea.eps}
+\caption{Xxtea performance overhead for different number of pinned register pairs}
+\label{fig-performance-pinnedregs-xxtea-per-opcode-category}
 \end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\mygraphsize]{pinnedregs-performance-all-benchmarks.eps}
+\caption{Per benchmark performance overhead different number of pinned register pairs}
+\label{fig-performance-pinnedregs-per-benchmark}
+\end{figure}
+
 Perhaps the most interesting benchmark is xxtea. Its high average stack depth means popped value caching does not have much effect: most registers are used for real stack values, leaving few chances to reuse a value that was previously popped from the stack. 
 
 When we apply the mark loops optimisation, performance actually degrades by 5\%, and code size overhead increases 6\%! Here we have an interesting tradeoff: if we use a register to pin a variable, accessing that variable will be cheaper, but this register will no longer be available for stack caching, so more stack values may have to be spilled to memory.

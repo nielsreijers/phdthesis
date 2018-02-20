@@ -19,19 +19,17 @@ We define the overhead from each category as the number of bytes or cycles spent
 In Figure \ref{fig-performance-per-opcode-category} we see how our optimisations combine to reduce performance overhead. We take the average of all benchmarks, and show both the total overhead, and the overhead for each instruction category. Figure \ref{fig-performance-per-benchmark} shows the total overhead for each individual benchmark. We start with the original AOT approach with only the simple peephole optimiser, and then incrementally add each of our optimisations. The lightweight method call optimisation is already included in these results. We will examine its effect separately in Section \ref{sec-evaluation-method-invocation}.
 
 \begin{figure}
- \centering
- \begin{minipage}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\myfiguresizeperformance]{performance-per-opcode-category.eps}
-  \caption{Perf. overhead per category}
-  \label{fig-performance-per-opcode-category}
- \end{minipage}\hfill
- \begin{minipage}{0.45\textwidth}
-  \centering
-  \includegraphics[width=\myfiguresizeperformance]{performance-per-benchmark.eps}
-  \caption{Perf. overhead per benchmark}
-  \label{fig-performance-per-benchmark}
- \end{minipage}
+\centering
+\includegraphics[width=\mygraphsize]{performance-per-opcode-category.eps}
+\caption{Performance overhead per category}
+\label{fig-performance-per-opcode-category}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\mygraphsize]{performance-per-benchmark.eps}
+\caption{Performance overhead per benchmark}
+\label{fig-performance-per-benchmark}
 \end{figure}
 
 Using the simple optimiser, the types 1, 2 and 3 overhead are all significant, at 136\%,  107\%, and 70\% respectively. The basic approach does not have many reasons to emit a move, so we see that in some cases the AOT version actually spends fewer cycles on move instructions than the C version, resulting in small negative values.  When we improve the peephole optimiser to include non-consecutive push/pop pairs, push/pop overhead drops by 99.4\% (of native C performance), but if the push and pop target different registers, they are replaced by a move instruction, and we see an increase of 11.5\% in move overhead. For a 16-bit value this takes 1 cycle (for a MOVW instruction), instead of 8 cycles for two pushes and two pops. The increase in moves shows most of the extra cases that are handled by the improved optimiser are replaced by a move instead of eliminated, since the 11.5\% extra move overhead matches a 92\% reduction in push/pop overhead.

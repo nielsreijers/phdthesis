@@ -17,10 +17,10 @@ For these cases we introduce a new type of method call: lightweight methods. The
 \end{itemize}
 
 \begin{figure}
-  \centering
-  \includegraphics[width=.5\linewidth]{method-calls-vs-duration.eps}
-  \caption{CoreMark method calls vs duration with logarithmic scales}
-  \label{fig-coremark-method-calls-vs-duration}
+\centering
+\includegraphics[width=.5\linewidth]{method-calls-vs-duration.eps}
+\caption{CoreMark method calls vs duration with logarithmic scales}
+\label{fig-coremark-method-calls-vs-duration}
 \end{figure}
 
 Lightweight methods give us third choice, in between a normal method call and method inlining. When calling a lightweight method, we directly \mycode{CALL} the method's code. We bypass the VM completely, reusing the caller's stack frame, and leaving the parameters on the (caller's) stack. In effect, the lightweight method behaves similar to inlined code, but since we can \mycode{CALL} it from multiple places, we do not incur the code size overhead of duplicating large inlined methods.
@@ -130,10 +130,10 @@ A normal method that invokes a possible string of lightweight methods, needs to 
 % For each method the number of locals is known by the infuser. If it is a lightweight method that will call another lightweight, one extra slot is reserved for the return address. In addition, each method needs to reserve the maximum number of extra slots required for of any lightweight method it may call. Since we can only call one at a time, they can all use the same space reserved in the caller's stack frame. A similar calculation is done to determine any extra reference stack space needed to accommodate the lightweight methods that may be called.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.95\linewidth]{stack-frame-lightweight-method.eps}
-  \caption{Stack frame layout for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls lightweight method \mycode{h\_lw}.}
-  \label{fig-stack-frame-lightweight-method}
+\centering
+\includegraphics[width=0.95\linewidth]{stack-frame-lightweight-method.eps}
+\caption{Stack frame layout for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls lightweight method \mycode{h\_lw}.}
+\label{fig-stack-frame-lightweight-method}
 \end{figure}
 
 An example is shown in Figure \ref{fig-stack-frame-lightweight-method}, which shows the stack frame for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls another lightweight method \mycode{h\_lw}.

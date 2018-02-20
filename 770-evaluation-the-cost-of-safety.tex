@@ -1,3 +1,5 @@
+\input{770-tbl-safety-cost}
+
 \section{The cost of safety}
 \label{sec-evaluation-safety}
 
@@ -5,30 +7,28 @@ The advantage of using a VM to provide safety is that the necessary checks are e
 
 % would be nice to get code size for Harbor and t-kernel.
 
-\input{770-tbl-safety-cost}
-
-
 \subsection{Run-time cost}
 \label{sec-evaluation-run-time-cost}
+
 \begin{figure}
-  \centering
-  \includegraphics[width=0.6\linewidth]{safety-cost.eps}
-  \caption{Overhead increase due to safety checks}
-  \label{fig-safety-cost-per-benchmark}
+\centering
+\includegraphics[width=\mygraphsize]{safety-cost.eps}
+\caption{Overhead increase due to safety checks}
+\label{fig-safety-cost-per-benchmark}
 \end{figure}
 
 \begin{figure}
-   \centering
-  \includegraphics[width=0.6\linewidth]{safety-ld-st-percentage-vs-overhead.eps}
-  \caption{Percentage of array/object load/store instructions and cost of read/write safety}
-  \label{fig-safety-ld-st-percentage-vs-overhead}
+\centering
+\includegraphics[width=\mygraphsize]{safety-ld-st-percentage-vs-overhead.eps}
+\caption{Percentage of array/object load/store instructions and cost of read/write safety}
+\label{fig-safety-ld-st-percentage-vs-overhead}
 \end{figure}
 
 \begin{figure}
-   \centering
-  \includegraphics[width=0.6\linewidth]{safety-cost-diff-using-regs.eps}
-  \caption{Comparison of safety cost with bounds in memory or registers}
-  \label{fig-safety-cost-memory-or-registers}
+\centering
+\includegraphics[width=\mygraphsize]{safety-cost-diff-using-regs.eps}
+\caption{Comparison of safety cost with bounds in memory or registers}
+\label{fig-safety-cost-memory-or-registers}
 \end{figure}
 
 First we examine the run-time cost of our safety guarantees. Table \ref{tbl-safety-cost} shows the results for our 12 benchmarks. Figure \ref{fig-safety-cost-per-benchmark} shows the data in the first section of the table. The baseline here is the unsafe version of our VM, which is on average 71.1\% slower than native C. We first add write checks only, since this is sufficient to satisfy our guarantee that no malicious code can corrupt the state of the VM. This increases the average overhead to 105.3\% of native C, corresponding to an 19.9\% increase in runtime compared to the unsafe VM.
@@ -77,15 +77,14 @@ We implemented this as a benchmark that fills an array of 256 elements with an a
 
 Our benchmark is implemented as a simple loop as shown in Listing \ref{lst-fill-array}.
 
-\begin{listing}[]
-	\centering
- 	\begin{minted}{java}
-        for (short i = 0; i < NUMBERS; i++) {
-            numbers[i] = (byte)1;
-        }
-	\end{minted}
-	\caption{Fill array benchmark (8-bit version)}
-	\label{lst-fill-array}
+\begin{listing}
+\begin{minted}{java}
+    for (short i = 0; i < NUMBERS; i++) {
+        numbers[i] = (byte)1;
+    }
+\end{minted}
+\caption{Fill array benchmark (8-bit version)}
+\label{lst-fill-array}
 \end{listing}
 
 \input{771-tbl-evaluation-safety-fillarray}

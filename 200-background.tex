@@ -25,7 +25,7 @@ The second class of devices, wireless sensor nodes, are distinctly less powerful
 While an enormous number of different hardware platforms have been developed, the components they use come from a limited set. Two of the most popular families of CPUs used in these platforms are the Atmel AVR and Texas Instruments MSP430. Both families of CPUs come in a large number of variations with different amounts of memory, IO ports, and physical packages, but the underlying architecture is similar for all. Table \ref{tbl-atmega128-msp430f1611} lists the main characteristics for two popular member for both families, the ATMEGA128 and the MSP430F1611. Below we will describe the most important properties for this class of devices that are relevant to the work in this dissertation.
 
 \begin{table}
-\caption{Main characteristics of the ATMEGA128 and MSP430F1611 CPUs.}
+\caption{Main characteristics of the ATMEGA128 and MSP430F1611 CPUs}
 \label{tbl-atmega128-msp430f1611}
     \begin{threeparttable}
     \begin{tabular}{lrr}
@@ -109,10 +109,10 @@ The JVM stores information in three different places:
 \end{itemize}
 
 \begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{jvmmemory.eps}
-  \caption{Highlevel overview of JVM memory design}
-  \label{fig-jvm-memory}
+\centering
+\includegraphics[width=\linewidth]{jvmmemory.eps}
+\caption{Highlevel overview of JVM memory design}
+\label{fig-jvm-memory}
 \end{figure}
 
 The JVM is a 32-bit machine. All the places where data may be stored, objects on the heap, operand stacks and local variable slots, and a class' static variables, are essentially a block of 32-bit wide slots. 64-bit \mycode{long} and \mycode{double} types occupy two slots on the operand stack of local variable space, while the shorter \mycode{byte}, and \mycode{short} types are sign-extended and stored as a 32-bit value.

@@ -123,10 +123,10 @@ The result when applied to our example is shown in Table \ref{tbl-constshift}, w
 The \mycode{GETFIELD\_*} and \mycode{PUTFIELD\_*} instructions are used to access fields in objects. Because of Darjeeling's split architecture, the offset from the object pointer is known at compile time only for integer fields, but not for reference fields. As shown in Figure \ref{fig-super-class-sub-class-field-layout}, integer fields will be at the same offset, regardless of whether an object is of the compile-time type, or a subclass. References fields may shift up in subclass instances, so \mycode{GETFIELD\_A} and \mycode{PUTFIELD\_A} must examine the object's actual type and calculate the offset accordingly, adding significant overhead.
 
 \begin{figure}
-  \centering
-  \includegraphics[width=0.7\linewidth]{super-class-sub-class-field-layout.eps}
-  \caption{Base class and sub class layout}
-  \label{fig-super-class-sub-class-field-layout}
+\centering
+\includegraphics[width=0.7\linewidth]{super-class-sub-class-field-layout.eps}
+\caption{Base class and sub class layout}
+\label{fig-super-class-sub-class-field-layout}
 \end{figure}
 
 This overhead can be avoided if we can be sure of the offset at compile time, which is the case if the class is marked \mycode{final}. In this case the infuser will replace the \mycode{GETFIELD\_A} or \mycode{PUTFIELD\_A} opcode with a \mycode{\_FIXED} version so the VM knows it is safe to determine the offset at AOT compile time. Conveniently, one of the optimisations ProGuard does, is marking any class that is not subclassed as \mycode{final}, so most of this is automatic.
