@@ -34,15 +34,14 @@ While Java allows us to declare variables as \mycode{final}, this is only a lang
 This is especially important for arrays of constant data, which are common in WSN applications. When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a Java array object, and then uses the normal array access instructions to initialise each element individually, as shown in Listing \ref{lst-constant-array-initialisation}.
 
 \begin{listing}
-	\centering
-	\begin{minted}{c}
-sspush(256); newarray;                     // create the array
-adup; sconst_0;    sconst_0;   bastore;    // set index 0
-adup; sconst_1;    sconst_3;   bastore;    // set index 1
-adup; sconst_2;    bspush(6);  bastore;    // set index 2
-...
-adup; bspush(255); bspush(-3); bastore;    // set index 255
-	\end{minted}
+\begin{minted}{c}
+    sspush(256); newarray;                     // create the array
+    adup; sconst_0;    sconst_0;   bastore;    // set index 0
+    adup; sconst_1;    sconst_3;   bastore;    // set index 1
+    adup; sconst_2;    bspush(6);  bastore;    // set index 2
+    ...
+    adup; bspush(255); bspush(-3); bastore;    // set index 255
+\end{minted}
 \caption{Darjeeling bytecode to initialise a byte array of constant data}
 \label{lst-constant-array-initialisation}
 \end{listing}
@@ -72,37 +71,35 @@ Besides the need to support constant data, the MoteTrack benchmark exposes anoth
 
 Listing \ref{lst-motetrack-data-structure} shows the main \mycode{RefSignature} data structure used in MoteTrack. This structure consists of a location, which is a simple struct of 3 shorts, and a signature, which has an id, and an array of 18 signals. A signal is defined by a source ID, and an array of 2 elements with RSSI values.
 
-\begin{listing}[H]
-\small
-\centering
+\begin{listing}
 \begin{minted}{c}
-#define NBR_RFSIGNALS_IN_SIGNATURE 18
-#define NBR_FREQCHANNELS            2
+    #define NBR_RFSIGNALS_IN_SIGNATURE 18
+    #define NBR_FREQCHANNELS            2
 
-struct RefSignature
-{
-    Point location;
-    Signature sig;
-};
+    struct RefSignature
+    {
+        Point location;
+        Signature sig;
+    };
 
-struct Point
-{
-    uint16_t x;
-    uint16_t y;
-    uint16_t z;
-};
+    struct Point
+    {
+        uint16_t x;
+        uint16_t y;
+        uint16_t z;
+    };
 
-struct Signature
-{
-    uint16_t id;
-    RFSignal rfSignals[NBR_RFSIGNALS_IN_SIGNATURE];
-};
+    struct Signature
+    {
+        uint16_t id;
+        RFSignal rfSignals[NBR_RFSIGNALS_IN_SIGNATURE];
+    };
 
-struct RFSignal
-{
-    uint16_t sourceID;
-    uint8_t rssi[NBR_FREQCHANNELS];
-};
+    struct RFSignal
+    {
+        uint16_t sourceID;
+        uint8_t rssi[NBR_FREQCHANNELS];
+    };
 \end{minted}
 \caption{MoteTrack \mycode{RefSignature} data structure}
 \label{lst-motetrack-data-structure}
@@ -172,8 +169,8 @@ At a minimum, we should have a way to define simple aliases for primitive types,
 Java method calls are inherently more expensive than C functions. On the desktop, JIT compilers can remove much of this overhead, but a sensor VM does not have the resources for this. We found this often is a problem for small helper functions that are frequently called. As an example, the C version of the XXTEA benchmark contains this macro: 
 
 \begin{minted}{c}
-#define MX (((z>>5^y<<2) + (y>>3^z<<4)) \\
-             ^ ((sum^y) + (key[(p&3)^e] ^ z)))
+    #define MX (((z>>5^y<<2) + (y>>3^z<<4)) \\
+                 ^ ((sum^y) + (key[(p&3)^e] ^ z)))
 \end{minted}
 
 This macro is called in four places, and is very performance critical. Tools like Proguard \cite{proguard} can be used to inline small methods, but in this case it is larger than Proguard's size threshold. This leaves developers with two unattractive options: either leaving it as a method and accepting the performance penalty, or manually copy-pasting the code, which is error-prone and leads to code that is harder to maintain.
@@ -205,30 +202,29 @@ In our benchmarks we encountered a number of situations where a temporary object
 
 In code that frequently needs short-lived objects the overhead for allocating them can be significant, and unpredictable GC runs are a problem for code with specific timing constraints. Besides LEC, we saw similar situations in the CoreMark, MoteTrack and heat tracking benchmarks. The problem is especially serious on a sensor node, where the limited amount of memory means the garbage collector is triggered frequently even if relatively few temporary objects are created.
 
-\begin{listing}[]
-	\centering
-	\begin{minted}{java}
-public static short LEC(short[] numbers, Stream stream) {
-    BSI bsi = new BSI();      // Allocate bsi only once
-    for (...) {
+\begin{listing}
+\begin{minted}{java}
+    public static short LEC(short[] numbers, Stream stream) {
+        BSI bsi = new BSI();      // Allocate bsi only once
+        for (...) {
+            ...
+            compress(ri, ri_1, stream, bsi);
+            ...
+        }
+    }
+
+    private static void compress(short ri, short ri_1, Stream stream, BSI bsi) {
         ...
-        compress(ri, ri_1, stream, bsi);
+        encode(di, bsi);          // Pass bsi to encode to return both value and length
         ...
     }
-}
 
-private static void compress(short ri, short ri_1, Stream stream, BSI bsi) {
-    ...
-    encode(di, bsi);          // Pass bsi to encode to return both value and length
-    ...
-}
-
-private static void encode(short di, BSI bsi) {
-    ...
-    bsi.value = ...           // return value and length by setting object fields
-    bsi.length = ...
-}
-	\end{minted}
+    private static void encode(short di, BSI bsi) {
+        ...
+        bsi.value = ...           // return value and length by setting object fields
+        bsi.length = ...
+    }
+\end{minted}
 \caption{Avoiding multiple object allocations in the LEC benchmark}
 \label{lst-lec-avoiding-object-allocations}
 \end{listing}

@@ -16,7 +16,7 @@ For these cases we introduce a new type of method call: lightweight methods. The
 	\item Parameters are passed on the stack, rather than in local variables.
 \end{itemize}
 
-\begin{figure}[]
+\begin{figure}
   \centering
   \includegraphics[width=.5\linewidth]{method-calls-vs-duration.eps}
   \caption{CoreMark method calls vs duration with logarithmic scales}
@@ -29,11 +29,11 @@ Because the method will be called from multiple locations which may have differe
 
 As an example, consider the simple \mycode{isOdd} method in Listing \ref{lst-lightweight-stack-only}:
 
-\begin{listing}[H]
- \centering
- \begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \begin{minted}{java}
+\begin{listing}
+\centering
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\begin{minted}{java}
 // JAVA
 
 public static boolean
@@ -41,29 +41,29 @@ public static boolean
 {
   return (a & (short)1)==1;
 }
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.29\textwidth}
-  \centering
-  \begin{minted}{java}
+\end{minted}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.29\textwidth}
+\centering
+\begin{minted}{java}
 // NORMAL METHOD
 //              (Stack)
 SLOAD_0         (Int)
 SCONST_1        (Int,Int)
 SAND            (Int)
 SRETURN         ()
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.29\textwidth}
-  \centering
-  \begin{minted}{java}
+\end{minted}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.29\textwidth}
+\centering
+\begin{minted}{java}
 // LIGHTWEIGHT METHOD
 //              (Stack)
 SCONST_1        (Int,Int)
 SAND            (Int)
 SRETURN         ()
-  \end{minted}
- \end{minipage}
+\end{minted}
+\end{minipage}
 \caption{Simple, stack-only lightweight method example}
 \label{lst-lightweight-stack-only}
 \end{listing}
@@ -72,38 +72,38 @@ The normal implementation has a single local variable. It expects the parameter 
 
 We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. In the bottom half of Listing \ref{lst-comparison-lightweight-and-normal-invocation} we see how \mycode{INVOKELIGHT} and \mycode{INVOKESTATIC} are translated to native code. Both first flush the stack cache to memory. After that, the lightweight method can directly call the implementation of \mycode{isOdd}, while the native version first saves the stack pointers, and then enters an expensive call into the VM to setup a stack frame for \mycode{isOdd}, which in turn will call the actual method.
 
-\begin{listing}[H]
- \centering
- \begin{minipage}[t]{0.5\textwidth}
-  \centering
-  \begin{minted}{java}
+\begin{listing}
+\centering
+\begin{minipage}[t]{0.5\textwidth}
+\centering
+\begin{minted}{java}
 // NORMAL INVOCATION
 // INVOKESTATIC isOdd:
-  push r25        // Flush the cache
-  push r24
-  call &preinvoke // Save X and SP
-  ldi r22, 253    // Set parameters
-  ldi r23, 2      //  for callMethod
-  ldi r24, 21
-  ldi r20, 64
-  ldi r21, 42
-  ldi r18, 13
-  ldi r19, 0
-  ldi r25, 2
-  call &callMethod // Call to VM
-  call &postinvoke // Restore X and SP
-  \end{minted}
- \end{minipage}
- \begin{minipage}[t]{0.4\textwidth}
-  \centering
-  \begin{minted}[fontsize=\scriptsize,linenos=false]{java}
+    push r25        // Flush the cache
+    push r24
+    call &preinvoke // Save X and SP
+    ldi r22, 253    // Set parameters
+    ldi r23, 2      //  for callMethod
+    ldi r24, 21
+    ldi r20, 64
+    ldi r21, 42
+    ldi r18, 13
+    ldi r19, 0
+    ldi r25, 2
+    call &callMethod // Call to VM
+    call &postinvoke // Restore X and SP
+\end{minted}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\centering
+\begin{minted}[linenos=false]{java}
 // LIGHTWEIGHT INVOCATION
 // INVOKELIGHT isOdd:
-  push r25      // Flush the cache
-  push r24
-  call &isOdd
-  \end{minted}
- \end{minipage}
+    push r25      // Flush the cache
+    push r24
+    call &isOdd
+\end{minted}
+\end{minipage}
 \caption{Comparison of lightweight and normal method invocation}
 \label{lst-comparison-lightweight-and-normal-invocation}
 \end{listing}
@@ -152,41 +152,41 @@ In the translation of the \mycode{INVOKELIGHT} instruction we see we first flush
 
 In the method call, we first see the return address is popped off the stack into a register. Since \mycode{g\_lw} may call another lightweight method, we cannot leave it there but store it in the first local slot, incrementing Y in the process. After \mycode{g\_lw} is done, we see the reverse process to return to the caller, where we then see the Y register is restored to point to the caller's locals, and the local variable at offset 22 is loaded back into the pinned register.
 
-\begin{listing}[H]
- \centering
- \begin{minipage}[t]{0.45\textwidth}
-  \begin{minted}{java}
+\begin{listing}
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+\begin{minted}{java}
 // LIGHTWEIGHT INVOCATION
 INVOKELIGHT g_lw
- push r25        // Flush the cache
- push r24
- std Y+22, r14   // Save pinned value
- std Y+23, r15
- adiw Y, 26      // Move Y to g_lw's locals
- call &g_lw
- sbiw Y, 26      // Restore Y
- ldd r14, Y+22   // Reload pinned value
- ldd r15, Y+23
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.45\textwidth}
-  \centering
-  \begin{minted}{java}
+    push r25        // Flush the cache
+    push r24
+    std Y+22, r14   // Save pinned value
+    std Y+23, r15
+    adiw Y, 26      // Move Y to g_lw's
+    call &g_lw                 // locals
+    sbiw Y, 26      // Restore Y
+    ldd r14, Y+22   // Reload pinned value
+    ldd r15, Y+23
+\end{minted}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{minted}[linenos=false]{java}
 // IMPLEMENTATION OF g_lw
-pop r18     // Pop the return address
-pop r19
-st Y+, r18  // Save in 1st local,
-st Y+, r19  //  and increment Y
+    pop r18     // Pop the return address
+    pop r19
+    st Y+, r18  // Save in 1st local,
+    st Y+, r19  //  and increment Y
 
-  .. // g_lw's body
+      .. // g_lw's body
 
-ld r19, -Y  // Load return address,
-ld r18, -Y  //  and decrement Y
-push r19    // Push return address
-push r18    //  onto the stack
-ret
-  \end{minted}
- \end{minipage}
+    ld r19, -Y  // Load return address,
+    ld r18, -Y  //  and decrement Y
+    push r19    // Push return address
+    push r18    //  onto the stack
+    ret
+\end{minted}
+\end{minipage}
 \caption{Full lightweight method call}
 \label{lst-full-lighweight-method-call}
 \end{listing}
@@ -275,7 +275,7 @@ The infuser will scan all the methods in an infusion for this annotation. When i
 
 Listing \ref{lst-comparison-of-handwritten-and-converted-java-lw-method} shows the difference for the \mycode{isOdd} method. We can see this approach adds some overhead in the form of a \mycode{SSTORE\_0} and a \mycode{SLOAD\_0} instruction. However, using popped value caching, only the \mycode{SSTORE\_0} will have a run-time cost. Another disadvantage of the converted method is that is has to use a local variable, which will slightly increase memory usage, but in return this approach gives us a very easy way to create lightweight methods.
 
-\begin{listing}[H]
+\begin{listing}
  \centering
  \begin{minipage}[t]{0.32\textwidth}
   \centering
@@ -291,7 +291,7 @@ public static boolean
  \end{minipage}\hfill
  \begin{minipage}[t]{0.29\textwidth}
   \centering
-  \begin{minted}{java}
+  \begin{minted}[linenos=false]{java}
 // HANDWRITTEN
 //              (Stack)
 LW_PARAMETER    (Int)
@@ -302,7 +302,7 @@ SRETURN         ()
  \end{minipage}\hfill
  \begin{minipage}[t]{0.29\textwidth}
   \centering
-  \begin{minted}{java}
+  \begin{minted}[linenos=false]{java}
 // CONVERTED JAVA
 //              (Stack)
 LW_PARAMETER    (Int)

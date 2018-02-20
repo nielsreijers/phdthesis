@@ -32,17 +32,22 @@ However, the optimisations described here are only based on very conservative as
 
 \paragraph{Example} An example of these manual optimisations, applied to the bubble sort benchmark, can be seen in Listing \ref{lst-manual-optimisation}. To have a fair comparison, we applied exactly the same optimisations to the C versions of our benchmarks, but here this had little or no effect on the performance.
 
-\begin{listing}[H]
- \centering
- \begin{minipage}[t]{0.45\textwidth}
-  \centering
+\begin{listing}
+\centering
+
+\begin{minipage}[t]{0.47\textwidth}
+\centering
   \begin{minted}{java}
 // ORIGINAL
-public static void bsort(int[] numbers) {
-  short NUMNUMBERS=(short)numbers.length;
-  for (short i=0; i<NUMNUMBERS; i++) {
-    for (short j=0; j<NUMNUMBERS-i-1; j++) {
-      if (numbers[j]>numbers[j+1]) {
+public static void bsort(int[] numbers)
+{
+  short NUMBERS=(short)numbers.length;
+  for (short i=0; i<NUMBERS; i++)
+  {
+    for (short j=0; j<NUMBERS-i-1; j++)
+    {
+      if (numbers[j]>numbers[j+1])
+      {
         int temp = numbers[j];
         numbers[j] = numbers[j+1];
         numbers[j+1] = temp;
@@ -50,30 +55,35 @@ public static void bsort(int[] numbers) {
     }
   }
 }
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.45\textwidth}
-  \centering
-  \begin{minted}{java}
+\end{minted}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.52\textwidth}
+\centering
+\begin{minted}[linenos=false]{java}
 // MANUALLY OPTIMISED
-public static void bsort(int[] numbers) {
-  short NUMNUMBERS=(short)numbers.length;
-  for (short i=0; i<NUMNUMBERS; i++) {
-    short x=(short)(NUMNUMBERS-i-1);
-    short j_plus_one = 1;
-    for (short j=0; j<x; j++) {
+public static void bsort(int[] numbers)
+{
+  short NUMBERS=(short)numbers.length;
+  for (short i=0; i<NUMBERS; i++)
+  {
+    short x=(short)(NUMBERS-i-1);
+    short j_plus_1 = 1;
+    for (short j=0; j<x; j++)
+    {
       int val_at_j = numbers[j];
-      int val_at_j_plus_one = numbers[j_plus_one];
-      if (val_at_j>val_at_j_plus_one) {
-        numbers[j] = val_at_j_plus_one;
-        numbers[j_plus_one] = val_at_j;
+      int val_at_j_plus_1 = numbers[j_plus_1];
+      if (val_at_j>val_at_j_plus_1)
+      {
+        numbers[j] = val_at_j_plus_1;
+        numbers[j_plus_1] = val_at_j;
       }
-      j_plus_one++;
+      j_plus_1++;
     }
   }
 }
-  \end{minted}
- \end{minipage}
+\end{minted}
+\end{minipage}
 \caption{Optimisation of the bubble sort benchmark}
 \label{lst-manual-optimisation}
 \end{listing}

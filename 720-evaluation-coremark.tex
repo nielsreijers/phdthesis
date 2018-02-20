@@ -16,11 +16,11 @@ The C version of the linked list benchmark takes a block of memory and construct
 
 Instead we choose the more natural Java approach and define two classes to match the structs in C and create instances of these to initialise the list. This is also the faster option because accessing fields is faster than array access. The trade-off is memory consumption, since each object has its own heap header.
 
-\begin{listing}[H]
- \centering
- \begin{minipage}[t]{0.45\textwidth}
-  \centering
-  \begin{minted}{c}
+\begin{listing}
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{minted}{c}
 typedef struct list_data_s {
     ee_s16 data16;
     ee_s16 idx;
@@ -30,11 +30,11 @@ typedef struct list_head_s {
     struct list_head_s *next;
     struct list_data_s *info;
 } list_head;
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.45\textwidth}
-  \centering
-  \begin{minted}{java}
+\end{minted}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{minted}[linenos=false]{java}
 public static final class ListData {
     public short data16;
     public short idx;
@@ -44,8 +44,8 @@ public static final class ListHead {
     ListHead next;
     ListData info;
 }
-  \end{minted}
- \end{minipage}
+\end{minted}
+\end{minipage}
 \caption{C and Java version of the CoreMark list data structures}
 \label{lst-coremark-list-data-structures}
 \end{listing}

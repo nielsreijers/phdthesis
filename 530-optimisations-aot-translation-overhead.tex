@@ -8,22 +8,21 @@ Now that we have good quality bytecode to work with, we can start addressing the
 
 Our first optimisation is a small but effective extension to the simple peephole optimiser. Instead of optimising only consecutive push/pop pairs, we can optimise any pair of push/pop instructions if the following holds for the instructions in between:
 %\begin{itemize}
-%	\item they contain the same number of \mycode{push} and \mycode{pop} instructions (the \mycode{pop} matches the \mycode{push})
-%	\item they contain no branches
-%	\item they may be do not use the \emph{target} register of the \mycode{pop}
+%   \item they contain the same number of \mycode{push} and \mycode{pop} instructions (the \mycode{pop} matches the \mycode{push})
+%   \item they contain no branches
+%   \item they may be do not use the \emph{target} register of the \mycode{pop}
 %\end{itemize}
 
-\begin{listing}[H]
- \centering
- \begin{minted}{asm}
-PUSH Rs
-..
-..       instructions in between: - contain the same number of push and pop instructions
-..                                - contain no branches
-..                                - do not use register Rd
-..
-POP  Rd
- \end{minted}
+\begin{listing}
+    \begin{minted}{asm}
+    PUSH Rs
+    ..
+    ..       instructions in between: - contain the same number of push and pop instr.
+    ..                                - contain no branches
+    ..                                - do not use register Rd
+    ..
+    POP  Rd
+     \end{minted}
 \end{listing}
 
 In this case the pair can be eliminated if \mycode{Rs} == \mycode{Rd}, otherwise it is replaced by a '\mycode{mov Rd, Rs}'. Two push/pop pairs remained in our earlier example Table \ref{tbl-basic-translation}. For the pair in instructions 5 and 7, the value is popped into register R2. Since instruction 6 does not use register R2, we can safely replace this pair with a direct move. In contrast, the pair in instructions 1 and 3 cannot be optimised since the value is popped into register R1, which is also used by instruction 2. The result is shown in Table \ref{tbl-improved-peephole}
