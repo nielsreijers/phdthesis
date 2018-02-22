@@ -30,4 +30,4 @@ set term postscript eps enhanced color font "Helvetica,15"
 
 set output "../method-calls-vs-duration.eps"
 #plot "method-calls-vs-duration.dat" using ($1):($2):3 with labels offset 0,1 , "method-calls-vs-duration.dat" using 1:2 with points pt 7 ps 2
-plot "method-calls-vs-duration.dat" using 1:2:3 with labels offset 0,1 , "method-calls-vs-duration.dat" using 1:2 with points pt 7 ps 2
+plot "method-calls-vs-duration.dat" using 3:4:5 with labels offset 0,0.5, "method-calls-vs-duration.dat" using 1:2 with points pt 7 ps 2, "method-calls-vs-duration.dat" using 1:2:($3-$1):($4-$2) with vectors lt -1 lw 0.5 nohead
