@@ -60,7 +60,7 @@ The \mybench{MoteTrack} benchmark contains a large dictionary of reference RSSI 
 At 20560 bytes, this dictionary is small enough to fit in flash memory, but over 5 times larger than the available RAM. Similar to the 16-bit \mybench{FFT} benchmark, the only way to implement this in a VM without support for this kind of constant data, is to store it in flash and use a native method to read the signatures.
 
 \paragraph{Possible solutions}
-Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{AALOAD}, \mycode{IALOAD}, etc.) to read from them.
+Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{GETARRAY_A}, \mycode{GETARRAY_I}, etc.) to read from them.
 
 
 
