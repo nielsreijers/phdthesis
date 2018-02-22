@@ -1,9 +1,10 @@
 % UPDATED 20180213
 
 \begin{table}
-\caption{Methods per benchmark and relative performance for normal, lightweight invocation, and inlining. Highlights indicate changes from the versions used to obtain the results in the previous sections.}
+\caption{Methods per benchmark and relative performance for normal, lightweight invocation, and inlining}
 \label{tbl-evaluation-method-calls}
     \scriptsize
+    \begin{threeparttable}
     \begin{tabular}{lllllll}
     \toprule
                                  & \# calls                     & C                 & Java                          & Java                            & Java                            \\
@@ -56,6 +57,10 @@
     % \emph{code size}             &                              &                   & \multicolumn{1}{r}{702}       & \multicolumn{1}{r}{890}         & \multicolumn{1}{r}{722}         \\ 
     \bottomrule
     \end{tabular}
+    \begin{tablenotes}
+        \item Highlights indicate changes from the versions used to obtain the results in the previous sections.
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
 
 
