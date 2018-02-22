@@ -1,18 +1,18 @@
 \chapter{Conclusion}
-This dissertation described the MyVM sensor node virtual machine. MyVM extends the state of the art by combining the desirable features of platform independent reprogramming and a safe execution environment with acceptable performance. We evaluated MyVM using a set of benchmarks, including small benchmarks to highlight specific behaviours, and five examples of real sensor node applications.
+This dissertation described the CapeVM sensor node virtual machine. CapeVM extends the state of the art by combining the desirable features of platform independent reprogramming and a safe execution environment with acceptable performance. We evaluated CapeVM using a set of benchmarks, including small benchmarks to highlight specific behaviours, and five examples of real sensor node applications.
 
 To come back to the research questions stated in Section \ref{sec-introduction-research-questions}, we can conclude the following:
 
 \begin{enumerate}
 	\item
-	After identifying the sources of overhead in previous work on ahead-of-time compilers for sensor nodes, MyVM introduced a number of optimisations to reduce the performance overhead by over 80\%, and the code size overhead by 60\%, resulting in an average performance overhead of 105\%, and the code size overhead of 82\% compared to native C.
+	After identifying the sources of overhead in previous work on ahead-of-time compilers for sensor nodes, CapeVM introduced a number of optimisations to reduce the performance overhead by over 80\%, and the code size overhead by 60\%, resulting in an average performance overhead of 105\%, and the code size overhead of 82\% compared to native C.
 
-	The optimisations introduced by MyVM do increase the size of our VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node.
+	The optimisations introduced by CapeVM do increase the size of our VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node.
 
 	The price to pay for platform independence and a safe execution environment comes in three forms. We believe the remaining performance overhead will be acceptable for many applications, but the increase in code size, and the space taken by the VM do limit the size of applications we can load onto a device. In addition, the overhead in memory usage was a problem for a number of benchmarks.
 
 	\item
-	MyVM's second contribution is providing a safe execution environment. Compared to native binary code, the higher level of abstraction of MyVM's bytecode allowed us to develop a relatively simple set of safety checks.
+	CapeVM's second contribution is providing a safe execution environment. Compared to native binary code, the higher level of abstraction of CapeVM's bytecode allowed us to develop a relatively simple set of safety checks.
 	
 	This results in a modest overhead in terms of VM size, and the fact that most checks are performed at translation time means the additional overhead for providing safety is limited to a 35\% slowdown and 6\% increase in code size, again relative to native C.
 

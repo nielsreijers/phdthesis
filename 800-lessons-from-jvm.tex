@@ -4,7 +4,7 @@
 
 \label{sec-lessons-from-jvm}
 
-In Section \ref{sec-introduction-research-questions} we defined two of our main research questions as how close an AOT compiling sensor node VM can come to native performance, and whether a VM is an efficient way to provide a safe execution environment. These questions are not specific to Java, and the main motivation to base MyVM on Java was the availability of a rich set of tools and infrastructure to build on, including a solid VM to start from in the form of Darjeeling.
+In Section \ref{sec-introduction-research-questions} we defined two of our main research questions as how close an AOT compiling sensor node VM can come to native performance, and whether a VM is an efficient way to provide a safe execution environment. These questions are not specific to Java, and the main motivation to base CapeVM on Java was the availability of a rich set of tools and infrastructure to build on, including a solid VM to start from in the form of Darjeeling.
 
 One aspect of Java/JVM that makes it an attractive choice for sensor nodes is its simplicity, allowing (a subset of) it to be implement in as little as 8KB \cite{Harbaum}. However, it also lacks some features that make it a less good fit for a typical sensor node code in a number of situations. These range from minor annoyances that reduce code readability, to the lack of support for constant data, or high memory consumption for nested data structures that could be a show stopper for a number of applications.
 
