@@ -233,7 +233,7 @@ Specifically, this dissertation makes the following contributions:
     \item They also reduce the code size overhead by 60\%, and show that the increase in VM size is quickly compensated for, thus mitigating a drawback of the previous AOT approach.
     \item We show that besides these improvements to the AOT technique, better optimisation in the Java to JVM bytecode compiler is critical to achieving good performance.
     \item We describe a number of checks that are sufficient for the VM to provide our desired safety guarantees, and show how most of these checks can be easily done at load time, reducing the overhead of run-time checks.
-    \item We provide a comprehensive evaluation to analyse the overhead and the impact of each optimisation, and to show these results hold for a set of benchmarks with very different characteristics, including the commonly used CoreMark benchmark \cite{coremark}, and a number of benchmarks with typical sensor node code.
+    \item We provide a comprehensive evaluation to analyse the overhead and the impact of each optimisation, and to show these results hold for a set of benchmarks with very different characteristics, including the commonly used \mybench{CoreMark} benchmark \cite{coremark}, and a number of benchmarks with typical sensor node code.
     \item Using the same benchmarks we evaluate the cost of our safety checks, and show this to be comparable or better than two existing approaches to provide a safe execution environment on a sensor node.
     \item Finally, we identify a number of aspects of the Java virtual machine that make it a bad match for sensor nodes, and propose ways to address these issues in future sensor node VMs.
 \end{itemize}

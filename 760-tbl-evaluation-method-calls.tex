@@ -11,7 +11,7 @@
     \midrule
     \midrule
     \\
-    CoreMark \\
+    \mybench{CoreMark} \\
     ee\_isdigit                  & \multicolumn{1}{r}{3920}     & normal (inlined)  & manually inlined              & \tblhighlight lightweight (JVM) & manually inlined                \\
     core\_state\_transition      & \multicolumn{1}{r}{1024}     & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
     crcu8                        & \multicolumn{1}{r}{584}      & normal (inlined)  & lightweight                   & lightweight                     & \tblhighlight normal            \\
@@ -32,7 +32,7 @@
     \\
     \midrule
     \\
-    FFT \\
+    \mybench{FFT} \\
     FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight(JVM)  & \tblhighlight normal            \\
     \\
     %                                                                                 fft                             fft_lw                            fft_fn
@@ -42,7 +42,7 @@
     \\
     \midrule
     \\
-    heap sort \\
+    \mybench{heap sort} \\
     SWAP                         & \multicolumn{1}{r}{1642}     & \#define          & manually inlined              & manually inlined                & manually inlined                \\
     siftDown                     & \multicolumn{1}{r}{383}      & normal            & lightweight                   & \tblhighlight manually inlined  & \tblhighlight normal            \\
     \\

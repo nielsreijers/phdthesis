@@ -193,7 +193,7 @@ To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:
 \end{table}
 
 \subsubsection{Resulting performance}
-Ellul's approach improves performance considerably compared to the interpreters, but using the standard CoreMark benchmark \cite{coremark}, it still generates code that is still up to 9x slower than optimised native C. The average slowdown found in our benchmarks was 5.4x.
+Ellul's approach improves performance considerably compared to the interpreters, but using the standard \mybench{CoreMark} benchmark \cite{coremark}, it still generates code that is still up to 9x slower than optimised native C. The average slowdown found in our benchmarks was 5.4x.
 
 It is important to further improve this for two reasons. First, even if an application is asleep for a large percentage of the time, it may at times want to measure something at high resolution, similar to how ADAE \cite{Chang:2010ek} responds to what it calls 'interesting events' by taking extra measurements as long as its energy budget permits. Any slowdown in the VM will affect the maximum rate at which such samples can be taken.
 

@@ -40,7 +40,7 @@ For each value that is live at the beginning of the loop, we need to emit the lo
 \label{fig-codesize-per-benchmark}
 \end{figure}
 
-The constant shift optimisation unrolls the loop that is normally generated for bit shifts. This significantly improves performance, but the effect on the code size depends on the number of bits to shift by. The constant load and loop take at least 5 instructions. In most cases the unrolled shifts will be smaller, but MD5 and XXTEA show a small increase in code size since they contains shifts by a large number of bits.
+The constant shift optimisation unrolls the loop that is normally generated for bit shifts. This significantly improves performance, but the effect on the code size depends on the number of bits to shift by. The constant load and loop take at least 5 instructions. In most cases the unrolled shifts will be smaller, but \mybench{MD5} and \mybench{XXTEA} show a small increase in code size since they contains shifts by a large number of bits.
 
 Using 16-bit array indexes also reduces code size. The benchmarks here already have the manual code optimisations, so they use short index variables. This means the infuser will emit a \mycode{S2I} instruction to cast them to 32-bit ints if the array access instructions expect an int index. Not having to emit those when the array access instructions expect a 16-bit index, and the reduced work the access instruction needs to do, saves about 13\% code size overhead in addition to the 17\% reduction in performance overhead. Using 32-bit variables in the source code also removes the need for \mycode{S2I} instructions, but the extra effort needed to manipulate the 32-bit index variable makes the net code size even larger.
 
