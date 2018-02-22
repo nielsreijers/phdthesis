@@ -53,7 +53,7 @@ While an enormous number of different hardware platforms have been developed, th
 \end{table}
 
 \paragraph{Memory}
-Memory is split into persistent Flash memory for code, and volatile RAM for data. The MSP430 CPUs have a von Neumann architecture and can execute code from both, while the AVR's Harvard architecture can only execute code from Flash. Flash memory is typically in the range of 16KB to 256KB, while RAM, which consumes energy even in sleep mode, is restricted to up to 10KB. There are no caches, and since both memories are on chip, access times are constant and take only a few cycles.
+Memory is split into persistent flash memory for code, and volatile RAM for data. The MSP430 CPUs have a von Neumann architecture and can execute code from both, while the AVR's Harvard architecture can only execute code from flash memory. Flash memory is typically in the range of 16KB to 256KB, while RAM, which consumes energy even in sleep mode, is restricted to up to 10KB. There are no caches, and since both memories are on chip, access times are constant and take only a few cycles.
 
 \paragraph{Simple architecture}
 These CPUs achieve their extremely low cost and power consumption by restricting themselves to very simple design. Each instruction costs a fixed number of cycles, varying only for taken or non-taken branches. Since most instructions only take one or two cycles, there is no pipelining or need for branch prediction. There is also no memory management unit or protection rings, and no floating point support.

@@ -29,7 +29,7 @@ Our benchmarks expose some limitations of using a VM instead of native code, whi
 
 \subsubsection{MoteTrack}
 \label{sec-evaluation-benchmark-implementation-motetrack}
-The \mybench{MoteTrack} application uses received signal strength (RSSI) measurements from a number of beacon nodes to do indoor localisation. It contains a small database of reference RSSI signatures, which is stored as a constant array in Flash memory for the C version. When implemented as an array in Java, this becomes too large to fit in memory, which forces us to implement the method that reads from this database as a native C method that reads from Flash instead. This means our benchmark is no longer platform independent.
+The \mybench{MoteTrack} application uses received signal strength (RSSI) measurements from a number of beacon nodes to do indoor localisation. It contains a small database of reference RSSI signatures, which is stored as a constant array in flash memory for the C version. When implemented as an array in Java, this becomes too large to fit in memory, which forces us to implement the method that reads from this database as a native C method that reads from flash memory instead. This means our benchmark is no longer platform independent.
 
 The constant data stored in this database is a structure of many small struct in an array in C. The memory overhead when translating this directly to Java was too high to run the application, forcing us to make two more modifications. First, the original source has the option to list RSSI signatures at different transmission powers, but the authors note this may not always improve results. The original C code only uses a single transmission power, which results in arrays of a single element that get optimised away at compile time. We replaces these arrays in the Java version with simple variables. Second, we flattened a two element array with RSSI values for different channels into two separated variables to eliminate the overhead for allocating too many small arrays.
 
@@ -43,7 +43,7 @@ It contains two phases: first the heat sensor is calibrated with no heat sources
 
 We modified the calibration phase to allow it to run on the more resource constrained sensor node, but the resulting calibration data is identical. The code for the detection phase was copied directly from the source used on the Raspberry Pi, only modified to avoid repeatedly allocating temporary objects as described in Section \ref{sec-no-gc}.
 
-Our implementation reads sensor measurements from a table in Flash memory using a native call, similar to \mybench{MoteTrack}'s RSSI database. In this case however, we argue this does not mean the application is no longer platform independent since this is only done to allow to be able to run the benchmark in a simulator. A real version would use some library call to read from a sensor.
+Our implementation reads sensor measurements from a table in flash memory using a native call, similar to \mybench{MoteTrack}'s RSSI database. In this case however, we argue this does not mean the application is no longer platform independent since this is only done to allow to be able to run the benchmark in a simulator. A real version would use some library call to read from a sensor.
 
 
 \subsubsection{LEC compression}
@@ -53,7 +53,7 @@ The LEC algorithm is described in detailed pseudo code in \cite{Marcelloni:2009j
 \subsubsection{FFT}
 Both 8-bit and 16-bit versions of the \mycode{fix\_fft.c} exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
 
-Both versions contain a table of precalculated sine wave values. For the 8-bit version this is a 256 element byte array, which we implemented in Java. For the 16-bit version, the array is a 1024 element array of shorts, which fits in memory, but the JVM code to initialise it becomes too large for flash memory, again highlighting the problem current sensor node VMs have with constant data. The 16-bit version uses a native C call prior to starting the benchmark to initialise the array directly from Flash memory.
+Both versions contain a table of precalculated sine wave values. For the 8-bit version this is a 256 element byte array, which we implemented in Java. For the 16-bit version, the array is a 1024 element array of shorts, which fits in memory, but the JVM code to initialise it becomes too large for flash memory, again highlighting the problem current sensor node VMs have with constant data. The 16-bit version uses a native C call prior to starting the benchmark to initialise the array directly from flash memory.
 
 \subsubsection{Outlier detection}
 We implemented the outlier detection algorithm as described in \cite{Kumar:2007ge}:
