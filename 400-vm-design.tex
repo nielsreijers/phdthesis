@@ -1,6 +1,6 @@
 \chapter{MyVM}
 
-This chapter we introduce MyVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. MyVM runs directly on the hardware, without any OS layer in between, and has complete control over the device. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATMEGA, cannot do.
+This chapter we introduce MyVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. MyVM runs directly on the hardware, without any OS layer in between, and has complete control over the device. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATmega, cannot do.
 
 \section{Goals}
 \label{sec-myvm-goals}
@@ -12,7 +12,7 @@ To support scenarios like this, the translation process should be very light wei
 
 Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but, as we will see, a lot can be achieved with very limited resources.
 
-The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is already larger than JVM bytecode, and our AOT compiled code is on average 67\% larger than its optimised C equivalent. This is the price we pay for increased performance, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous AOT compilation techniques.
+The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load-time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is already larger than JVM bytecode, and our AOT compiled code is on average 67\% larger than its optimised C equivalent. This is the price we pay for increased performance, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous AOT compilation techniques.
 
 We summarise our goals and constraints below:
 \begin{itemize}
@@ -42,7 +42,7 @@ This means we can free each message, which can be as small as a single JVM instr
 
 \section{Translating bytecode to native code}
 \label{sec-basic-translation}
-Our baseline AOT compiler is an implementation of Ellul's approach, discussed in Section \ref{sec-state-of-the-art-elluls-aot}. We adapt this for the Atmel ATMEGA128 CPU, while Ellul's work uses the Texas Instruments MSP430. 
+Our baseline AOT compiler is an implementation of Ellul's approach, discussed in Section \ref{sec-state-of-the-art-elluls-aot}. We adapt this for the Atmel ATmega128 CPU, while Ellul's work uses the Texas Instruments MSP430. 
 
 In this unoptimised version of our translator, each bytecode instruction the VM receives is simply replaced with a fixed, equivalent sequence of native instructions. The native stack is used to mimic the JVM stack. An example of this is shown in Table 1.
 
@@ -114,9 +114,9 @@ In our AOT compiler we use the native stack for the JVM integer operand stack, s
 We use the AVR's X register as an extra stack pointer for the reference stack.
 
 \subsection{Peephole optimisation}
-Since our baseline should be as close as possible to Ellul's MSP430 implementation, we implement the same peephole optimisations. However, differences between the ATMEGA and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations is shown in Table \ref{tbl-myvm-peephole}.
+Since our baseline should be as close as possible to Ellul's MSP430 implementation, we implement the same peephole optimisations. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations is shown in Table \ref{tbl-myvm-peephole}.
 
-A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode{st X+} or \mycode{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also optimise blocks of pushes followed by pops, which are very common on the 8-bit ATMEGA. 
+A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode{st X+} or \mycode{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also optimise blocks of pushes followed by pops, which are very common on the 8-bit ATmega. 
 
 When the push and pop instructions target different registers, this results in multiple \mycode{mov} instructions. Two \mycode{mov} instructions with consecutive registers can be further optimised using the \mycode{movw} instruction to copy a register pair to another register pair in a single cycle.
 
@@ -176,6 +176,6 @@ We will discuss the cost of using our VM more in more detail in Chapter \ref{sec
 
 
 \section{Target platforms}
-We implemented our VM for the ATmega128 CPU \cite{Atmel:ATMEGA128Datasheet}. The AVR family of CPUs is widely used in low power embedded systems. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
+We implemented our VM for the ATmega128 CPU \cite{Atmel:ATmega128Datasheet}. The AVR family of CPUs is widely used in low power embedded systems. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
 
 The ATmega128 has 32 8-bit registers. We expect the Cortex M0 \cite{ARM:2009vz}, with 13 32-bit general purpose registers, or the MSP430 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well. In Section \ref{sec-evaluation-other-platforms} we will examine the expected impact of the number of registers and of using a 16 or 32-bit architecture.

@@ -3,7 +3,7 @@
 \section{The cost of safety}
 \label{sec-evaluation-safety}
 
-The advantage of using a VM to provide safety is that the necessary checks are easy to do, compared to native code, and most can be done at load-time. This leads to both a very modest increase in VM complexity due to the safety checks, and a lower run-time overhead. In this section we evaluate both.
+The advantage of using a VM to provide safety is that the necessary checks are easy to do, compared to native code, and most can be done at translation time. This leads to both a very modest increase in VM complexity due to the safety checks, and a lower run-time overhead. In this section we evaluate both.
 
 % would be nice to get code size for Harbor and t-kernel.
 
@@ -31,13 +31,13 @@ The advantage of using a VM to provide safety is that the necessary checks are e
 \label{fig-safety-cost-memory-or-registers}
 \end{figure}
 
-First we examine the run-time cost of our safety guarantees. Table \ref{tbl-safety-cost} shows the results for our 12 benchmarks. Figure \ref{fig-safety-cost-per-benchmark} shows the data in the first section of the table. The baseline here is the unsafe version of our VM, which is on average 71.1\% slower than native C. We first add write checks only, since this is sufficient to satisfy our guarantee that no malicious code can corrupt the state of the VM. This increases the average overhead to 105.3\% of native C, corresponding to an 19.9\% increase in runtime compared to the unsafe VM.
+First we examine the run-time cost of our safety guarantees. Table \ref{tbl-safety-cost} shows the results for our 12 benchmarks. Figure \ref{fig-safety-cost-per-benchmark} shows the data in the first section of the table. The baseline here is the unsafe version of our VM, which is on average 71.1\% slower than native C. We first add write checks only, since this is sufficient to satisfy our guarantee that no malicious code can corrupt the state of the VM. This increases the average overhead to 105.3\% of native C, corresponding to an 19.9\% increase in run time compared to the unsafe VM.
 
-We can see the cost of safety depends greatly on the benchmark we run. Most checks are done at load-time, including writes to local and static variables. The only check that adds significant run-time overhead is check \ref{chk-memory-access-within-heap}, which checks the target of an object field or array write is within the heap bounds.
+We can see the cost of safety depends greatly on the benchmark we run. Most checks are done at translation time, including writes to local and static variables. The only check that adds significant run-time overhead is check \ref{chk-memory-access-within-heap}, which checks the target of an object field or array write is within the heap bounds.
 
 Thus, the run-time overhead is determined by the number of object or array accesses a benchmark does. The percentage of these is shown in the first part of Table \ref{tbl-safety-cost}. Since bubble sort has by far the highest percentage of array writes, at 18\% of all executed bytecode instructions, it also incurs the highest overhead from adding write safety, slowing down by 47\%. Binary search on the other hand, which does no writes at all, is unaffected. As usual CoreMark, being a large benchmark with a mix of operations, is somewhere in the middle. The clear correlation between the percentage of array and object writes, and the slowdown compared to the unsafe version is shown in Figure \ref{fig-safety-ld-st-percentage-vs-overhead}.
 
-\paragraph{Safe reads}
+\subsubsection{Safe reads}
 Next we consider read safety. Up to this point our VM only checks the application cannot \emph{write} to memory it's not supposed to write to, however, it may still read from any location.
 
 The recently published Meltdown and Spectre vulnerabilities in desktop CPUs can be exploited by malicious code to read from anywhere in memory, exposing both kernel's and other applications private data, which may contain sensitive information such as authentication tokens, passwords, etc. This sent OS vendors rushing to release patches, which early report suggest may cause a performance penalty of up to 11\% \cite{Simakov:2018wp}.
@@ -48,7 +48,7 @@ Adding read safety to our VM is trivial: instructions to read from local and sta
 
 Looking at Figures \ref{fig-safety-cost-per-benchmark} and \ref{fig-safety-ld-st-percentage-vs-overhead}, we see the cost of providing read safety is higher than write safety. Most applications read from an array or object much more frequently than they write to them. As a result, our VM with read and write safety turned on slows down by 60\% on average, corresponding to a 174\% slowdown over native C. In addition to bubble sort, MoteTrack also suffers greatly from adding read safety, since it spends 19\% of it's instructions reading from the complex RSSI signature data structure. RC5 is the fastest benchmark, since it not only does relatively few array reads and writes, but also spends a large amount of time on expensive variable bit shifts, which have identical performance in both C and AOT compiled versions. The result is a slowdown of only 33\% compared to native C for the fully safe version.
 
-\paragraph{Keeping heap bounds in registers}
+\subsubsection{Keeping heap bounds in registers}
 In Section \ref{sec-safety-heap-access} we considered several alternatives to our chosen heap bounds check, one of which was to keep the bounds in dedicated registers to avoid having to fetch them from memory for each check. Here we evaluate this choice.
 
 The expected performance for this alternative is easily calculated. Having the bounds in registers would reduce the cost of the check from 22 to 14 cycles, reducing the safety overhead by $8/22=36\%$. However, this uses 4 registers which we can't use for stack caching.
@@ -64,7 +64,7 @@ Next, we examine the cost of safety in terms of code size. This comes in two par
 
 Most of our checks are not more complex than comparing two integers, and failing if a condition is not met. The most complex part is deciding the stack effects of instructions to guard against stack over- or underflow. This comes in the form of a table that encodes the effects of most instructions, and some specialised code to analyse a handful of instructions without fixed effect. In total, the increase in VM size for our safe version is a modest 1776 bytes.
 
-As we can see in Table \ref{tbl-safety-cost}, the size of the code the VM generates increases by only $(181.8/177.7)-1=2.3\%$. Since most checks occur at load-time, most instructions produce exactly the same native code in the safe version of our VM. The exceptions are \mycode{INVOKEVIRTUAL} and \mycode{INVOKEINTERFACE}, which now contains the expected stack effects to realise check \ref{chk-invokevirtual-stack-effects-match}, and the array and object write instructions \mycode{PUTFIELD} and \mycode{PUTARRAY}, which now emit a single extra \mycode{CALL} instruction the \mycode{heapcheck} routine. Since these instructions are both relatively rare, and already generate a larger block of native instructions than most instructions do in the unsafe version, the total effect on code size is very limited.
+As we can see in Table \ref{tbl-safety-cost}, the size of the code the VM generates increases by only $(181.8/177.7)-1=2.3\%$. Since most checks occur at translation time, most instructions produce exactly the same native code in the safe version of our VM. The exceptions are \mycode{INVOKEVIRTUAL} and \mycode{INVOKEINTERFACE}, which now contains the expected stack effects to realise check \ref{chk-invokevirtual-stack-effects-match}, and the array and object write instructions \mycode{PUTFIELD} and \mycode{PUTARRAY}, which now emit a single extra \mycode{CALL} instruction the \mycode{heapcheck} routine. Since these instructions are both relatively rare, and already generate a larger block of native instructions than most instructions do in the unsafe version, the total effect on code size is very limited.
 
 \subsection{Comparison to native code alternatives}
 As discussed in Section \ref{sec-state-of-the-art-safety}, several non-VM approaches have been proposed to guarantee safety on a sensor node. Two of these, \emph{t-kernel} and Harbor, allow the node to guarantee safety independent of the host. In this section we compare these to our approach, and consider the question whether a VM is a good way to provide safety.
