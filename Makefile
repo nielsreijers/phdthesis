@@ -6,6 +6,8 @@ NTU_WATERMARK_LINK=http://etds.lib.ntu.edu.tw/files/watermark.pdf
 
 .SUFFIXES: .tex
 
+TEXFLAG="-shell-escape"
+
 ifdef PASSWORD
 all: $(MAIN).pdf $(MAIN)-with-pass.pdf
 else
