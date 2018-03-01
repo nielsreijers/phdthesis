@@ -1,4 +1,4 @@
-# UPDATED 20180213
+# UPDATED 20180301
 
 Title           , "bounds in memory" , "bounds in registers" , "difference"
 "Bubble sort"   ,              247.5 ,                 207.6 ,       -39.9
@@ -7,11 +7,11 @@ Title           , "bounds in memory" , "bounds in registers" , "difference"
 "XXTEA"         ,               68.2 ,                  72.0 ,         3.8
 "MD5"           ,               60.3 ,                  55.0 ,        -5.3
 "RC5"           ,               22.2 ,                  28.4 ,         6.2
-"FFT"           ,               30.4 ,                  27.7 ,        -2.7
+"FFT"           ,               30.3 ,                  27.5 ,        -2.8
 "Outlier"       ,              128.4 ,                 140.0 ,        11.6
 "LEC"           ,              120.2 ,                 108.7 ,       -11.5
 "CoreMark"      ,              125.2 ,                 124.3 ,        -0.9
-"MoteTrack"     ,              222.6 ,                 201.8 ,       -20.8
+"MoteTrack"     ,              266.1 ,                 226.2 ,       -39.9
 "HeatCalib"     ,               33.9 ,                  39.4 ,         5.5
 "HeatDetect"    ,               91.3 ,                  85.9 ,        -5.4
-"average"       ,              105.3 ,                 100.3 ,        -5.0
+"average"       ,              108.7 ,                 102.2 ,        -6.5

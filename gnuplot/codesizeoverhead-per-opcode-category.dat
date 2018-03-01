@@ -1,11 +1,11 @@
-# UPDATED 20180212
+# UPDATED 20180301
 
-#X                  , total  , push/pop  ,  load/store   ,   mov(w)   ,      other
-   Simple peephole  , 193.7  ,     83.3  ,        59.7   ,      1.9   ,       48.7
-    Impr. peephole  ,   149  ,     25.9  ,        59.7   ,     14.9   ,       48.5
-       Stack cache  , 110.4  ,     -0.8  ,        59.7   ,      3.1   ,       48.5
-     Pop.val.cache  ,  94.5  ,      1.9  ,        43.3   ,      2.5   ,       46.8
-          Markloop  ,  94.8  ,      9.5  ,        32.3   ,      6.2   ,       46.7
-      Const. shift  ,  92.1  ,      9.5  ,        32.1   ,      7.1   ,       43.4
-16-bit array index  ,  78.7  ,      8.9  ,        31.9   ,      4.2   ,       33.7
-             SIMUL  ,  77.7  ,      8.4  ,        31.9   ,      4.1   ,       33.3
+#X                  , total  , push/pop  ,  load/store   ,   mov(w)   ,   vm+other
+   Simple peephole  , 198.2  ,     83.7  ,        60.4   ,      4.5   ,       49.7
+    Impr. peephole  , 153.7  ,     26.6  ,        60.4   ,     17.2   ,       49.5
+       Stack cache  , 112.1  ,     -0.9  ,        60.4   ,      3.2   ,       49.4
+     Pop.val.cache  ,  95.9  ,      1.9  ,        43.7   ,      2.7   ,       47.7
+          Markloop  ,  96.1  ,      9.5  ,        32.6   ,      6.4   ,       47.6
+      Const. shift  ,  93.5  ,      9.4  ,        32.4   ,      7.3   ,       44.4
+16-bit array index  ,  79.9  ,      8.9  ,        32.2   ,      4.3   ,       34.5
+             SIMUL  ,  78.8  ,      8.3  ,        32.2   ,      4.2   ,       34.1
