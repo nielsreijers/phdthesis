@@ -64,7 +64,7 @@ plot "codesizeoverhead-per-opcode-category.dat" using 2 title 'total'      with 
      "codesizeoverhead-per-opcode-category.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
-     "codesizeoverhead-per-opcode-category.dat" using 6 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5
+     "codesizeoverhead-per-opcode-category.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
 
 
 
@@ -110,7 +110,7 @@ plot "pinnedregs-performance-xxtea.dat" using 2 title 'total'      with linespoi
      "pinnedregs-performance-xxtea.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
      "pinnedregs-performance-xxtea.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
      "pinnedregs-performance-xxtea.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
-     "pinnedregs-performance-xxtea.dat" using 6 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5
+     "pinnedregs-performance-xxtea.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
      
 
 set key width -2.8

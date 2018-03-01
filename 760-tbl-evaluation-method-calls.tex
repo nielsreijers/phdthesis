@@ -1,4 +1,4 @@
-% UPDATED 20180213
+% UPDATED 20180301
 
 \begin{table}
 \caption{Methods per benchmark and relative performance for normal, lightweight invocation, and inlining}
@@ -27,7 +27,7 @@
     \\
     % The cycles from the simulation are for 50 iterations. Just divide by 50 here so the cycle count + the number of invokes produces the right overhead. An actual simulation run with 1 iteration is a bit slower, but only a few % so it's not significant enough to worry about here.
     %                                                                                 coremk                          coremk_lw                         coremk_fn
-    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{3,373,037} & \multicolumn{1}{r}{3,543,531}   & \multicolumn{1}{r}{4,844,211}   \\
+    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{3,373,038} & \multicolumn{1}{r}{3,543,532}   & \multicolumn{1}{r}{4,844,211}   \\
     \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{98.1\%}    & \multicolumn{1}{r}{108.1\%}     & \multicolumn{1}{r}{184.5\%}     \\
     \emph{code size}             &                              &                   & \multicolumn{1}{r}{9,182}     & \multicolumn{1}{r}{9,228}       & \multicolumn{1}{r}{9,512}       \\
     \\
@@ -37,9 +37,9 @@
     FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight(JVM)  & \tblhighlight normal            \\
     \\
     %                                                                                 fft                             fft_lw                            fft_fn
-    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{179,818}   & \multicolumn{1}{r}{215,146}     & \multicolumn{1}{r}{661,486}     \\
-    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{17.7\%}    & \multicolumn{1}{r}{40.9\%}      & \multicolumn{1}{r}{333.1\%}     \\
-    \emph{code size}             &                              &                   & \multicolumn{1}{r}{1,342}     & \multicolumn{1}{r}{1,338}       & \multicolumn{1}{r}{1,426}       \\
+    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{179,692}   & \multicolumn{1}{r}{215,020}     & \multicolumn{1}{r}{661,360}     \\
+    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{17.7\%}    & \multicolumn{1}{r}{40.8\%}      & \multicolumn{1}{r}{333.1\%}     \\
+    \emph{code size}             &                              &                   & \multicolumn{1}{r}{1,342}     & \multicolumn{1}{r}{1,320}       & \multicolumn{1}{r}{1,408}       \\
     \\
     \midrule
     \\
@@ -62,6 +62,3 @@
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
-
-
-

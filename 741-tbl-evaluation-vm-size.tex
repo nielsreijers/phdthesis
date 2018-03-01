@@ -1,4 +1,4 @@
-% UPDATED 20180218
+% UPDATED 20180301
 
 \begin{table}
 % Memory consumption is based on using only 11 element arrays. Current implementation is lazy and just uses a 16 byte array, but we never use the first two and last three, since they're not used for stack caching.
@@ -11,15 +11,15 @@
                               & interpreter & baseline &                      & reduction &   even  & usage     \\
     \midrule
     \midrule
-    Baseline                  &     6605 B  &          &                      &           &         & 23 B      \\
-    Improved peephole         &     6881 B  &   276 B  & \scriptsize   (+276) &  -14.8\%  &  1.9 KB & 23 B      \\
-    Simple stack caching      &     7825 B  &  1220 B  & \scriptsize   (+944) &  -27.6\%  &  4.4 KB & 34 B      \\
-    Popped value caching      &     9057 B  &  2452 B  & \scriptsize  (+1232) &  -33.1\%  &  7.4 KB & 78 B      \\
-    Markloop                  &    12337 B  &  5732 B  & \scriptsize  (+3280) &  -33.0\%  & 17.4 KB & 85 B      \\
-    Const shift               &    12785 B  &  6180 B  & \scriptsize   (+448) &  -33.8\%  & 18.3 KB & 85 B      \\
-    16-bit array index        &    12765 B  &  6160 B  & \scriptsize    (-20) &  -38.2\%  & 16.1 KB & 85 B      \\
-    SIMUL                     &    12831 B  &  6226 B  & \scriptsize    (+66) &  -38.7\%  & 16.1 KB & 85 B      \\
-    Lightweight methods       &    13379 B  &  6774 B  & \scriptsize   (+548) &  -38.9\%  & 17.4 KB & 85 B      \\
+    Baseline                  &     6863 B  &          &                      &           &         & 23 B      \\
+    Improved peephole         &     7139 B  &   276 B  & \scriptsize   (+276) &  -14.6\%  &  1.9 KB & 23 B      \\
+    Simple stack caching      &     7961 B  &  1098 B  & \scriptsize   (+822) &  -28.2\%  &  3.9 KB & 34 B      \\
+    Popped value caching      &     9229 B  &  2366 B  & \scriptsize  (+1268) &  -33.7\%  &  7.0 KB & 78 B      \\
+    Markloop                  &    12511 B  &  5648 B  & \scriptsize  (+3282) &  -33.6\%  & 16.8 KB & 85 B      \\
+    Const shift               &    12955 B  &  6092 B  & \scriptsize   (+444) &  -34.5\%  & 17.7 KB & 85 B      \\
+    16-bit array index        &    12935 B  &  6072 B  & \scriptsize    (-20) &  -38.8\%  & 15.6 KB & 85 B      \\
+    SIMUL                     &    13001 B  &  6138 B  & \scriptsize    (+66) &  -39.3\%  & 15.6 KB & 85 B      \\
+    Lightweight methods       &    13549 B  &  6686 B  & \scriptsize   (+548) &  -39.6\%  & 16.9 KB & 85 B      \\
     \bottomrule
     \end{tabular}
 \end{table}
