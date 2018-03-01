@@ -85,7 +85,7 @@ Since our VM is based on Darjeeling, we will examine it in more detail in this s
 \begin{figure}
 \centering
 \includegraphics[width=0.6\linewidth]{darjeeling-infusion-process}
-\caption{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
+\caption[Darjeeling infusion process]{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
 \label{fig-darjeeling-infusion-process}
 \end{figure}
 Like most other sensor node JVMs, it uses a \emph{split VM architecture} \cite{Simon:2006wd}. The actual virtual machine running on the node does not use standard JVM class files, but these class files first have to be transformed by an offline tool into a format more suitable for a sensor node. In Darjeeling's case this tool is called the \emph{infuser}, which takes several Java classes and statically links them into a single \emph{infusion}.
@@ -108,7 +108,7 @@ Besides statically linking classes, the infuser also makes several changes to th
 \begin{figure}
 \centering
 \includegraphics[width=0.6\linewidth]{darjeeling-split-stack}
-\caption{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
+\caption[Darjeeling split operand stack]{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
 \label{fig-darjeeling-split-stack}
 \end{figure}
 
@@ -138,7 +138,7 @@ On the desktop, VM performance has been studied extensively, but for sensor node
 Their approach is both simple and effective. To translate JVM bytecode each JVM bytecode instruction is simply replaced by a fixed sequence of native instructions that implement it. This can be done in a single pass, as the bytecode is being received by the node, writing native code to flash memory instead of the JVM bytecode. Like Darjeeling, they use a split stack architecture, with the CPU's native stack doubling as integer operand stack for each access, while reference operands are still stored in the stack frame.
 
 \begin{table}
-\caption{Example of Ellul's Bytecode to Native Code Translation of \mycode{c=a+b;}}
+\caption{Example of Ellul's AOT translation of \mycode{c=a+b;}}
 \label{tbl-ellul-aot-example}
     \begin{tabular}{llll}
     \toprule
