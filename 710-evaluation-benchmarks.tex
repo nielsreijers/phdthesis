@@ -41,7 +41,7 @@ The \mybench{heat detection} application is adapted from code used by a differen
 
 It contains two phases: first the heat sensor is calibrated with no heat sources in view to determine the average and standard deviation of the sensor readings. In the next phase the algorithm tracks the position of a person moving within the field of view of the sensor, and detects extreme temperatures that may indicate a fire. We list both phases separately in the evaluation.
 
-We modified the calibration phase to allow it to run on the more resource constrained sensor node, but the resulting calibration data is identical. The code for the detection phase was copied directly from the source used on the Raspberry Pi, only modified to avoid repeatedly allocating temporary objects as described in Section \ref{sec-no-gc}.
+We modified the calibration phase to allow it to run on the more resource-constrained sensor node, but the resulting calibration data is identical. The code for the detection phase was copied directly from the source used on the Raspberry Pi, only modified to avoid repeatedly allocating temporary objects as described in Section \ref{sec-no-gc}.
 
 Our implementation reads sensor measurements from a table in flash memory using a native call, similar to \mybench{MoteTrack}'s RSSI database. In this case however, we argue this does not mean the application is no longer platform independent since this is only done to allow to be able to run the benchmark in a simulator. A real version would use some library call to read from a sensor.
 

@@ -227,7 +227,7 @@ Sensor node CPUs do not have features such as memory management units (MMUs) and
 
 The two most expensive checks are \ref{chk-no-nativestack-overflow} and \ref{chk-memory-access-within-heap}. The last is the cause of most of the run-time overhead, and both require us to keep a safety margin in between the heap and stack. While this margin is small, RAM memory is a scarce resource we would prefer not to waste.
 
-We propose two checks to be added to the CPU, causing it to trap to a fixed error handler when the check fails to allow the node to terminate the program.
+We propose two checks to be added to the CPU, causing it to trap to a fixed error handler when the check fails to allow the node to terminate the programme.
 
 \subsection{Stack overflow protection}
 To protect against stack overflow, we propose extending the CPU with a stack bound register. The CPU compares the stack pointer to this stack bound whenever it is modified, either by a direct write or implicitly by a \mycode{PUSH} instruction. If the stack pointer drops below the stack bound, the CPU traps to the error handler.

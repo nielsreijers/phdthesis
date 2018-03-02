@@ -129,7 +129,7 @@ In addition, the JVM will verify the bytecode at load time to make sure it is we
 \subsection{WAT, AOT, and JIT compilation}
 While the popularity of Java rose quickly after its introduction, it also very quickly got a reputation to be slow. As Tyma put it in 1998 "The plain truth is: Java is slow. Java isn't just slow, it's \emph{really} slow, \emph{surprisingly} slow. It is 'you get to watch the buttons being drawn on your toolbar' slow." \cite{Tyma:1998vj}.
 
-The main reason is all early implementations of the JVM were interpreters. An interpreter executes a program by retrieving instructions from memory one at a time, and then executing them. An outline of what a typical interpreter's main loop looks like is shown in Listing \ref{lst-interpreter-loop-outline}. For each instruction, the VM needs to (i) retrieve the bytecode at the current programme counter, (ii) increment the programme counter, (iii) jump to the correct case label, (iv) execute the instruction, and (v) loop for the next iteration.
+The main reason is all early implementations of the JVM were interpreters. An interpreter executes a programme by retrieving instructions from memory one at a time, and then executing them. An outline of what a typical interpreter's main loop looks like is shown in Listing \ref{lst-interpreter-loop-outline}. For each instruction, the VM needs to (i) retrieve the bytecode at the current programme counter, (ii) increment the programme counter, (iii) jump to the correct case label, (iv) execute the instruction, and (v) loop for the next iteration.
 
 \begin{listing}
     \centering

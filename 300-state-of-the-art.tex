@@ -66,7 +66,7 @@ SwissQM \cite{Muller:2007fs} is a more traditional and more powerful VM, based o
 
 VM* \cite{Koshy:2005ww} sits halfway between the generic and ASVM approach. It is a Java VM that can be extended with new features according to application requirements. Unfortunately, it is closed source.
 
-Several generic VMs for high level languages like Python or Java have also been developed, which fit on severely resource constrained nodes. Almost all rewrite the original bytecode to their own format and employ various techniques to reduce code size. Some functionality is sacrificed in order to fit on the sensor nodes, for instance reflection or floating point support are typically not supported.
+Several generic VMs for high level languages like Python or Java have also been developed, which fit on severely resource-constrained nodes. Almost all rewrite the original bytecode to their own format and employ various techniques to reduce code size. Some functionality is sacrificed in order to fit on the sensor nodes, for instance reflection or floating point support are typically not supported.
 
 The Python-on-a-chip project \cite{python-on-a-chip} developed a Python bytecode interpreter small enough to fit on sensor nodes. Requiring 55K of programme memory and a recommended 8K of RAM, it fits on many, but not all of the current sensor boards. MicroPython \cite{micropython} requires slightly more hardware at 256KB programme and 16KB RAM, but has it's own hardware platform and runs Python 3.
 
@@ -85,7 +85,7 @@ Since our VM is based on Darjeeling, we will examine it in more detail in this s
 \begin{figure}
 \centering
 \includegraphics[width=0.6\linewidth]{darjeeling-infusion-process}
-\caption[Darjeeling infusion process]{Darjeeling infusion process, taken from \cite{Brouwers:2009cj}}
+\caption[Darjeeling infusion process]{Darjeeling infusion process, source: \cite{Brouwers:2009cj}}
 \label{fig-darjeeling-infusion-process}
 \end{figure}
 Like most other sensor node JVMs, it uses a \emph{split VM architecture} \cite{Simon:2006wd}. The actual virtual machine running on the node does not use standard JVM class files, but these class files first have to be transformed by an offline tool into a format more suitable for a sensor node. In Darjeeling's case this tool is called the \emph{infuser}, which takes several Java classes and statically links them into a single \emph{infusion}.
@@ -108,7 +108,7 @@ Besides statically linking classes, the infuser also makes several changes to th
 \begin{figure}
 \centering
 \includegraphics[width=0.6\linewidth]{darjeeling-split-stack}
-\caption[Darjeeling split operand stack]{Darjeeling split operand stack, taken from \cite{Brouwers:2009cj}}
+\caption[Darjeeling split operand stack]{Darjeeling split operand stack, source: \cite{Brouwers:2009cj}}
 \label{fig-darjeeling-split-stack}
 \end{figure}
 
@@ -187,7 +187,7 @@ To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:
     \bottomrule
     \end{tabular}
     \begin{tablenotes}
-    \item MSP430 assembly, taken from \cite{Ellul:2012thesis}
+    \item MSP430 assembly, source: \cite{Ellul:2012thesis}
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
