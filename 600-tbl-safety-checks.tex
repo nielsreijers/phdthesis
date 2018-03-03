@@ -39,17 +39,17 @@
     \tcheck{chk-sufficient-locals-at-invokelight}
         & For each \mycode{INVOKELIGHT}, the total number of slots - the number of own variable slots for the caller >= the total variable slots for the callee. \\
 
-    \tcheck{chk-sufficient-stack-space-at-invokelight}
-        & At the point of an \mycode{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee. \\
-
-    \tcheck{chk-stack-is-empty-at-branches}
-        & The stack is empty at branches and branch targets. \\
-
     \tcheck{chk-no-operandstack-underflow}
         & Before each instruction, the stack depth >= the number of elements to be consumed by the instruction. \\
 
     \tcheck{chk-no-operandstack-overflow}
         & After each instruction, the stack depth <= the max stack depth announced in the header. \\
+
+    \tcheck{chk-stack-is-empty-at-branches}
+        & The stack is empty at branches and branch targets. \\
+
+    \tcheck{chk-sufficient-stack-space-at-invokelight}
+        & At the point of an \mycode{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee, for both integer and reference stacks. \\
 
     \tcheck{chk-local-variable-slot-exists}
         & The index of the local variable < the number of own variable slots for the current method. \\
