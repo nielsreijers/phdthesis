@@ -1,13 +1,13 @@
 \section{Method calls}
 \label{sec-optimisations-method-calls}
 
-Finally, we will look at the overhead caused by method calls. In native code, the smallest function call only has 8 cycles of overhead for a \mycode{CALL} and \mycode{RET}, and some \mycode{MOV}s may be needed to move the parameters to the right registers. More complicated functions may spend up to 76 cycles saving and restoring call-saved registers. As we have seen in Section \ref{sec-overhead-method-call}, in Java a considerable amount of state needs to be initialised. For the simplest method call this takes about 550 cycles, and this increases further for large methods with many parameters.
+Finally, we will look at the overhead caused by method calls. In native code, the smallest possible function call only has 8 cycles of overhead for a \mycode{CALL} and \mycode{RET}, and some \mycode{MOV}s may be needed to move the parameters to the right registers. More complicated functions may spend up to 76 cycles saving and restoring call-saved registers. As we have seen in Section \ref{sec-overhead-method-call}, in Java a considerable amount of state needs to be initialised. For the simplest method call this takes about 540 cycles, and this increases further for large methods with many parameters.
 
 When we look at the methods in a programme, we typically see a spectrum from a limited number of large methods at the base of the call tree that take a long time to complete and are only called a few times, to small (near-)leaf methods that are fast and frequently called. Figure \ref{fig-coremark-method-calls-vs-duration} shows this spectrum for the \mybench{CoreMark} benchmark.
 
-For the slow methods at the base, the impact of the method call is not very significant for the overall execution time and we can afford to take the 550 cycles penalty. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
+For the slow methods at the base, the impact of the method call is not very significant for the overall execution time and we can afford the 550 cycles penalty. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
 
-At the very end of this spectrum we have tiny helper functions that may be inlined. However, this is only possible for small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee\_isdigit} was small enough to inline. When we inline larger methods, the tradeoff is an increase in code size. So we have a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
+At the very end of this spectrum are tiny helper functions that may be inlined. However, this is only possible for very small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee\_isdigit} was small enough to inline. When larger methods are inlined, the tradeoff is an increase in code size. There is a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
 
 \subsection{Lightweight methods}
 For these cases we introduce a new type of method call: lightweight methods. These methods differ from normal methods in two ways:
@@ -68,9 +68,9 @@ SRETURN         ()
 \label{lst-lightweight-stack-only}
 \end{listing}
 
-The normal implementation has a single local variable. It expects the parameter to be stored there and the stack to be empty when we enter the method. In contrast, the lightweight method does not have any local variables and expects the parameter to be on the stack.
+The normal implementation has a single local variable. It expects the parameter to be stored there and the stack to be empty when we enter the method. In contrast, the lightweight method does not have any local variables and expects the parameter to be on the stack at the start of the method.
 
-We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. In the bottom half of Listing \ref{lst-comparison-lightweight-and-normal-invocation} we see how \mycode{INVOKELIGHT} and \mycode{INVOKESTATIC} are translated to native code. Both first flush the stack cache to memory. After that, the lightweight method can directly call the implementation of \mycode{isOdd}, while the native version first saves the stack pointers, and then enters an expensive call into the VM to setup a stack frame for \mycode{isOdd}, which in turn will call the actual method.
+We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. In Listing \ref{lst-comparison-lightweight-and-normal-invocation} we see how \mycode{INVOKELIGHT} and \mycode{INVOKESTATIC} are translated to native code. Both first flush the stack cache to memory. After that, the lightweight method can directly call the implementation of \mycode{isOdd}, while the native version first saves the stack pointers, and then enters an expensive call into the VM to setup a stack frame for \mycode{isOdd}, which in turn will call the actual method.
 
 \begin{listing}
 \centering
@@ -111,7 +111,7 @@ We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. I
 \subsubsection{Local variables}
 The lightweight implementation of the \mycode{isOdd} example only needs to process the values that are on the stack, but this is only possible for the smallest methods. If we want a lightweight method to be able to use local variables, we need to reserve space for them in the caller's stack frame, equal to the maximum number of slots needed by all the lightweight methods it may call.
 
-In our AOT compiled code, we use the ATmega's Y register to point the start of a method's local variables. To call a lightweight method with local variables, the caller only needs to shift Y up to the region reserved for lightweight method variables before doing the \mycode{CALL}. The lightweight method can then access its locals as if it were a normal method.
+In our AOT compiled code, we use the ATmega's Y register to point the start of a method's local variables. To call a lightweight method with local variables, the caller only needs to shift Y up to the region reserved for lightweight method variables before doing the \mycode{CALL}. The lightweight method can then access its locals as if it were a normal method. After the lightweight method returns, the caller lowers Y, so it points to the caller's own variables again.
 
 \subsubsection{Nested calls}
 A final extension is to allow for nested calls. While frequently called leaf methods benefit the most from lightweight methods, there are many cases where it is useful for lightweight methods to call other lightweight methods. A good example from the \mybench{CoreMark} benchmark is the 16-bit \mycode{crcu16} function, which is implemented as two calls to \mycode{crcu8}. While \mycode{crcu8} is the most critical, there is still one call to \mycode{crcu16} for every two to \mycode{crcu8}.
@@ -140,7 +140,7 @@ An example is shown in Figure \ref{fig-stack-frame-lightweight-method}, which sh
 
 The stack frame for \mycode{f} contains space for its own locals, and for the locals of the lightweight method it calls: \mycode{g\_lw}. In turn, \mycode{g\_lw}'s locals contain space for \mycode{h\_lw}'s locals, as well as a slot to store the return address back to \mycode{f}. Since \mycode{h\_lw} does not call any other methods, it just keeps its return address in registers.
 
-When a method calls a lightweight method with local variables, it will move the Y register to point at that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g\_lw}'s locals. Since \mycode{g\_lw} may call \mycode{h\_lw}, \mycode{g\_lw}'s prologue will first store its return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
+When a method calls a lightweight method with local variables, it will move the Y register to point at that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g\_lw}'s locals. Since \mycode{g\_lw} may call \mycode{h\_lw}, \mycode{g\_lw}'s prologue will first store the return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
 
 \subsubsection{Mark loop}
 Lightweight methods may use any register and do not save call-saved registers like normal methods. The only case where this would be necessary is when it is called inside a \mycode{MARKLOOP} block that uses the same register to pin a variable. In this case we save those variables back to memory before calling the lightweight method and load them after the call returns. Since lightweight methods always come before their invocation in the infusion, the VM already knows which registers it uses, and will only save and restore pinned variables if there is a conflict. Because registers for mark loop are allocated low to high, and for normal stack caching from high to low, in many cases the two may not collide.
@@ -148,9 +148,11 @@ Lightweight methods may use any register and do not save call-saved registers li
 \subsubsection{Example call}
 An example of the most complex case for a lightweight call is shown in Listing \ref{lst-full-lighweight-method-call}, which shows how method \mycode{f} from Figure \ref{fig-stack-frame-lightweight-method} would call \mycode{g\_lw}, assuming \mycode{f} is in a markloop block at the time which pinned a variable R14:R15, and these registers are also used by \mycode{g\_lw}.
 
-In the translation of the \mycode{INVOKELIGHT} instruction we see we first flush the cache to memory, and then save the value of the local short at offset 22 that was pinned to R14:R15. Finally we add 26 to the Y register to skip the caller's own local variables and point Y to the start of the space reserved for lightweight method locals.
+In the translation of the \mycode{INVOKELIGHT} instruction, first the stack cache is flushed to memory, then the value of the local variable at offset 22 is saved because it was pinned to R14:R15. Next, the Y register is incremented by 26 to skip the caller's own local variables and point Y to the start of the space reserved for lightweight method locals.
 
-In the method call, we first see the return address is popped off the stack into a register. Since \mycode{g\_lw} may call another lightweight method, we cannot leave it there but store it in the first local slot, incrementing Y in the process. After \mycode{g\_lw} is done, we see the reverse process to return to the caller, where we then see the Y register is restored to point to the caller's locals, and the local variable at offset 22 is loaded back into the pinned register.
+In the implementation of \mycode{g\_lw}, the return address is popped off the stack into R18:R19. Since \mycode{g\_lw} may call another lightweight method which will do the same, the return address then is stored in the first local slot, incrementing Y in the process. After \mycode{g\_lw}'s body, the return address is pushed back onto the stack before the final \mycode{ret} instruction.
+
+After \mycode{g\_lw} returns, the reverse process is used to return to the caller: the Y register is restored to point to the caller's locals, and the local variable at offset 22 is loaded back into the pinned register.
 
 \begin{listing}
 \centering
@@ -191,6 +193,74 @@ INVOKELIGHT g_lw
 \label{lst-full-lighweight-method-call}
 \end{listing}
 
+
+\subsection{Creating lightweight methods}
+We currently support two ways to create lightweight methods:
+\begin{itemize}
+	\item handwritten JVM bytecode
+	\item converting a Java method 
+\end{itemize}
+
+\subsubsection{Handwritten JVM bytecode}
+For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in JVM bytecode, which the infuser will simply add to the infusion, and then process it in the same way as it processes a normal method, with one step added:
+
+For lightweight methods, the parameters will be on the stack at the start of the method, but the infusers expects to start with an empty stack. To allow the infuser to process them like other methods, we add a dummy \mycode{LW\_PARAMETER} instruction for each parameter. This instruction is skipped when writing the binary infusion, but it tricks the infuser into thinking the parameters are being put on the stack.
+
+\subsubsection{Converting Java methods}
+This handwritten approach is useful for the smallest methods, and allows us to create bytecode that only uses the stack, which produces the most efficient code. But for more complex methods it quickly becomes very cumbersome to write the bytecode by hand.
+
+As a second, slightly slower, but more convenient option, we provide a way to convert normal Java methods to lightweight methods by adding a \mycode{@Lightweight} annotation to it.
+
+The infuser will scan all the methods in an infusion for this annotation. When it finds a method marked \mycode{@Lightweight}, the transformation to turn a normal JVM method into a lightweight one is simple: we first add a dummy \mycode{LW\_PARAMETER} instruction for each parameter, followed by \mycode{STORE} instructions to pop these parameters off the stack and store them in the right local variables. After this, we can use the normal body of the method and call it as a lightweight method.
+
+Listing \ref{lst-comparison-of-handwritten-and-converted-java-lw-method} shows the difference for the \mycode{isOdd} method. We can see this approach adds some overhead in the form of a \mycode{SSTORE\_0} and a \mycode{SLOAD\_0} instruction. However, using popped value caching, only the \mycode{SSTORE\_0} will have a run-time cost. Another disadvantage of the converted method is that is has to use a local variable, which will slightly increase memory usage, but in return this approach gives us a very easy way to create lightweight methods.
+
+\begin{listing}
+ \centering
+ \begin{minipage}[t]{0.32\textwidth}
+  \centering
+  \begin{minted}{java}
+// JAVA
+@Lightweight
+public static boolean
+          isOdd (short a)
+{
+  return (a & (short)1)==1;
+}
+  \end{minted}
+ \end{minipage}\hfill
+ \begin{minipage}[t]{0.29\textwidth}
+  \centering
+  \begin{minted}[linenos=false]{java}
+// HANDWRITTEN
+//              (Stack)
+LW_PARAMETER    (Int)
+SCONST_1        (Int,Int)
+SAND            (Int)
+SRETURN         ()
+  \end{minted}
+ \end{minipage}\hfill
+ \begin{minipage}[t]{0.29\textwidth}
+  \centering
+  \begin{minted}[linenos=false]{java}
+// CONVERTED JAVA
+//              (Stack)
+LW_PARAMETER    (Int)
+SSTORE_0        ()
+SLOAD_0         (Int)
+SCONST_1        (Int,Int)
+SAND            (Int)
+SRETURN         ()
+  \end{minted}
+ \end{minipage}
+ \vspace{0.5cm}
+
+\caption{Comparison of hand written lightweight method and converted Java method}
+\label{lst-comparison-of-handwritten-and-converted-java-lw-method}
+\end{listing}
+
+\subsubsection{Replacing \mycode{INVOKE}s}
+The infuser does a few more transformations to the bytecode. Every method is scanned for \mycode{INVOKESTATIC} instructions that invoke a lightweight method. These are simply replaced by an \mycode{INVOKELIGHT}, and the number of extra slots for the reference stack and local variables of the current method is increased if necessary. Finally, methods are sorted so a lightweight method will be defined before it is invoked, to make sure the VM can always generate the \mycode{CALL} directly.
 
 \subsection{Overhead comparison}
 We now compare the overhead for the various ways we can call a method in Table \ref{tbl-method-invoke-overhead-comparison}.
@@ -241,87 +311,19 @@ Comparing this to a normal method call, we see the cost is much higher, and less
     \midrule
     flush the stack cache \footnote{excluding effect on future popped value cache performance because of cleared value tags}
                                                               &                 &                         & 8 per word                  & 8 per word                  & 8 per word                                          \\
-    \mycode{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 82                                  \\
+    \mycode{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 80                                  \\
+% was (20180303)    \mycode{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 82                                  \\
     create stack frame                                        &                 &                         &                             &                             & \textasciitilde 450                                 \\
     method pro-/epilogue                                      &                 &                         & 8 or 16                     & 8 or 16                     & 10 to 71                                            \\
     store and load parameters                                 &                 & 4 or 8 per word         &                             & 4 or 8 per word             & 4 or 8 per word                                     \\
     \\
-    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 542 to \textasciitilde 603 +} \\
+% was (20180303)    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 542 to \textasciitilde 603 +} \\
+    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 540 to \textasciitilde 601 +} \\
                                                               &                 &                         & \emph{8 per word}           & \emph{12 or 16 per word}    & \emph{12 or 16 per word}                            \\
     \bottomrule
     \end{tabular}
     }
 \end{table}
-
-\subsection{Creating lightweight methods}
-We currently support two ways to create a lightweight method:
-\begin{itemize}
-	\item handwritten JVM bytecode
-	\item converting a Java method 
-\end{itemize}
-
-\subsubsection{Handwritten JVM bytecode}
-For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in JVM bytecode, which the infuser will simply add to the infusion, and then process it in the same way as it processes a normal method, with one step added:
-
-For lightweight methods, the parameters will be on the stack at the start of the method, but the infusers expects to start with an empty stack. To allow the infuser to process them like other methods, we add a dummy \mycode{LW\_PARAMETER} instruction for each parameter. This instruction is skipped when writing the binary infusion, but it tricks the infuser into thinking the parameters are being put on the stack.
-
-
-\subsubsection{Converting Java methods}
-This handwritten approach is useful for the smallest methods, and allows us to create bytecode that only uses the stack, which produces the most efficient code. But for more complex methods it quickly becomes very cumbersome to write the bytecode by hand.
-
-As a second, slightly slower, but more convenient option, we developed a way to convert normal Java methods to lightweight methods by adding a \mycode{@Lightweight} annotation to it.
-
-The infuser will scan all the methods in an infusion for this annotation. When it finds a method marked \mycode{@Lightweight}, the transformation to turn a normal JVM method into a lightweight one is simple: we first add a dummy \mycode{LW\_PARAMETER} instruction for each parameter, followed by \mycode{STORE} instructions to pop these parameters off the stack and store them in the right local variables. After this, we can use the normal body of the method and call it as a lightweight method.
-
-Listing \ref{lst-comparison-of-handwritten-and-converted-java-lw-method} shows the difference for the \mycode{isOdd} method. We can see this approach adds some overhead in the form of a \mycode{SSTORE\_0} and a \mycode{SLOAD\_0} instruction. However, using popped value caching, only the \mycode{SSTORE\_0} will have a run-time cost. Another disadvantage of the converted method is that is has to use a local variable, which will slightly increase memory usage, but in return this approach gives us a very easy way to create lightweight methods.
-
-\begin{listing}
- \centering
- \begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \begin{minted}{java}
-// JAVA
-@Lightweight
-public static boolean
-          isOdd (short a)
-{
-  return (a & (short)1)==1;
-}
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.29\textwidth}
-  \centering
-  \begin{minted}[linenos=false]{java}
-// HANDWRITTEN
-//              (Stack)
-LW_PARAMETER    (Int)
-SCONST_1        (Int,Int)
-SAND            (Int)
-SRETURN         ()
-  \end{minted}
- \end{minipage}\hfill
- \begin{minipage}[t]{0.29\textwidth}
-  \centering
-  \begin{minted}[linenos=false]{java}
-// CONVERTED JAVA
-//              (Stack)
-LW_PARAMETER    (Int)
-SSTORE_0        ()
-SLOAD_0         (Int)
-SCONST_1        (Int,Int)
-SAND            (Int)
-SRETURN         ()
-  \end{minted}
- \end{minipage}
- \vspace{0.5cm}
-
-\caption{Comparison of hand written lightweight method and converted Java method}
-\label{lst-comparison-of-handwritten-and-converted-java-lw-method}
-\end{listing}
-
-
-\subsubsection{Replacing \mycode{INVOKE}s}
-The infuser does a few more transformations to the bytecode. Every method is scanned for \mycode{INVOKESTATIC} instructions that invoke a lightweight method. These are simply replaced by an \mycode{INVOKELIGHT}, and the number of extra slots for the reference stack and local variables of the current method is increased if necessary. Finally, methods are sorted so a lightweight method will be defined before it is invoked, to make sure the VM can always generate the \mycode{CALL} directly.
 
 
 \subsection{Limitations and tradeoffs}
@@ -329,7 +331,7 @@ There are a few limitations to the use of lightweight methods:
 \paragraph{No recursion} Since we need to be able to determine how much space to reserve in the caller's stack frame for a lightweight method's reference stack and local variables, we do not support recursion, although lightweight calls can be nested.
 
 \paragraph{No garbage collection}
-Lightweight methods reuse the caller's stack frame. This is a problem for the garbage collector, which works by inspecting each stack frame and finding the references on the stack and in local variables. If the garbage collector would be triggered while we're in a lightweight call, it would not know where to find the lightweight method's references, since the stack frame only has information for the method that owns it.
+Lightweight methods reuse the caller's stack frame. This is a problem for the garbage collector, which works by inspecting each stack frame and finding the references on the stack and in local variables. If the garbage collector would be triggered while we're in a lightweight call, it would not know where to find the lightweight method's references, since the stack frame only has information for the method that owns it. Thus, we do not allow lightweight methods to perform any action that may trigger the garbage collector.
 
 While it may be possible to relax this constraint with some effort, in most cases this is only a minor restriction. Lightweight methods are most useful for fast and frequently called methods, and operations that may trigger the garbage collector are usually expensive, so there is less to be gained from using a lightweight method in these situations.
 

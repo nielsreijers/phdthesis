@@ -28,39 +28,21 @@ We argue that a tailored library should be designed from the ground-up specifica
 
 \section{Support for constant data}
 \label{sec-const-data}
-%\ref{sec-evaluation-benchmark-implementation-motetrack}
-While Java allows us to declare variables as \mycode{final}, this is only a language level feature, and the VM has no concept of constant data. This is not surprising, since most physical CPUs do not make the distinction either. However, this is different on a sensor node where code and data memory are split. The amount of flash memory is usually several times larger than the available RAM, so constant data should be kept in flash instead of wasting precious RAM on data that will never change.
 
-This is especially important for arrays of constant data, which are common in WSN applications. When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a Java array object, and then uses the normal array access instructions to initialise each element individually, as shown in Listing \ref{lst-constant-array-initialisation}.
+%TODO: rewrite now that we've implemented it already
 
-\begin{listing}
-\begin{minted}{c}
-    sspush(256); newarray;                     // create the array
-    adup; sconst_0;    sconst_0;   bastore;    // set index 0
-    adup; sconst_1;    sconst_3;   bastore;    // set index 1
-    adup; sconst_2;    bspush(6);  bastore;    // set index 2
-    ...
-    adup; bspush(255); bspush(-3); bastore;    // set index 255
-\end{minted}
-\caption{Darjeeling bytecode to initialise a byte array of constant data}
-\label{lst-constant-array-initialisation}
-\end{listing}
+% Arrays of constant data appear in several of our benchmarks. The \mybench{LEC} benchmark contains two arrays of 17 16-bit and 8-bit, which are small enough to store in RAM. In this case the lack of support for constant data wastes a few bytes of memory, but doesn't prevent us from implementing the algorithm. However, in two other cases it did.
 
+% \paragraph{FFT}
+% The \mybench{FFT} benchmark contains an array of sine wave values that would be too expensive to calculate at run time. For the 8 bit version, this contains 256 bytes, which is small enough to fit in RAM. However, the 16-bit version contained an array of 1024 16-bit values, which in itself would just fit in memory, but the JVM code to initialise it becomes too large for flash memory, forcing us to use native code to initialise it prior to starting the benchmark.
 
-There are two problems with this: (i) the array will occupy scarce RAM; and (ii) initialising array elements using JVM instructions requires 4 instructions per element, resulting in 1669 bytes of code to initialise a 256 byte array.
+% \paragraph{MoteTrack}
+% The \mybench{MoteTrack} benchmark contains a large dictionary of reference RSSI signatures that are used to determine a node's location by matching the observed RSSI values to known locations in the reference database.
 
-Arrays of constant data appear in several of our benchmarks. The \mybench{LEC} benchmark contains two arrays of 17 16-bit and 8-bit, which are small enough to store in RAM. In this case the lack of support for constant data wastes a few bytes of memory, but doesn't prevent us from implementing the algorithm. However, in two other cases it did.
+% At 20560 bytes, this dictionary is small enough to fit in flash memory, but over 5 times larger than the available RAM. Similar to the 16-bit \mybench{FFT} benchmark, the only way to implement this in a VM without support for this kind of constant data, is to store it in flash and use a native method to read the signatures.
 
-\paragraph{FFT}
-The \mybench{FFT} benchmark contains an array of sine wave values that would be too expensive to calculate at run time. For the 8 bit version, this contains 256 bytes, which is small enough to fit in RAM. However, the 16-bit version contained an array of 1024 16-bit values, which in itself would just fit in memory, but the JVM code to initialise it becomes too large for flash memory, forcing us to use native code to initialise it prior to starting the benchmark.
-
-\paragraph{MoteTrack}
-The \mybench{MoteTrack} benchmark contains a large dictionary of reference RSSI signatures that are used to determine a node's location by matching the observed RSSI values to known locations in the reference database.
-
-At 20560 bytes, this dictionary is small enough to fit in flash memory, but over 5 times larger than the available RAM. Similar to the 16-bit \mybench{FFT} benchmark, the only way to implement this in a VM without support for this kind of constant data, is to store it in flash and use a native method to read the signatures.
-
-\paragraph{Possible solutions}
-Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash memory. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{GETARRAY\_A}, \mycode{GETARRAY\_I}, etc.) to read from them.
+% \paragraph{Possible solutions}
+% Supporting constant arrays will require changes to both the language and bytecode. From the programmer's perspective it should be enough to simply add an annotation like `\mycode{progmem}' to an array declaration to tell the compiler it should be stored in flash memory. The bytecode will then need to be expanded to allow constant arrays in the constant pool, and to add new versions of the array load instructions (e.g. \mycode{GETARRAY\_A}, \mycode{GETARRAY\_I}, etc.) to read from them.
 
 
 

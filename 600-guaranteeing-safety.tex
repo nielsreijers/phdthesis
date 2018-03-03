@@ -174,7 +174,7 @@ The actual write to the heap is often done by an offset from \mycode{Z} using th
 
 This means the write could end up at most 63 bytes above the end of the heap. The cheapest way to avoid this would be to not use the \mycode{STD} instruction, but instead use the \mycode{ADIW} to add the offset to \mycode{Z} and use the normal \mycode{ST} instruction to store without displacement. However, this would add 2 bytes and 2 cycles for instruction. Instead we reuse the same small safety margin mentioned in check \ref{chk-no-nativestack-overflow}. This is safe because we will never be writing to a heap object and executing a function in the VM or libc at the same time.
 
-\paragraph{Alternatives}
+\paragraph{Alternative solutions}
 We considered several alternative implementations for \mycode{heapcheck}. Since the \mycode{CALL} and \mycode{RET} instructions are expensive, we can save 7 cycles by inlining in the check instead of calling it. However, this would increase the code size overhead from 4 bytes to over 30 bytes, which we consider too high.
 
 If we align the top and bottom boundaries of the heap at 256 bytes, this would eliminate the need to bounds check the lower byte of the \mycode{Z} register, \mycode{ZL}. This would save 6 of the 22 cycles, but would waste RAM since some bytes below and above the heap would have to remain unused. Since RAM is such a scarce resource and the performance gain is limited, we decided against this.
