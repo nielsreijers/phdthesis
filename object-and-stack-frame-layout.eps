@@ -1,9 +1,9 @@
 %!PS-Adobe-3.0 EPSF-3.0
-%%Title: ojbect-and-stack-frame-layout.fig
+%%Title: object-and-stack-frame-layout.fig
 %%Creator: fig2dev Version 3.2 Patchlevel 5e
-%%CreationDate: Fri May  5 14:36:46 2017
+%%CreationDate: Sat Mar  3 14:29:59 2018
 %%For: nielsreijers@Nielss-MacBook-Pro.local (Niels Reijers)
-%%BoundingBox: 0 0 430 272
+%%BoundingBox: 0 0 664 272
 %Magnification: 1.0000
 %%EndComments
 %%BeginProlog
@@ -82,8 +82,8 @@ end
 
 /pageheader {
 save
-newpath 0 272 moveto 0 0 lineto 430 0 lineto 430 272 lineto closepath clip newpath
--12.6 284.2 translate
+newpath 0 272 moveto 0 0 lineto 664 0 lineto 664 272 lineto closepath clip newpath
+-26.1 284.2 translate
 1 -1 scale
 $F2psBegin
 10 setmiterlimit
@@ -102,88 +102,110 @@ pageheader
 % 
 % here starts figure with depth 50
 /Times-Roman ff 200.00 scf sf
-4200 375 m
-gs 1 -1 sc (Stack frame layout) col0 sh gr
+1125 3450 m
+gs 1 -1 sc (static integer variables) col0 sh gr
 % Polyline
 0 slj
 0 slc
 7.500 slw
-n 225 3000 m
- 3450 3000 l gs col0 s gr 
+n 8250 3975 m
+ 11475 3975 l gs col0 s gr 
 % Polyline
-n 225 2625 m
- 3450 2625 l gs col0 s gr 
+n 8250 3600 m
+ 11475 3600 l gs col0 s gr 
 % Polyline
- [60] 0 sd
-n 300 1500 m
- 3375 1500 l gs col0 s gr  [] 0 sd
+n 8250 3225 m
+ 11475 3225 l gs col0 s gr 
 % Polyline
-n 225 3750 m 3450 3750 l 3450 525 l 225 525 l
- cp gs col0 s gr 
-/Times-Roman ff 200.00 scf sf
-1125 3600 m
-gs 1 -1 sc (uint16_t:2 color) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-1125 3225 m
-gs 1 -1 sc (uint16_t:14 size) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-1350 2850 m
-gs 1 -1 sc (uint8_t id) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-1275 2175 m
-gs 1 -1 sc (integer fields) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-1200 1050 m
-gs 1 -1 sc (reference fields) col0 sh gr
-% Polyline
-n 4125 4350 m
- 7350 4350 l gs col0 s gr 
-% Polyline
-n 4125 3975 m
- 7350 3975 l gs col0 s gr 
-% Polyline
-n 4125 3600 m
- 7350 3600 l gs col0 s gr 
-% Polyline
-n 4125 3225 m
- 7350 3225 l gs col0 s gr 
-% Polyline
-n 4125 1350 m
- 7350 1350 l gs col0 s gr 
+n 8250 1350 m
+ 11475 1350 l gs col0 s gr 
 % Polyline
  [60] 0 sd
-n 4200 2550 m
- 7275 2550 l gs col0 s gr  [] 0 sd
+n 8325 2550 m
+ 11400 2550 l gs col0 s gr  [] 0 sd
 % Polyline
-n 4125 4725 m 7350 4725 l 7350 525 l 4125 525 l
+n 8250 4725 m 11475 4725 l 11475 525 l 8250 525 l
  cp gs col0 s gr 
 /Times-Roman ff 200.00 scf sf
-5025 4575 m
+9150 4575 m
 gs 1 -1 sc (dj_frame* parent) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-4800 3825 m
+8925 3825 m
 gs 1 -1 sc (int16_t* saved_intStack) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-4875 3450 m
+9000 3450 m
 gs 1 -1 sc (ref_t* saved_refStack) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-4950 4200 m
+9075 4200 m
 gs 1 -1 sc (dj_global_id method) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-4875 2925 m
+9000 2925 m
 gs 1 -1 sc (local reference slots) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-5025 2025 m
+9150 2025 m
 gs 1 -1 sc (local integer slots) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-5100 975 m
+9225 975 m
 gs 1 -1 sc (reference stack) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-225 375 m
-gs 1 -1 sc (Heap object layout) col0 sh gr
 % Polyline
-n 225 3375 m
- 3450 3375 l gs col0 s gr 
+n 450 525 m 3675 525 l 3675 4575 l 450 4575 l
+ cp gs col0 s gr 
+% Polyline
+n 4350 3375 m
+ 7575 3375 l gs col0 s gr 
+% Polyline
+n 4350 3000 m
+ 7575 3000 l gs col0 s gr 
+% Polyline
+n 4350 2625 m
+ 7575 2625 l gs col0 s gr 
+% Polyline
+ [60] 0 sd
+n 4425 1500 m
+ 7500 1500 l gs col0 s gr  [] 0 sd
+% Polyline
+n 4350 3750 m 7575 3750 l 7575 525 l 4350 525 l
+ cp gs col0 s gr 
+% Polyline
+n 450 1650 m
+ 3675 1650 l gs col0 s gr 
+% Polyline
+ [60] 0 sd
+n 525 2775 m
+ 3600 2775 l gs col0 s gr  [] 0 sd
+/Times-Roman ff 200.00 scf sf
+4350 375 m
+gs 1 -1 sc (Heap object layout) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+8325 375 m
+gs 1 -1 sc (Stack frame layout) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+450 375 m
+gs 1 -1 sc (Infusion layout) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+5250 3600 m
+gs 1 -1 sc (uint16_t:2 color) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+5250 3225 m
+gs 1 -1 sc (uint16_t:14 size) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+5475 2850 m
+gs 1 -1 sc (uint8_t id) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+5400 2175 m
+gs 1 -1 sc (integer fields) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+5325 1050 m
+gs 1 -1 sc (reference fields) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+900 1050 m
+gs 1 -1 sc (various bookkeeping fields) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+975 2250 m
+gs 1 -1 sc (static reference variables) col0 sh gr
+% Polyline
+n 8250 4350 m
+ 11475 4350 l gs col0 s gr 
 % here ends figure;
 pagefooter
 showpage

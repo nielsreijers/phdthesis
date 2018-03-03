@@ -1,6 +1,6 @@
 \chapter{CapeVM}
 
-This chapter we introduce CapeVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. CapeVM runs directly on the hardware, without any OS layer in between, and has complete control over the device. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATmega, cannot do.
+This chapter we introduce the global design of CapeVM. Our VM is based on Darjeeling \cite{Brouwers:2009cj}. CapeVM runs directly on the hardware, without any OS layer in between, and has complete control over the device. Like other sensor node VMs, Darjeeling is originally an interpreter. We replace this interpreter with an AOT compiler: instead of interpreting the bytecode, the VM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATmega, cannot do.
 
 \section{Goals}
 \label{sec-CapeVM-goals}
@@ -8,7 +8,7 @@ Working on resource-constrained devices means we have to make some compromises. 
 
 WuKong, discussed in Section \ref{sec-state-of-the-art-wukong} is a good motivating example. Parts of WuKong applications may be written in Java. A node may be part of more than one application, and the WuKong master may dynamically decide to move an object to another node. This means new Java code may have to be loaded onto a device, while another (part of the) application is already running.
 
-To support scenarios like this, the translation process should be very light weight. Specifically, it should use as little memory as possible, since this is a very scarce resource and any memory used by the AOT compiler cannot be used for a different task running at the same time. This means we cannot do any analysis on the bytecode that would require us to hold 'large' data structures in memory.
+To support scenarios like this, the translation process should be very light weight. Specifically, it should use as little memory as possible, since this is a very scarce resource and any memory used by the AOT compiler cannot be used for other concurrently running tasks. This means we cannot do any analysis on the bytecode that would require us to hold large data structures in memory.
 
 Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but, as we will see, a lot can be achieved with very limited resources.
 
@@ -31,9 +31,9 @@ We summarise our goals and constraints below:
 \label{fig-translation-process}
 \end{figure}
 
-The complete process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}. Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes. We then use ProGuard \cite{proguard} to do some simple optimisations, but these are very basic steps like removing dead code, and overlapping local variable slots where possible, etc.
+The complete process from Java source to a native application on the node is shown in Figure \ref{fig-translation-process}. Like all sensor node JVMs, Darjeeling uses a modified JVM bytecode. Java source code is first compiled to normal Java classes. We then use ProGuard \cite{proguard} to optimise the bytecode, but these optimisations are limited to a few very basic steps such as dead code removal, overlapping local variable slots where possible, etc.
 
-The optimised Java classes are then transformed into Darjeeling's own bytecode format, called an 'infusion'. For details of this transformation we refer to the Darjeeling paper \cite{Brouwers:2009cj}. Here it is sufficient to note that no knowledge of the target platform is used in this transformation, so the result is still platform independent. This infusion is then sent to the node, where out AOT compiler translates it to native AVR code at load time.
+The optimised Java classes are then transformed into Darjeeling's own bytecode format, called an 'infusion'. For details of this transformation we refer to the Darjeeling paper \cite{Brouwers:2009cj}. Here it is sufficient to note that no knowledge of the target platform is used in this transformation, so the result is still platform independent. This infusion is then sent to the node, where our AOT compiler translates it to native AVR code at load time.
 
 When the node receives a large programme, it should not have to keep multiple messages in memory since this will consume too much memory. Our approach allows the bytecode to be translated to native code in a single pass, on instruction at a time. Only some small, fixed-size data structures are kept in memory during the process. A second pass over the generated code then fills in addresses left blank by branch instructions, since the target addresses of forward branches are not known until the target instruction is generated.
 
@@ -42,13 +42,13 @@ This means we can free each message, which can be as small as a single JVM instr
 
 \section{Translating bytecode to native code}
 \label{sec-basic-translation}
-Our baseline AOT compiler is an implementation of Ellul's approach, discussed in Section \ref{sec-state-of-the-art-elluls-aot}. We adapt this for the Atmel ATmega128 CPU, while Ellul's work uses the Texas Instruments MSP430. 
+Our baseline AOT compiler is an implementation of Ellul's approach, as described in his thesis \cite{Ellul:2012thesis}, adapted for the Atmel ATmega128 CPU, while Ellul's work uses the Texas Instruments MSP430. 
 
 In this unoptimised version of our translator, each bytecode instruction the VM receives is simply replaced with a fixed, equivalent sequence of native instructions. The native stack is used to mimic the JVM stack. An example of this is shown in Table 1.
 
-The first column shows a fragment of JVM code which does a shift right of variable \mycode{A}, and repeats this while \mycode{A} is greater than \mycode{B}. While this may not be a very useful operation, it is the smallest example that will allow us to illustrate our code generation optimisations in the following chapter. The second column shows the code the AOT compiler will execute for each JVM instruction. Together, the first and second column match the case labels and body of a big switch statement in our compiler. The third column shows the resulting AVR native code, which is currently almost a 1-on-1 mapping, with the exception of the branch instruction and some optimisations by a simple peephole optimiser, both described below.
+The first column shows a fragment of JVM code which does a shift right of variable \mycode{A}, and repeats this while \mycode{A} is greater than \mycode{B}. While this may not be a very useful operation, it is the smallest example that will allow us to illustrate our code generation optimisations in the following chapter. The second column shows the code the AOT compiler will execute for each JVM instruction. Together, the first and second column match the case labels and body of a big switch statement in the compiler. The third column shows the resulting AVR native code, which is currently almost a 1-on-1 mapping, with the exception of the branch instruction and some optimisations by a simple peephole optimiser, both described below.
 
-The example has been slightly simplified for readability. Since the AVR is an 8-bit CPU, in the real code many instructions are duplicated for loading the high and low bytes of a short. The cycle count is based on the actual number of generated instructions, and for a single iteration.
+The example has been slightly simplified for readability. Since the AVR is an 8-bit CPU, in the real code many instructions are duplicated for the high and low bytes of a short. The cycle count is based on the actual number of generated instructions, and for a single iteration.
 
 \begin{table}
 \caption{Translation of \mycode{ do\{A{>}{>}{>}=1;\} while(A>B);}}
@@ -87,7 +87,7 @@ The example has been slightly simplified for readability. Since the AVR is an 8-
 \end{table}
 
 \subsection{Branches}
-Forward branches pose a problem for our direct translation approach since the target address is not yet known. A second problem is that on the ATmega, a branch may take 1 to 3 words, depending on the distance to the target, so it is also not known how much space should be reserved for a branch.
+Forward branches pose a problem for this direct translation approach since the target address is not yet known. A second problem is that on the ATmega, a branch may take 1 to 3 words, depending on the distance to the target, so it is also not known how much space should be reserved for a branch.
 
 To solve this the infuser modifies the bytecode by inserting a new instruction, \mycode{BRTARGET}, in front of any instruction that is the target of a branch. The branch instructions themselves are modified to target the id of a \mycode{BRTARGET}, which are implicitly numbered, instead of a bytecode offset. When the VM encounters a \mycode{BRTARGET} during translation, no code is emitted, but it records the address where the next instruction will be emitted in a separate part of flash. Branch instruction initially emit a temporary 3-word 'branch tag', containing the branch target id and the branch condition. After code generation is finished and all target addresses are known, the VM scans the generated code a second time, and replaces each branch tag with the real branch instruction.
 
@@ -100,23 +100,23 @@ This is an example of something we often see: an optimisation may take a few hun
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\linewidth]{object-and-stack-frame-layout.eps}
+\includegraphics[width=0.8\linewidth]{object-and-stack-frame-layout.eps}
 \caption{Object and stack frame layout}
 \label{fig-object-and-stack-frame-layout}
 \end{figure}
 
-When Darjeeling's garbage collection runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This is then iteratively expanded to also cover all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be garbage collected.
+When Darjeeling's garbage collection runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This is then iteratively expanded to also cover all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be freed by the garbage collector.
 
 To mark the root set, the garbage collector needs to determine which local variables, static variables, object fields, and values on the operand stack are references. To do this efficiently, Darjeeling separates references and integers throughout the VM: the operand stack, instance variables on the heap, class static variables, and local variables in a method's stack frame are all split in a block for integers and one for references, as shown in Figure \ref{fig-object-and-stack-frame-layout}.
 
-In our AOT compiler we use the native stack for the JVM integer operand stack, so the integer operand stack is not in a method's stack frame, but space for the reference stack still is. This uses less memory than having the integer stack in the stack frame, since we need to reserve space for the maximum stack depth in the frame, which is often much lower for the reference stack than for the integer stack.
+In our AOT compiler we use the native stack for the JVM integer operand stack, so the integer operand stack is not in a method's stack frame, but the reference stack is. This uses less memory than having the integer stack in the stack frame, since we need to reserve space for the maximum stack depth in the frame, which is often much lower for the reference stack than for the integer stack.
 
 We use the AVR's X register as an extra stack pointer for the reference stack.
 
 \subsection{Peephole optimisation}
 Since our baseline should be as close as possible to Ellul's MSP430 implementation, we implement the same peephole optimisations. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations is shown in Table \ref{tbl-CapeVM-peephole}.
 
-A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode{st X+} or \mycode{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also optimise blocks of pushes followed by pops, which are very common on the 8-bit ATmega. 
+A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode{st X+} or \mycode{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also similarly optimise blocks of pushes followed by blocks of pops, which are very common on the 8-bit ATmega. 
 
 When the push and pop instructions target different registers, this results in multiple \mycode{mov} instructions. Two \mycode{mov} instructions with consecutive registers can be further optimised using the \mycode{movw} instruction to copy a register pair to another register pair in a single cycle.
 
@@ -156,16 +156,17 @@ When the push and pop instructions target different registers, this results in m
 
 \subsection{Bytecode modification}
 \label{sec-vm-design-bytecode-modifications}
-We made several modifications to the infuser and bytecode format to support our AOT compiler and improve performance. These changes will be introduced in more detail in the following sections, but for completeness we also list them here:
+We made several modifications to the infuser and introduced new bytecode format to support our AOT compiler and improve performance. These changes will be introduced in more detail in the following sections, but for completeness we also list them here:
 
 \begin{itemize}
-  \item The new \mycode{BRTARGET} opcode marks targets of branch instructions, and all branch instructions are modified to target a \mycode{BRTARGET} id instead of a bytecode offset.
-  \item The new \mycode{MARKLOOP} opcode marks inner loops and the variables they use.
-  \item \mycode{\_FIXED} versions of the \mycode{GETFIELD\_A} and \mycode{PUTFIELD\_A} opcodes are used to access an object's reference fields when the offset is known at compile time (the offset it always known at compile time for integer fields).
-  \item The new \mycode{SIMUL} opcode does 16x16-bit to 32-bit multiplication.
-  \item Array access opcodes now use 16-bit indexes.
-  \item New \mycode{\_CONST} versions of all (variable) bit shift opcodes to support shift by a constant number of bits.
-  \item The new \mycode{INVOKELIGHT} opcode for an optimised 'lightweight' way of calling methods.
+	\item The \mycode{BRTARGET} opcode marks targets of branch instructions. All branch instructions are modified to target a \mycode{BRTARGET} id instead of a bytecode offset.
+	\item The \mycode{MARKLOOP} opcode marks inner loops and the variables they use.
+	\item \mycode{PUTFIELD\_A\_FIXED} and \mycode{GETFIELD\_A\_FIXED} are used to access an object's reference fields when the offset is known at compile time. The offset ia always known at compile time for integer fields.
+	\item The \mycode{SIMUL} opcode does 16x16-bit to 32-bit multiplication.
+	\item New \mycode{\_CONST} versions of the (variable) bit shift opcodes support shifting by a constant number of bits.
+	\item The \mycode{INVOKELIGHT} opcode supports an optimised 'lightweight' way of calling methods.
+	\item The \mycode{GETCONSTARRAY} opcodes support reading from arrays of constant data stored in the constant pool.
+	\item Array access opcodes now use 16-bit indexes.
 \end{itemize}
 
 
@@ -176,6 +177,6 @@ We will discuss the cost of using our VM more in more detail in Chapter \ref{sec
 
 
 \section{Target platforms}
-We implemented CapeVM for the ATmega128 CPU \cite{Atmel:ATmega128Datasheet}. The AVR family of CPUs is widely used in low power embedded systems. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
+CapeVM was implemented for the ATmega128 CPU \cite{Atmel:ATmega128Datasheet}. The AVR family of CPUs is widely used in low power embedded systems. However, our approach does not depend on any AVR specific properties and we expect similar results for many other CPUs in this class. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers.
 
-The ATmega128 has 32 8-bit registers. We expect the Cortex M0 \cite{ARM:2009vz}, with 13 32-bit general purpose registers, or the MSP430 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well. In Section \ref{sec-evaluation-other-platforms} we will examine the expected impact of the number of registers and of using a 16 or 32-bit architecture.
+The ATmega128 has 32 8-bit registers. We expect the Cortex M0 \cite{ARM:2009vz}, with 13 32-bit general purpose registers, or the MSP430 \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, with 12 16-bit registers, and used by Ellul and Martinez \cite{Ellul:2010iw}, to both be good matches as well. In Section \ref{sec-evaluation-other-platforms} we will examine the expected impact of the number of registers and of using a 16 or 32-bit architecture on the resulting performance.
