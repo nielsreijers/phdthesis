@@ -158,7 +158,7 @@ This calculation is a good example of a situation where the slowdown caused by c
 \subsubsection{Ahead-of-Time compilation}
 Thus, a better performing VM is needed, preferably one that performs as close to native performance as possible. Translating bytecode to native code is a common technique to improve performance in desktop VMs. Translation can occur at three moments: offline, ahead-of-time (AOT), or just-in-time (JIT). JIT compilers translate only the necessary parts of bytecode at run time, just before they are executed. They are common on desktops and on more powerful mobile environments, but are impractical on sensor node platforms that can often only execute code from flash memory. This means a JIT compiler would have to write to flash memory at run time, which is expensive and would cause unacceptable delays. Translating to native code offline, before it is sent to the node, has the advantage that more resources are available for the compilation process. We do not have a JVM compiler that compiles to our sensor node's native code to test the resulting performance, but we would expect it would be similar to compiled C code in most cases. However, doing so, even if only for small, performance critical sections of code, sacrifices the two of the key advantages of using a VM: The host now needs knowledge of the target platform, and needs to prepare a different binary for each type of CPU used in the network, and for the node it will be difficult to provide a safe execution environment when it receives binary code.
 
-Therefore, this dissertation will focus on the middle option: translating the bytecode to native code on the device itself, at load time. We will build on previous work by Joshua Ellul \cite{Ellul:2012thesis} on AOT translation on sensor nodes. This approach reduces performance overhead to a slowdown of up to 9x, significantly faster than the interpreting VMs, but not fast enough for the LEC compression example. Unfortunately, it also results in an increase in the size of the stored programmes of up to 4.5x, which limits the size of the programmes that can be loaded on a device.
+Therefore, this dissertation will focus on the middle option: translating the bytecode to native code on the node itself, at load time. We will build on previous work by Joshua Ellul \cite{Ellul:2012thesis} on AOT translation on sensor nodes. This approach reduces performance overhead to a slowdown of up to 9x, significantly faster than the interpreting VMs, but not fast enough for the LEC compression example. Unfortunately, it also results in an increase in the size of the stored programmes of up to 4.5x, which limits the size of the programmes that can be loaded on a node.
 
 \subsection{Safety}
 \label{sec-introduction-safety}
@@ -237,24 +237,24 @@ Specifically, this dissertation makes the following contributions:
 \end{enumerate}
 
 \section{Structure of thesis}
-Chapter 2 introduces some necessary background knowledge on wireless sensor networks, Java and the Java virtual machine, and JIT and AOT compilation.
+Chapter 2 introduces necessary background knowledge on wireless sensor networks, Java and the Java virtual machine, and AOT compilation.
 
 Chapter 3 discusses the state of the art in improving performance for sensor node VMs and providing safe execution environments.
 
 Chapter 4 describes the global design of CapeVM.
 
-Chapter 5 first analyses the sources of overhead for the current state of the art in sensor node AOT compilers, and then presents a set of optimisations to address each of these sources. In a number of cases where there were multiple options to implement an optimisation we also describe alternatives and motivate our choice.
+Chapter 5 first analyses the sources of overhead for the current state of the art in sensor node AOT compilers, and then presents a set of optimisations to address each of these sources. In a number of cases where there were multiple options to implement an optimisation we describe alternatives and motivate our choice.
 
 Chapter 6 presents a set of checks that allow CapeVM to provide the sandbox safety guarantees described in Section \ref{sec-introduction-safety}, and shows how the JVM's simple design allows for most of these checks to be done at load time.
 
-Chapter 7 evaluates the effect of the optimisations presented in Section \ref{sec-optimisations} and the cost of the safety checks presented in Section \ref{sec-safety} and compares this with related work on safe execution environments. We use a set of benchmarks with different characteristics, both synthetic ones to show the behaviour in extreme cases and several benchmarks taken from real sensor node code.
+Chapter 7 evaluates the effect of the optimisations presented in Section \ref{sec-optimisations} and the cost of the safety checks presented in Section \ref{sec-safety}. We use a set of benchmarks with different characteristics, both synthetic ones to show the behaviour in extreme cases and several benchmarks taken from real sensor node code.
 
-Chapter 8 describes a number of issues we encountered while doing this work, which show Java in its current form is not the best choice for a sensor node VM, and suggests ways to improve these in future sensor node VMs.
+Chapter 8 describes a number of issues we encountered while doing this work, which show standard Java is not the best choice for a sensor node VM, and suggests ways to improve these in future sensor node VMs.
 
 Chapter 9 concludes this work.
 
 \section{List of publications}
-This dissertation is based on previously published technical reports or conference proceedings. The material presented in the subsequent chapters is based on the content of these publications.
+Part of the work presented in this dissertation is based on previously published reports or conference proceedings:
 
 \begin{itemize}
     \item N. Reijers, K. J. Lin, Y. C. Wang, C. S. Shih, and J. Y. Hsu, “Design of an Intelligent Middleware for Flexible Sensor Configuration in M2M Systems”, 2nd International Conference on Sensor Networks (SENSORNETS), February 2013.
@@ -263,10 +263,22 @@ This dissertation is based on previously published technical reports or conferen
 \end{itemize}
 
 \section{Naming}
-In literature various names are used for our target devices. The word \emph{mote} was common in early WSN research, as was \emph{sensor node}, or \emph{device} although the latter may also refer to larger, more powerful devices. In this dissertation we will use the terms \emph{sensor node} or simply \emph{node} interchangeably to refer solely to the type of severely resource-constrained devices described above.
+In literature various names are used for our target devices. The word \emph{mote} was common in early research on wireless sensor networks, as was \emph{sensor node}, or simply \emph{device}, although the latter is also used for larger, more powerful devices. In this dissertation we will use the terms \emph{sensor node} or just \emph{node} interchangeably to refer solely to the type of severely resource-constrained devices described above.
 
-The terms \emph{wireless sensor networks}, \emph{cyber-physical systems} and \emph{internet-of-things} are all commonly used to describe sensor node applications. We will use WSN since it is the longer established term, and more clearly focussed on resource-constrained devices, but note that this also covers a large portion of IoT applications.
+%TODO: consistent use of (sensor) node and device
+%TODO: do we? actually right now neither term is used very often. Maybe drop this, but should be more consistent.
+%The terms \emph{wireless sensor networks}, \emph{cyber-physical systems} and \emph{internet-of-things} are all commonly used to describe sensor node applications. We will use WSN since it is the longer established term, and more clearly focussed on resource-constrained devices, but note that this also covers a large portion of IoT applications.
 
-When reprogramming these devices, the code is expected to be sent by a more powerful device in charge of configuring the network. These more powerful devices outside or on the edge of wireless sensor network are refered to in literature by various names, including \emph{server}, \emph{gateway}, \emph{master}, \emph{controller}, or \emph{host}. While these names have slightly different accents or refer to different roles, this is not relevant for the work in this dissertation. We will use \emph{host} to refer to the source of the code that is uploaded to the sensor node, possibly over multiple hops in the network, and assume the host to be a more powerful device with desktop-class processing capabilities.
+When reprogramming these nodes, a new programme must be sent to them by a more powerful device. This role is refered to in literature by various names, including \emph{server}, \emph{gateway}, \emph{master}, \emph{controller}, or \emph{host}, depending on the exact design of the network and the way it is reconfigured. For the work in this dissertation these differences are not relevant, and we will use \emph{host} to refer to the source of the code that is uploaded to the sensor node, which is assumed to be a more powerful device with desktop-class processing capabilities.
 
 Since our VM is an ahead-of-time compiler, the Java source code is transformed into native code in two steps. We will use \emph{compile time} to refer to the compilation of Java code into Java byte code on the host, and \emph{translation time} to refer to the translation of this byte code into native code on the device.
+
+Finally, we follow Dalvik in naming our virtual machine after a coastal town. In this case the beautiful city of Cape Town, where parts of our VM were developed over the course of two trips.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,angle=270]{capetown.JPG}
+\caption{Cape Town office}
+\label{fig-capetown}
+\end{figure}
+
