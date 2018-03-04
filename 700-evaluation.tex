@@ -1,10 +1,10 @@
 \chapter{Evaluation}
 \label{sec-evaluation}
-This dissertation presents a number of techniques to make sensor node virtual machines safe, and improve their performance, staying within the constraints set out in Section \ref{sec-CapeVM-goals}. This chapter evaluates how CapeVM meets these goals by measuring its performance and code size overhead for a number of different benchmarks.
+This dissertation presents a number of techniques to improve the performance of sensor node virtual machines and make them safe, while staying within the constraints set out in Section \ref{sec-CapeVM-goals}. This chapter evaluates to what extent CapeVM meets these goals by measuring its performance and code size overhead for a number of different benchmarks.
 
 First, Section \ref{sec-evaluation-benchmarks} will describe our experimental setup, the benchmarks used, and where the source code for these benchmarks was obtained.
 
-Next, Section \ref{sec-evaluation-coremark} will use our largest benchmark to examine the effect of the lack of optimisations done by the standard \mycode{javac} compiler, and the manual optimisations we do on the Java source that in a future version should be done by an optimising compiler/infuser.
+Next, Section \ref{sec-evaluation-coremark} will use our largest benchmark to examine the effect of the lack of optimisations done by the standard \mycode{javac} compiler, and the manual optimisations we do on the Java source that in a future version should be done by an optimising infuser.
 
 Sections \ref{sec-evaluation-aot-translation-performance} and \ref{sec-evaluation-aot-translation-code-size} evaluate the result of our optimisations to the AOT translation process on performance and code size respectively.
 
@@ -12,6 +12,6 @@ Section \ref{sec-evaluation-method-invocation} evaluates the cost of method invo
 
 The cost of adding safety checks is examined in Section \ref{sec-evaluation-safety}.
 
-Platform independence is one of the main reasons to use a VM. While we only implement our approach for the Atmel AVR platform, Section \ref{sec-evaluation-other-platforms} presents measurements that give an indication of the expected performance on other sensor node platforms.
+Platform independence is one of the main reasons to use a VM. While we only implement our approach for the ATmega128, Section \ref{sec-evaluation-other-platforms} presents measurements that give an indication of the expected performance on other sensor node platforms.
 
 Finally, in Section \ref{sec-evaluation-limitations} we discuss the limitations and cost of using a VM, and describe some known hard cases our VM currently does not handle as well.

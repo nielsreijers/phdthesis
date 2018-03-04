@@ -15,8 +15,8 @@ set xrange [0:20]
 set yrange [0:100]
 
 set output "../safety-ld-st-percentage-vs-overhead.eps"
-plot "safety-ld-st-percentage-vs-overhead.dat" using 3:4 title 'Loads vs. read safety overhead'      with points pointtype 31 , \
-     "safety-ld-st-percentage-vs-overhead.dat" using 1:2 title 'Stores vs. write safety overhead'    with points pointtype 31 lc rgb "red"
+plot "safety-ld-st-percentage-vs-overhead.dat" using 3:4 title 'Loads vs. read safety overhead'      with points pointtype 31 lc "#e7a529", \
+     "safety-ld-st-percentage-vs-overhead.dat" using 1:2 title 'Stores vs. write safety overhead'    with points pointtype 31 lc "#56b5e8"
 
 
 set autoscale x

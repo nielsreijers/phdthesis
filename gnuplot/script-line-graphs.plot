@@ -39,7 +39,7 @@ plot "performance-per-opcode-category.dat" using 2 title 'total'      with lines
 
 
 
-set ylabel "Increase in code size as a % of native C size"
+set ylabel "Overhead (% of native C size)"
 set xtics ("simple \n peeph." 0, "impr. \n peeph." 1, "stack \n caching" 2, "pop.val. \n caching" 3, "mark \n loops" 4, "const \n shift" 5, "16-bit \n index" 6, "SIMUL" 7)
 
 set key width -2.8

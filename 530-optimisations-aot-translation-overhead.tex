@@ -155,6 +155,7 @@ This complements one of the manual optimisations discussed in Section \ref{sec-o
 In CapeVM's bytecode, the array access instructions are named \mycode{GETARRAY} and \mycode{PUTARRAY} to be in line with \mycode{GET/PUTFIELD} and \mycode{GET/PUTSTATIC}.
 
 \subsubsection{Support for constant arrays}
+\label{sec-opt-constant-arrays}
 While Java allows us to declare variables as \mycode{final}, this is only a language level feature, and the VM has no concept of constant data. This is not surprising, since most physical CPUs do not make the distinction either, but a sensor node code and data memory are split. The amount of flash memory is usually several times larger than the available RAM, so constant data should be kept in flash instead of wasting precious RAM on data that never changes.
 
 This is especially important for arrays of constant data, which are common in WSN applications. For example, the FFT benchmark contains an array of precalculated sine wave values. When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a normal Java array object, and then uses the array access instructions to initialise each element individually, as shown in Listing \ref{lst-constant-array-initialisation}. The \mycode{final} keyword only affects the reference to the \mycode{Sinewave} array, but does not cause the contents to be put in flash memory.
