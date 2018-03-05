@@ -1,4 +1,4 @@
-% UPDATED 20180301
+% UPDATED 20180305
 
 \begin{table}
 \caption{Methods per benchmark and relative performance for normal, lightweight invocation, and inlining}
@@ -27,9 +27,9 @@
     \\
     % The cycles from the simulation are for 50 iterations. Just divide by 50 here so the cycle count + the number of invokes produces the right overhead. An actual simulation run with 1 iteration is a bit slower, but only a few % so it's not significant enough to worry about here.
     %                                                                                 coremk                          coremk_lw                         coremk_fn
-    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{3,373,038} & \multicolumn{1}{r}{3,543,532}   & \multicolumn{1}{r}{4,844,211}   \\
-    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{98.1\%}    & \multicolumn{1}{r}{108.1\%}     & \multicolumn{1}{r}{184.5\%}     \\
-    \emph{code size}             &                              &                   & \multicolumn{1}{r}{9,182}     & \multicolumn{1}{r}{9,228}       & \multicolumn{1}{r}{9,512}       \\
+    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{3,353,474} & \multicolumn{1}{r}{3,523,967}   & \multicolumn{1}{r}{4,488,847}   \\
+    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{97.0\%}    & \multicolumn{1}{r}{107.0\%}     & \multicolumn{1}{r}{163.6\%}     \\
+    \emph{code size}             &                              &                   & \multicolumn{1}{r}{9,234}     & \multicolumn{1}{r}{9,280}       & \multicolumn{1}{r}{9,540}       \\
     \\
     \midrule
     \\
