@@ -105,23 +105,23 @@ Generally, arrays of primitive types don't suffer from this problem and can be s
 \label{sec-small-datatypes}
 Because RAM is scarce, 16-bit short and single byte data types are commonly used in sensor node code. The standard JVM only has 32 and 64-bit operations, and variables and stack values are stored as 32-bit, even if the actual type is shorter. On a sensor node this wastes memory, and causes a performance overhead since most nodes have 8-bit or 16-bit architectures. Therefore, many sensor node JVMs, including Darjeeling, introduce 16-bit operations and store values in 16-bit slots.
 
-However, this is only one half of the solution. At the language level, Java defines that an expression evaluates to 32-bits, or 64-bits if at least one operand is a \mycode{long}. Attempting to store this in a 16-bit variable will result in a `lossy conversion' error at compile time, unless explicitly cast to a \mycode{short}.
+However, this is only one half of the solution. At the language level, Java defines that an expression evaluates to 32-bits, or 64-bits if at least one operand is a \mintinline[fontsize=\small]{java}{long}. Attempting to store this in a 16-bit variable will result in a `lossy conversion' error at compile time, unless explicitly cast to a \mintinline[fontsize=\small]{java}{short}.
 
-As an example, if we have 3 \mycode{short} variables, a, b, and c, and want to do 
-\mintinline{java}{a=b+c;}, we need to insert a cast to avoid errors from the Java compiler:
+As an example, if we have 3 \mintinline[fontsize=\small]{java}{short} variables, a, b, and c, and want to do 
+\mintinline[fontsize=\small]{java}{a=b+c;}, we need to insert a cast to avoid errors from the Java compiler:
 
-\mintinline{java}{a=(short)(b+c);}
+\mintinline[fontsize=\small]{java}{a=(short)(b+c);}
 
 Passing literal integer values to a method call treats them as ints, even if they are short enough to fit in a smaller type, which results in calls like: 
 
-\mintinline{java}{f((byte)1);}
+\mintinline[fontsize=\small]{java}{f((byte)1);}
 
 While seemingly a small annoyance, in more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read.
 
 \paragraph{Possible solutions}
 %If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.
 
-We suggest that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: Declaring variable \mintinline{java}{a} as \mintinline{java}{unchecked short} would implictly narrow to short when needed, so \mintinline{java}{a=b+c;} would not need an explicit cast, while declaring it as a normal \mintinline{java}{short} would.
+We suggest that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: Declaring variable \mintinline[fontsize=\small]{java}{a} as \mintinline[fontsize=\small]{java}{unchecked short} would implictly narrow to short when needed, so \mintinline[fontsize=\small]{java}{a=b+c;} would not need an explicit cast, while declaring it as a normal \mintinline[fontsize=\small]{java}{short} would.
 
 
 
