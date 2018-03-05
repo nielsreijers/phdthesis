@@ -1,4 +1,4 @@
-# UPDATED 20180301
+# UPDATED 20180305
 
 Title           ,  "8-bit" , "16-bit" ,   "32-bit"
 "Bubble sort"   ,    139.5 ,    101.2 ,       94.4
@@ -6,4 +6,4 @@ Title           ,  "8-bit" , "16-bit" ,   "32-bit"
 "Binary search" ,    106.3 ,     65.2 ,       66.0
 "Outlier"       ,    159.0 ,     75.7 ,      121.6
 "Fill array"    ,    210.1 ,    182.8 ,      155.3
-"FFT"           ,     96.7 ,     17.7 ,        0.0
+"FFT"           ,     95.5 ,     17.7 ,        0.0

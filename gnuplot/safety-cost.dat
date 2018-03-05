@@ -1,17 +1,17 @@
-# UPDATED 20180301
+# UPDATED 20180305
 
 Title           , "unsafe" , "safe writes" , "safe reads and writes"
 "Bubble sort"   , 101.2    ,    247.5      , 393.9
 "Heap sort"     ,  88.5    ,    153.9      , 287.8
 "Binary search" ,  65.2    ,     65.2      , 151.7
-"XXTEA"         ,  57.6    ,     68.2      , 100.0
+"XXTEA"         ,  57.6    ,     68.2      ,   100
 "MD5"           ,  45.7    ,     60.3      ,  80.3
 "RC5"           ,  19.5    ,     22.2      ,  33.4
-"FFT"           ,  17.7    ,     30.3      ,  43.0
+"FFT"           ,  17.7    ,     30.3      ,    43
 "Outlier"       ,  75.7    ,    128.4      , 226.6
-"LEC"           ,  86.5    ,    120.2      , 193.2
-"CoreMark"      ,  98.1    ,    125.2      , 203.4
+"LEC"           ,  84.6    ,    118.4      , 179.8
+"CoreMark"      ,    97    ,      124      , 202.2
 "MoteTrack"     , 156.3    ,    266.1      , 445.1
 "HeatCalib"     ,  30.5    ,     33.9      ,  43.9
 "HeatDetect"    ,  73.4    ,     91.3      , 126.9
-"average"       ,  70.5    ,    108.7      , 179.2
+"average"       ,  70.2    ,    108.4      ,   178

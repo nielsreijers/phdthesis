@@ -1,4 +1,4 @@
-# UPDATED 20160301
+# UPDATED 20160305
 
 #Array element/object field STORES   Overhead of safe writes vs unsafe VM    Array element/object field LOADS    Overhead of safe reads and writes vs safe writes only
                              18.0  ,                                  72.7  ,                              18.0 ,                                                    72.8
@@ -9,9 +9,24 @@
                               1.5  ,                                   2.3  ,                               6.4 ,                                                     9.4
                               6.1  ,                                  10.7  ,                               7.0 ,                                                    10.8
                               5.8  ,                                  30.0  ,                              10.7 ,                                                    55.9
-                              3.6  ,                                  18.1  ,                               7.9 ,                                                    39.1
-                              2.6  ,                                  13.7  ,                              11.7 ,                                                    39.5
+                              3.7  ,                                  18.3  ,                               7.9 ,                                                    33.3
+                              2.6  ,                                  13.7  ,                              11.6 ,                                                    39.7
                              10.0  ,                                  42.8  ,                              21.4 ,                                                    69.8
                               1.4  ,                                   2.6  ,                               4.1 ,                                                     7.7
                               4.7  ,                                  10.3  ,                               9.8 ,                                                    20.5
-                              5.3  ,                                  22.4  ,                              10.4 ,                                                    41.3
+                              5.3  ,                                  22.4  ,                              10.4 ,                                                    40.9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
