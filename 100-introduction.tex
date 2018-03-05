@@ -183,7 +183,7 @@ Our approach depends only on the correctness of our VM, and guarantees it can al
 Internet-of-Things devices come in a wide range with varying capabilities. The larger IoT platforms are powerful enough to run standard operating systems, tools and languages, and VMs are well established as a good way to programme devices powerful enough to run advanced JIT compilers. This dissertation focusses specifically on small sensor nodes for which no such standards exists. These platforms have the following characteristics:
 \begin{itemize}
     \item Separate data and programme memory: Memory is split into RAM for data, and flash memory for code. While some device can execute code from both RAM and flash \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, others cannot \cite{Atmel:ATmega128Datasheet}.
-    \item Very limited memory: Since RAM consumes energy even when the CPU is in sleep mode, it is typically restricted to 10 KB of RAM or less. More flash memory is usually available to hold programmes, but at 32-256KB this is still very limited.
+    \item Very limited memory: Since RAM consumes energy even when the CPU is in sleep mode, it is typically restricted to 10 KB of RAM or less. More flash memory is usually available to hold programmes, but at 32 to 256 KB this is still very limited.
     \item Simple CPUs: While usually rich in IO to drive actuators and read from sensors, the rest of the CPUs used in these devices is usually a very simple design to save cost and power consumption. Instructions usually take a fixed number of cycles, since memory is on chip access times are constant and fast, and there are no complicating factors like deep pipelines, caches, or branch predictions.
     \item Very limited energy budget: Typical usage scenarios for WSNs demand a long battery lifetime, since frequent replacement or recharging would be too impractical or costly. All aspects of WSN software design are therefore focused towards minimizing energy use.
 \end{itemize}
@@ -273,12 +273,12 @@ When reprogramming these nodes, a new programme must be sent to them by a more p
 
 Since our VM is an ahead-of-time compiler, the Java source code is transformed into native code in two steps. We will use \emph{compile time} to refer to the compilation of Java code into Java byte code on the host, and \emph{translation time} to refer to the translation of this byte code into native code on the device.
 
-Finally, we follow Dalvik in naming our virtual machine after a coastal town. In this case the beautiful city of Cape Town, where parts of our VM were developed over the course of two trips.
+Finally, we follow Dalvik in naming our virtual machine after a coastal town. In this case the beautiful city of Cape Town, where parts of CapeVM were developed over the course of two trips.
 
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth,angle=270]{capetown.JPG}
-\caption{Cape Town office}
+\caption{Cape Town workplace}
 \label{fig-capetown}
 \end{figure}
 
