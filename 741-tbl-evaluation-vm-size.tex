@@ -1,11 +1,9 @@
-% UPDATED 20180301
-
 \begin{table}
 % Memory consumption is based on using only 11 element arrays. Current implementation is lazy and just uses a 16 byte array, but we never use the first two and last three, since they're not used for stack caching.
 \centering
 \caption{Code size and memory consumption}
 \label{tbl-code-size-and-memory-consumption}
-    \begin{tabular}{lrrrrrr}
+    \begin{tabular}{lrrrrrr} % UPDATED 20180305
     \toprule
                               & size vs     & size vs  &                      & AOT code  &   break & memory    \\
                               & interpreter & baseline &                      & reduction &   even  & usage     \\
@@ -19,7 +17,7 @@
     Const shift               &    12955 B  &  6092 B  & \scriptsize   (+444) &  -34.5\%  & 17.7 KB & 87 B      \\
     16-bit array index        &    12935 B  &  6072 B  & \scriptsize    (-20) &  -38.8\%  & 15.6 KB & 87 B      \\
     SIMUL                     &    13001 B  &  6138 B  & \scriptsize    (+66) &  -39.3\%  & 15.6 KB & 87 B      \\
-    Lightweight methods       &    13549 B  &  6686 B  & \scriptsize   (+548) &  -39.6\%  & 16.9 KB & 87 B      \\
+    Lightweight methods       &    13549 B  &  6686 B  & \scriptsize   (+548) &  -39.5\%  & 16.9 KB & 87 B      \\
     \bottomrule
     \end{tabular}
 \end{table}

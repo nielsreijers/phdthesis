@@ -54,7 +54,7 @@ The example has been slightly simplified for readability. Since the AVR is an 8-
 \caption{Translation of \mycode{ do\{A{>}{>}{>}=1;\} while(A>B);}}
 \label{tbl-basic-translation}
     \scriptsize
-    \begin{tabular}{llll}
+    \begin{tabular}{llll} % NO SIMULATION DATA
     \toprule
     JVM                 & AOT compiler                       & AVR        & cycles \\
     \midrule
@@ -125,7 +125,7 @@ When the push and pop instructions target different registers, this results in m
 \caption{CapeVM's peephole optimisations}
 \label{tbl-CapeVM-peephole}
     \begin{threeparttable}
-    \begin{tabular}{lrrlrr}
+    \begin{tabular}{lrrlrr} % NO SIMULATION DATA
     \toprule
     Before         & Cycles & Length  & After        & Cycles & Length \\
     Instructions   &        & (bytes) & Instructions &        & (bytes) \\

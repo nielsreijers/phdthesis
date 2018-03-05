@@ -1,10 +1,8 @@
-% UPDATED 20180213
-
 \begin{table}
 \caption{Comparison of our approach to related work}
 \label{tbl-contribution-comparison}
     \begin{threeparttable}
-    \begin{tabular}{lrrrrrrrr}
+    \begin{tabular}{lrrrrrrrr} % UPDATED 20180305
     \toprule
     Approach        & Platform    & Safe               & Performance           & Code size                  \\
                     & indep.      &                    &                       &                            \\
@@ -18,8 +16,8 @@
     \emph{t-kernel} & No          & Yes                & 50 to 200\% slower    & 500 to 750\% larger        \\
     % CapeVM (unsafe) & Yes         & No                 & 18 to 165\% slower    & -17 to 121\% larger        \\
     % CapeVM (safe)   & Yes         & Yes                & 22 to 247\% slower    & -16 to 125\% larger        \\
-    CapeVM (unsafe) & Yes         & No                 & 71\% slower           & 79\% larger                \\ % avg
-    CapeVM (safe)   & Yes         & Yes                & 109\% slower          & 83\% larger                \\ % avg
+    CapeVM (unsafe) & Yes         & No                 & 70\% slower           & 79\% larger                \\ % avg
+    CapeVM (safe)   & Yes         & Yes                & 108\% slower          & 83\% larger                \\ % avg
     \bottomrule
     \end{tabular}
     \begin{tablenotes}
