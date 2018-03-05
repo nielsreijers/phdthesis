@@ -59,6 +59,3 @@ For the smallest devices, or if we want to be able to load especially large prog
 
 For the baseline approach we only use 25 bytes for a number of commonly used values such as a pointer to the next instruction to be compiled, the number of instructions in the method, etc. The simple stack caching approach adds a 11 byte array to store the state of each register pair we use for stack caching. Popped value caching adds two more arrays of 16-bit elements to store the value tag and age of each value. Mark loops only needs an extra 16-bit word to mark which registers are pinned, and a few other variables. Finally, the instruction set optimisations do not require any additional memory. In total, our compiler requires 87 bytes of memory during the compilation process.
 
-\subsection{Constant arrays}
-%TODO write evaluation for constant arrays
-TODO
