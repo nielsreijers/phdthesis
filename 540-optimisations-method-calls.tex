@@ -116,13 +116,13 @@ In our AOT compiled code, we use the ATmega's Y register to point the start of a
 \subsubsection{Nested calls}
 A final extension is to allow for nested calls. While frequently called leaf methods benefit the most from lightweight methods, there are many cases where it is useful for lightweight methods to call other lightweight methods. A good example from the \mybench{CoreMark} benchmark is the 16-bit \mycode{crcu16} function, which is implemented as two calls to \mycode{crcu8}. While \mycode{crcu8} is the most critical, there is still one call to \mycode{crcu16} for every two to \mycode{crcu8}.
 
-So far we have not discussed how to handle the return address in a lightweight method. Our AOT compiler uses the native stack to store JVM integer stack value, which means the operands to a lightweight method will be on the native stack. But when we do a \mycode{CALL}, the return address is put on the stack, covering the method parameters.
+So far we have not discussed how to handle the return address in a lightweight method. Our AOT compiler uses the native stack to store VM's integer stack value, which means the operands to a lightweight method will be on the native stack. But when we do a \mycode{CALL}, the return address is put on the stack, covering the method parameters.
 
 For leaf methods, the lightweight method will first pop the return address into two fixed registers, and avoid using these register for stack caching. When the method returns, the return address is pushed back onto the stack before the \mycode{RET} instruction.
 
 For lightweight methods that will call another lightweight method, the return value is also popped from the stack, but instead of leaving it in the fixed register, where it would be overwritten by the nested call, we save it in the first local variable slot and increment Y to skip this slot. Since each lightweight method has its own block of locals, we can nest calls as deeply as we want.
 
-This difference in method prologue and epilogue is the only difference in the way the VM generates code for a lightweight method, all JVM instructions can then be translated the same way as for a normal method.
+This difference in method prologue and epilogue is the only difference in the way the VM generates code for a lightweight method, all bytecode instructions can then be translated the same way as for a normal method.
 
 \subsubsection{Stack frame layout}
 A normal method that invokes a possible string of lightweight methods, needs to save space for this in its stack frame. How much space it needs to reserve can be determined by the infuser at compile time, and this information is added to the method descriptor.
@@ -197,12 +197,12 @@ INVOKELIGHT g_lw
 \subsection{Creating lightweight methods}
 We currently support two ways to create lightweight methods:
 \begin{itemize}
-	\item handwritten JVM bytecode
+	\item handwritten bytecode
 	\item converting a Java method 
 \end{itemize}
 
-\subsubsection{Handwritten JVM bytecode}
-For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in JVM bytecode, which the infuser will simply add to the infusion, and then process it in the same way as it processes a normal method, with one step added:
+\subsubsection{Handwritten bytecode}
+For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in bytecode, which the infuser will simply add to the infusion, and then process it in the same way as it processes a normal method, with one step added:
 
 For lightweight methods, the parameters will be on the stack at the start of the method, but the infusers expects to start with an empty stack. To allow the infuser to process them like other methods, we add a dummy \mycode{LW\_PARAMETER} instruction for each parameter. This instruction is skipped when writing the binary infusion, but it tricks the infuser into thinking the parameters are being put on the stack.
 
@@ -211,7 +211,7 @@ This handwritten approach is useful for the smallest methods, and allows us to c
 
 As a second, slightly slower, but more convenient option, we provide a way to convert normal Java methods to lightweight methods by adding a \mycode{@Lightweight} annotation to it.
 
-The infuser will scan all the methods in an infusion for this annotation. When it finds a method marked \mycode{@Lightweight}, the transformation to turn a normal JVM method into a lightweight one is simple: we first add a dummy \mycode{LW\_PARAMETER} instruction for each parameter, followed by \mycode{STORE} instructions to pop these parameters off the stack and store them in the right local variables. After this, we can use the normal body of the method and call it as a lightweight method.
+The infuser will scan all the methods in an infusion for this annotation. When it finds a method marked \mycode{@Lightweight}, the transformation to turn a normal method into a lightweight one is simple: we first add a dummy \mycode{LW\_PARAMETER} instruction for each parameter, followed by \mycode{STORE} instructions to pop these parameters off the stack and store them in the right local variables. After this, we can use the normal body of the method and call it as a lightweight method.
 
 Listing \ref{lst-comparison-of-handwritten-and-converted-java-lw-method} shows the difference for the \mycode{isOdd} method. We can see this approach adds some overhead in the form of a \mycode{SSTORE\_0} and a \mycode{SLOAD\_0} instruction. However, using popped value caching, only the \mycode{SSTORE\_0} will have a run-time cost. Another disadvantage of the converted method is that is has to use a local variable, which will slightly increase memory usage, but in return this approach gives us a very easy way to create lightweight methods.
 

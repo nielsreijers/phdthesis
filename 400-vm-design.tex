@@ -37,16 +37,16 @@ The optimised Java classes are then transformed into Darjeeling's own bytecode f
 
 When the node receives a large programme, it should not have to keep multiple messages in memory since this will consume too much memory. Our approach allows the bytecode to be translated to native code in a single pass, on instruction at a time. Only some small, fixed-size data structures are kept in memory during the process. A second pass over the generated code then fills in addresses left blank by branch instructions, since the target addresses of forward branches are not known until the target instruction is generated.
 
-This means we can free each message, which can be as small as a single JVM instruction, immediately after processing. Since messages do need to be processed in the correct order, the actual transmission protocol may still decide to keep more messages in memory to reduce the need for retransmissions in the case of out of order delivery. But our translation process does not require it to do so, and a protocol that values memory usage over retransmissions cost could simply discard out of order messages and request retransmissions when necessary.
+This means we can free each message, which can be as small as a single bytecode instruction, immediately after processing. Since messages do need to be processed in the correct order, the actual transmission protocol may still decide to keep more messages in memory to reduce the need for retransmissions in the case of out of order delivery. But our translation process does not require it to do so, and a protocol that values memory usage over retransmissions cost could simply discard out of order messages and request retransmissions when necessary.
 
 
 \section{Translating bytecode to native code}
 \label{sec-basic-translation}
 Our baseline AOT compiler is an implementation of Ellul's approach, as described in his thesis \cite{Ellul:2012thesis}, adapted for the Atmel ATmega128 CPU, while Ellul's work uses the Texas Instruments MSP430. 
 
-In this unoptimised version of our translator, each bytecode instruction the VM receives is simply replaced with a fixed, equivalent sequence of native instructions. The native stack is used to mimic the JVM stack. An example of this is shown in Table 1.
+In this unoptimised version of our translator, each bytecode instruction the VM receives is simply replaced with a fixed, equivalent sequence of native instructions. The native stack is used to mimic the VM's operand stack. An example of this is shown in Table 1.
 
-The first column shows a fragment of JVM code which does a shift right of variable \mycode{A}, and repeats this while \mycode{A} is greater than \mycode{B}. While this may not be a very useful operation, it is the smallest example that will allow us to illustrate our code generation optimisations in the following chapter. The second column shows the code the AOT compiler will execute for each JVM instruction. Together, the first and second column match the case labels and body of a big switch statement in the compiler. The third column shows the resulting AVR native code, which is currently almost a 1-on-1 mapping, with the exception of the branch instruction and some optimisations by a simple peephole optimiser, both described below.
+The first column shows a fragment of bytecode which does a shift right of variable \mycode{A}, and repeats this while \mycode{A} is greater than \mycode{B}. While this may not be a very useful operation, it is the smallest example that will allow us to illustrate our code generation optimisations in the following chapter. The second column shows the code the AOT compiler will execute for each bytecode instruction. Together, the first and second column match the case labels and body of a big switch statement in the compiler. The third column shows the resulting AVR native code, which is currently almost a 1-on-1 mapping, with the exception of the branch instruction and some optimisations by a simple peephole optimiser, both described below.
 
 The example has been slightly simplified for readability. Since the AVR is an 8-bit CPU, in the real code many instructions are duplicated for the high and low bytes of a short. The cycle count is based on the actual number of generated instructions, and for a single iteration.
 
@@ -56,7 +56,7 @@ The example has been slightly simplified for readability. Since the AVR is an 8-
     \scriptsize
     \begin{tabular}{llll} % NO SIMULATION DATA
     \toprule
-    JVM                 & AOT compiler                       & AVR        & cycles \\
+    Bytecode            & AOT compiler                       & AVR        & cycles \\
     \midrule
     \midrule
     0: BRTARGET(0)      & \sccomment{record current address} &            & \\
@@ -109,7 +109,7 @@ When Darjeeling's garbage collection runs, it needs to mark the \emph{root set}:
 
 To mark the root set, the garbage collector needs to determine which local variables, static variables, object fields, and values on the operand stack are references. To do this efficiently, Darjeeling separates references and integers throughout the VM: the operand stack, instance variables on the heap, class static variables, and local variables in a method's stack frame are all split in a block for integers and one for references, as shown in Figure \ref{fig-object-and-stack-frame-layout}.
 
-In our AOT compiler we use the native stack for the JVM integer operand stack, so the integer operand stack is not in a method's stack frame, but the reference stack is. This uses less memory than having the integer stack in the stack frame, since we need to reserve space for the maximum stack depth in the frame, which is often much lower for the reference stack than for the integer stack.
+In our AOT compiler we use the native stack for the VM's integer operand stack, so the integer operand stack is not in a method's stack frame, but the reference stack is. This uses less memory than having the integer stack in the stack frame, since we need to reserve space for the maximum stack depth in the frame, which is often much lower for the reference stack than for the integer stack.
 
 We use the AVR's X register as an extra stack pointer for the reference stack.
 

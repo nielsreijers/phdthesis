@@ -11,7 +11,7 @@
     \midrule
     \\
     \mybench{CoreMark} \\
-    ee\_isdigit                  & \multicolumn{1}{r}{3920}     & normal (inlined)  & manually inlined              & \tblhighlight lightweight (JVM) & manually inlined                \\
+    ee\_isdigit                  & \multicolumn{1}{r}{3920}     & normal (inlined)  & manually inlined              & \tblhighlight lightweight (handw.) & manually inlined                \\
     core\_state\_transition      & \multicolumn{1}{r}{1024}     & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
     crcu8                        & \multicolumn{1}{r}{584}      & normal (inlined)  & manually inlined              & manually inlined                & manually inlined                \\
     crcu16                       & \multicolumn{1}{r}{292}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
@@ -32,7 +32,7 @@
     \midrule
     \\
     \mybench{FFT} \\
-    FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight(JVM)  & \tblhighlight normal            \\
+    FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight(handw.)  & \tblhighlight normal            \\
     \\
     %                                                                                 fft                             fft_lw                            fft_fn
     \emph{cycles}                &                              &                   & \multicolumn{1}{r}{179,692}   & \multicolumn{1}{r}{215,020}     & \multicolumn{1}{r}{661,360}     \\

@@ -5,7 +5,7 @@
     \begin{tabular}{llll|c|c|c|c} % NO SIMULATION DATA
     \toprule
                        &                                                      &                     &        & \multicolumn{4}{c}{cache state} \\
-    JVM                & AOT compiler                                         & AVR                 & cycles & R1                   & R2                   & R3                   & R4                   \\
+    Bytecode           & AOT compiler                                         & AVR                 & cycles & R1                   & R2                   & R3                   & R4                   \\
     \midrule
     \midrule
     0: MARKLOOP(0,1)   & \sccomment{emit markloop prologue:}                  & LDD R1,Y+0          & 4      & \sce{    }{LS0}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\
