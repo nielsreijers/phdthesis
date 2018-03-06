@@ -17,7 +17,7 @@ In this chapter we discuss the most pressing issues we encountered, summarised i
 
 A minimum Java APIs for resource-constrained devices, the Connected Limited Device Configuration (CLDC) specification, was proposed by Sun Microsystems \cite{CLDC}. The CLDC was primarily intended for devices larger than typical sensor nodes, and not tailored to the characteristics of typical sensor node code. Providing support for the full CLDC specification would require a substantial amount of memory and programme space for features that are rarely required by sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the original Darjeeling VM.
 
-The largest mismatch comes from the CLDC's string support, which takes up over 8 KB. While string support is one of the most basic features one would expect to find in the standard library of any general purpose language, it is rarely required within sensor node applications that usually don't have a UI and only communicate with the outside world through radio messages.
+The largest mismatch comes from the CLDC's string support, which takes up over 8 KB. While string support is one of the most basic features one would expect to find in the standard library of any general purpose language, it is rarely required within sensor node applications that usually do not have a UI and only communicate with the outside world through radio messages.
 
 On the other hand, the standard library should include abstractions for typical sensor node operations that are missing from the CLDC. The CLDC \mycode{Stream} abstraction is intended to facilitate file, network and memory operations. The abstraction is not well suited for communication protocols required by WSN applications, such as I$^{2}$C and SPI. In CLDC, connections between devices can be initiated by specifying URI-like strings. However, processing these is relatively expensive, and WSN nodes often identify other nodes using a 16 or 32-bit identifier.
 
@@ -96,7 +96,7 @@ The second problem is the added memory usage. The C struct only takes up 80 byte
 
 Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variable stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 235 bytes, and reading a RSSI value still takes two lookups.
 
-Generally, arrays of primitive types don't suffer from this problem and can be stored efficiently, but programmes containing large arrays of objects can cause significant overhead. In some cases we can work around this problem by flattening the structure, for instance in \mybench{MoteTrack}'s case we could replace the array of \mycode{RFSignal}s with three separate arrays for \mycode{sourceID}s, \mycode{rssi\_0} and \mycode{rssi\_1}, but only at a significant cost in readability.
+Generally, arrays of primitive types do not suffer from this problem and can be stored efficiently, but programmes containing large arrays of objects can cause significant overhead. In some cases we can work around this problem by flattening the structure, for instance in \mybench{MoteTrack}'s case we could replace the array of \mycode{RFSignal}s with three separate arrays for \mycode{sourceID}s, \mycode{rssi\_0} and \mycode{rssi\_1}, but only at a significant cost in readability.
 
 
 
@@ -226,7 +226,7 @@ While features like threads and garbage collection are all useful, they come at 
 
 In Table \ref{tab-vm-size} we show the code size in Darjeeling for some features we discuss below. These were determined by only counting the size of functions directly related to specific features. The actual cost is higher since some, especially garbage collection, also add complexity to other functions throughout the VM. Combined, the features below and the string functions mentioned in Section \ref{sec-std-lib} make up about half the VM.
 
-Besides an increase in VM size, these features also cause a performance penalty, and features such as threads and exceptions are much harder in an AOT compiler where we can't implement them in the interpreter loop. This means that if we care about performance and the corresponding reduction in CPU energy consumption, we either have to give them up, or spend considerably more in terms of VM complexity and size.
+Besides an increase in VM size, these features also cause a performance penalty, and features such as threads and exceptions are much harder in an AOT compiler where we cannot implement them in the interpreter loop. This means that if we care about performance and the corresponding reduction in CPU energy consumption, we either have to give them up, or spend considerably more in terms of VM complexity and size.
 
 
 \subsection{Threads}

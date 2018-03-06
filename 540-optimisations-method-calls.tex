@@ -277,7 +277,7 @@ For small handwritten lightweight methods this is the only cost, but for larger 
 
 The total overhead for a lightweight method call scales nicely with the method's complexity. For the smallest methods, the minimum is only 16 cycles, plus 8 cycles per word for the parameters. For the most complex cases this may go up to 100 to 150 cycles. But these methods must be more complex and will have a longer run time, so the relative overhead is still acceptable.
 
-The number of cycles in Table \ref{tbl-method-invoke-overhead-comparison} is just a broad indication of the overhead. Some factors, such as the cost of clearing the value tags is hard to predict, and inlining may allow some optimisations that aren't possible with a method call. In practice the actual cost in a number of specific cases we examined varies, but is in the range we predicted.
+The number of cycles in Table \ref{tbl-method-invoke-overhead-comparison} is just a broad indication of the overhead. Some factors, such as the cost of clearing the value tags is hard to predict, and inlining may allow some optimisations that are not possible with a method call. In practice the actual cost in a number of specific cases we examined varies, but is in the range we predicted.
 
 Comparing this to a normal method call, we see the cost is much higher, and less dependent on the complexity of the method that is called. The overhead from setting up the stack frame, and the more expensive translation of the \mycode{INVOKE} instruction (see Listing \ref{lst-lightweight-stack-only}) are fixed, meaning a call will cost at least around 540 cycles, increasing to over 700 cycles for more complex methods taking many parameters.
 

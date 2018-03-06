@@ -25,7 +25,7 @@ Our first optimisation is a small but effective extension to the simple peephole
      \end{minted}
 \end{listing}
 
-In this case the pair can be eliminated if \mycode{Rs} == \mycode{Rd}, otherwise it is replaced by a '\mycode{mov Rd, Rs}'. Two push/pop pairs remained in our earlier example Table \ref{tbl-basic-translation}. For the pair in instructions 5 and 7, the value is popped into register R2. Since instruction 6 does not use register R2, we can safely replace this pair with a direct move. In contrast, the pair in instructions 1 and 3 cannot be optimised since the value is popped into register R1, which is also used by instruction 2. The result is shown in Table \ref{tbl-improved-peephole}
+In this case the pair can be eliminated if Rs == Rd, otherwise it is replaced by a '\mycode{mov Rd, Rs}'. Two push/pop pairs remained in our earlier example Table \ref{tbl-basic-translation}. For the pair in instructions 5 and 7, the value is popped into register R2. Since instruction 6 does not use register R2, we can safely replace this pair with a direct move. In contrast, the pair in instructions 1 and 3 cannot be optimised since the value is popped into register R1, which is also used by instruction 2. The result is shown in Table \ref{tbl-improved-peephole}
 
 % This optimisation adds 278 bytes to the optimiser, since it now needs to understand the bytecode well enough to determine which registers are being used.
 

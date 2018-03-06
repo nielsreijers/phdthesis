@@ -17,7 +17,7 @@ The most common optimisations we performed are:
 	\item Use bit shifts for multiplications by a power of two.
 \end{itemize}
 
-We will briefly examine the effect of some 'unfair' optimisations on the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark}. These are optimisations that the infuser most likely couldn't do automatically, but a developer who's aware of the performance of the VM could easily do manually.
+We will briefly examine the effect of some 'unfair' optimisations on the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark}. These are optimisations that the infuser most likely could not do automatically, but a developer who's aware of the performance of the VM could easily do manually.
 
 \paragraph{Temporary variables}
 The first two optimisations generate extra store instructions, which means they may not always be beneficial if the value is never used again. But a value often only needs to be reused only once for it to be faster to store in a local variable than to calculate it twice. If we use the mark loops optimisation discussed in Section \ref{sec-optimisation-markloops}, in many cases the variable may be stored in registers, making accessing them either very cheap, or completely free.
