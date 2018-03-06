@@ -3,9 +3,10 @@
 \centering
 \caption{Code size and memory consumption}
 \label{tbl-code-size-and-memory-consumption}
+    \begin{threeparttable}
     \begin{tabular}{lrrrrrr} % UPDATED 20180305
     \toprule
-                              & size vs     & size vs  &                      & AOT code  &   break & memory    \\
+                              & Size vs     & Size vs  &                      & AOT code  &   Break & Memory    \\
                               & interpreter & baseline &                      & reduction &   even  & usage     \\
     \midrule
     \midrule
@@ -20,4 +21,8 @@
     Lightweight methods       &    13549 B  &  6686 B  & \scriptsize   (+548) &  -39.5\%  & 16.9 KB & 87 B      \\
     \bottomrule
     \end{tabular}
+    \begin{tablenotes}
+        \item The constant shift optimisation adds 170 bytes to the VM size. Because the MoteTrack benchmark cannot run without it, we cannot calculate the average code size reduction.
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
