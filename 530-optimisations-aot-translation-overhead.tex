@@ -182,7 +182,7 @@ This is especially important for arrays of constant data, which are common in se
 \end{listing}
 
 
-There are two problems with this: (i) the array will occupy scarce RAM; and (ii) initialising array elements using JVM instructions requires 4 instructions per element, resulting in 1662 bytes of code to initialise a 256 byte array.
+There are two problems with this: (i) the array will occupy scarce RAM; and (ii) initialising array elements using JVM instructions requires 4 instructions per element, resulting in 1663 bytes of bytecode to initialise a 256 byte array.
 
 To solve this we introduce four new \mycode{GETCONSTARRAY} instructions to read from constant arrays of ints, shorts, chars or bytes. The normal \mycode{GETARRAY} instructions take two operands from the stack: the reference to the array, and the index of the element to load. The \mycode{GETCONSTARRAY} instructions only read the index from the stack, and have the id of the constant array to read from encoded as a single byte operand in the bytecode instruction.
 

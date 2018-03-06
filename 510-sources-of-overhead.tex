@@ -68,7 +68,7 @@ Darjeeling's stack frame layout was shown in Figure \ref{fig-object-and-stack-fr
   \item push the return value onto the stack (using stack caching this will be free)
 \end{enumerate}
 
-Even after considerable effort optimising this process, this requires roughly 550 cycles for the simplest case: a call to a static method without any parameters or return value. For a virtual method the cost is higher because we need to look up the right implementation. While we may be able to save some more cycles with an even more rigorous refactoring, it is clear that the number of steps involved will always take considerably more time than a native function call.
+Even after considerable effort optimising this process, this requires roughly 540 cycles for the simplest case: a call to a static method without any parameters or return value. For a virtual method the cost is higher because we need to look up the right implementation. While we may be able to save some more cycles with an even more rigorous refactoring, it is clear that the number of steps involved will always take considerably more time than a native function call.
 
 \subsection{Optimisations}
 \label{sec-optimisations-java-source}

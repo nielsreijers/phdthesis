@@ -5,7 +5,7 @@ Finally, we will look at the overhead caused by method calls. In native code, th
 
 When we look at the methods in a programme, we typically see a spectrum from a limited number of large methods at the base of the call tree that take a long time to complete and are only called a few times, to small (near-)leaf methods that are fast and frequently called. Figure \ref{fig-coremark-method-calls-vs-duration} shows this spectrum for the \mybench{CoreMark} benchmark.
 
-For the slow methods at the base, the impact of the method call is not very significant for the overall execution time and we can afford the 550 cycles penalty. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
+For the slow methods at the base, the impact of the method call is not very significant for the overall execution time and we can afford the 540 cycles penalty. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
 
 At the very end of this spectrum are tiny helper functions that may be inlined. However, this is only possible for very small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee\_isdigit} was small enough to inline. When larger methods are inlined, the tradeoff is an increase in code size. There is a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
 
@@ -279,7 +279,7 @@ The total overhead for a lightweight method call scales nicely with the method's
 
 The number of cycles in Table \ref{tbl-method-invoke-overhead-comparison} is just a broad indication of the overhead. Some factors, such as the cost of clearing the value tags is hard to predict, and inlining may allow some optimisations that aren't possible with a method call. In practice the actual cost in a number of specific cases we examined varies, but is in the range we predicted.
 
-Comparing this to a normal method call, we see the cost is much higher, and less dependent on the complexity of the method that is called. The overhead from setting up the stack frame, and the more expensive translation of the \mycode{INVOKE} instruction (see Listing \ref{lst-lightweight-stack-only}) are fixed, meaning a call will cost at least around 550 cycles, increasing to over 700 cycles for more complex methods taking many parameters.
+Comparing this to a normal method call, we see the cost is much higher, and less dependent on the complexity of the method that is called. The overhead from setting up the stack frame, and the more expensive translation of the \mycode{INVOKE} instruction (see Listing \ref{lst-lightweight-stack-only}) are fixed, meaning a call will cost at least around 540 cycles, increasing to over 700 cycles for more complex methods taking many parameters.
 
 %INVOKE COST FOR LIGHTWEIGHT METHOD:
 %  8            CALL/RET
