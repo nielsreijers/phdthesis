@@ -47,7 +47,7 @@ The final source of overhead comes from method calls. In the JVM, each method ha
 "containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked and any other bookkeeping information that may be required by the implementation (stack pointer, programme counter, reference to previous activation frame, and the like)" \cite{Gosling:2014}
 \end{quotation}
 
-Darjeeling's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps Darjeeling goes through to invoke a Java method:
+CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps CapeVM goes through to invoke a Java method:
 
 \begin{enumerate}
   \small

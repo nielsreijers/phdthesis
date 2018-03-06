@@ -49,7 +49,7 @@ Using stack caching, code generation is split between the instruction translator
 
 In Table \ref{tbl-simplestackcaching} we translate the same example we used before, but this time using stack caching. The \mycode{emit\_PUSH} and \mycode{emit\_POP} instructions have been replaced by calls to the cache manager, and instructions that load something onto the stack start by asking the cache manager for a free register. The state of the stack cache is shown in the three columns added to the right. Currently it only tracks whether a register is on the stack or not. "Int1" marks the top element, followed by "Int2", etc. This example does not use the reference stack, but it is cached in the same way as the integer stack. A "*" marks a register that is marked as being used by the current instruction, but not currently on the stack. In the next two optimisations we will extend the cache state further.
  
-The example only shows four registers, but the ATmega128 has 32 8-bit registers. Since Darjeeling uses a 16-bit stack, we manage them as pairs. 10 registers are reserved, for example as a scratch register or to store a pointer to local or static variables, leaving 11 pairs available for stack caching.
+The example only shows four registers, but the ATmega128 has 32 8-bit registers. Since CapeVM uses a 16-bit stack, we manage them as pairs. 10 registers are reserved, for example as a scratch register or to store a pointer to local or static variables, leaving 11 pairs available for stack caching.
 
 \paragraph{Branches} Branch targets may be reached from multiple locations. We know the cache state if it was reached from the previous instruction, but not if it was reached through a branch. To ensure the cache state is the same on both paths, we flush the whole stack to memory whenever we encounter either a branch or a \mycode{BRTARGET} instruction. 
 
@@ -99,7 +99,7 @@ Still, there are a few things we can do by modifying the instruction set, that c
 
 Darjeeling's original instruction set is already quite different from the normal JVM instruction set. The most important change is the introduction of 16-bit operations. The JVM is internally a 32-bit machine, meaning \mycode{short}, \mycode{byte}, and \mycode{char} are internally stored as 32-bit integers. On a sensor device where memory is the most scarce resource, we often want to use shorter data types. To support this, Darjeeling internally stores values in 16-bit slots, and introduces 16-bit versions of all integer operations. For example if we want to multiply two shorts and store the result in a short, the 32-bit \mycode{IMUL} instruction is replaced by the 16-bit \mycode{SMUL} instruction. These transformations are all done by the infuser (see Figure \ref{fig-translation-process}).
 
-However, the changes made by Darjeeling are primarily aimed at reducing memory consumption, not at improving performance. We extend the infuser to make several other changes. The \mycode{BRTARGET} and \mycode{MARKLOOP} instructions have already been discussed, and the \mycode{INVOKELIGHT} instruction is the topic of the next section. In addition to these, we made the following five other modifications to Darjeeling's instruction set:
+However, the changes made by Darjeeling are primarily aimed at reducing memory consumption, not at improving performance. The infuser was extended to make several other changes. The \mycode{BRTARGET} and \mycode{MARKLOOP} instructions have already been discussed, and the \mycode{INVOKELIGHT} instruction is the topic of the next section. In addition to these, we made the following five other modifications to Darjeeling's instruction set:
 
 \subsubsection{Constant bit shifts}
 \label{sec-opt-constant-shift}
@@ -120,7 +120,7 @@ The result when applied to our example is shown in Table \ref{tbl-constshift}, w
 
 
 \subsubsection{\mycode{GET/PUTFIELD\_A\_FIXED} reference field access}
-The \mycode{GETFIELD\_*} and \mycode{PUTFIELD\_*} instructions are used to access fields in objects. Because of Darjeeling's split architecture, the offset from the object pointer is known at compile time only for integer fields, but not for reference fields. As shown in Figure \ref{fig-super-class-sub-class-field-layout}, integer fields will be at the same offset, regardless of whether an object is of the compile-time type, or a subclass. References fields may shift up in subclass instances, so \mycode{GETFIELD\_A} and \mycode{PUTFIELD\_A} must examine the object's type at run time and calculate the offset accordingly, adding significant overhead.
+The \mycode{GETFIELD\_*} and \mycode{PUTFIELD\_*} instructions are used to access fields in objects. Because references and integer slots are split, the offset from the object pointer is known at compile time only for integer fields, but not for reference fields. As shown in Figure \ref{fig-super-class-sub-class-field-layout}, integer fields will be at the same offset, regardless of whether an object is of the compile-time type, or a subclass. References fields may shift up in subclass instances, so \mycode{GETFIELD\_A} and \mycode{PUTFIELD\_A} must examine the object's type at run time and calculate the offset accordingly, adding significant overhead.
 
 \begin{figure}
 \centering
@@ -131,14 +131,14 @@ The \mycode{GETFIELD\_*} and \mycode{PUTFIELD\_*} instructions are used to acces
 
 This overhead can be avoided if we can be sure of the offset at compile time, which is the case if the class is marked \mycode{final}. In this case the infuser will replace the \mycode{GETFIELD\_A} or \mycode{PUTFIELD\_A} opcode with a \mycode{\_FIXED} version so the VM knows it is safe to determine the offset at AOT compile time. Conveniently, one of the optimisations ProGuard does, is to mark any class that is not subclassed as \mycode{final}, so most of this is automatic.
 
-\paragraph{Alternative solutions} An alternative we considered is to let go of Darjeeling's split architecture for object fields and mix them, so the offsets for reference fields would also be known at compile time. To allow the garbage collector to find the reference fields we could either extend the class descriptors with a bit map indicating the type of each slot, or let the garbage collector scan all classes in the inheritance line of an object.
+\paragraph{Alternative solutions} An alternative we considered is to let go of the split for references and integers for object fields and mix them, so the offsets for reference fields would also be known at compile time. To allow the garbage collector to find the reference fields we could either extend the class descriptors with a bit map indicating the type of each slot, or let the garbage collector scan all classes in the inheritance line of an object.
 
 We chose our solution because it is easy to implement and adds only a few bytes to the VM size, while the garbage collector is already one of the most complex components of the VM. Also, we found that almost all classes in our benchmarks could be marked \mycode{final}. Either solution would work, and the alternative could be considered as a more general solution.
 
 \paragraph{Evaluation}
 The impact of this optimisation is significant, but we decided not to include it in our evaluation since the overhead is the result of implementation choices in Darjeeling, which was optimised for size rather than performance. This means the overhead is a result of a Darjeeling specific choice, rather than a direct result of the AOT techniques or the JVM's design. Therefore, all results reported in this paper are with this optimisation already turned on.
 
-Since Darjeeling's split architecture has a lot of advantages in terms of complexity and VM size, we still feel it is important to mention this as an example of the kind of trade-offs faced when optimising for performance.
+Since the split architecture has a lot of advantages in terms of complexity and VM size, we still feel it is important to mention this as an example of the kind of trade-offs faced when optimising for performance.
 
 \subsubsection{\mycode{SIMUL} 16-bit to 32-bit multiplication}
 While Darjeeling already introduced 16-bit arithmetic operations, it does not cover the case of multiplying two 16-bit shorts, and storing the result in a 32-bit integer. In this case the infuser would emit \mycode{S2I} instructions to convert the operands to two 32-bit integers, and then use the normal \mycode{IMUL} instruction for full 32-bit multiplication. On an 8-bit device, this is significantly more expensive than 16x16 to 32-bit multiplication.

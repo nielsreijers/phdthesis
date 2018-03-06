@@ -92,7 +92,7 @@ Java does not have the concept of a struct. As described in Section \ref{sec-bac
 
 There are two problems with this. First, since the location of these Java objects is not known until run time, there is a performance penalty for having to follow the chain of references. \mybench{MoteTrack} will loop over the signals in the \mycode{rfSignals} array. Starting from this array, Java needs to do 3 lookups to get to the right RSSI value: the address of the current \mycode{RFSignal} object, the address of the \mycode{rssi} array, and then the actual RSSI value. For the C version, all the offsets are known at compile time, so the compiler can generate a much more efficient loop, directly reading from the right locations.
 
-The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes in Darjeeling. In addition, the 19 arrays have a 3 byte header, and the whole structure contains a total of 39 references, which take up 2 bytes each. In total, the collection of Java objects takes up $80 + 40*5 + 19*3 + 39*2 = 415$ bytes.
+The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes. In addition, the 19 arrays have a 3 byte header, and the whole structure contains a total of 39 references, which take up 2 bytes each. In total, the collection of Java objects takes up $80 + 40*5 + 19*3 + 39*2 = 415$ bytes.
 
 Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variable stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 235 bytes, and reading a RSSI value still takes two lookups.
 
@@ -250,7 +250,7 @@ Finally, garbage collection is clearly the most intrusive one to change. While t
 
 Still, there are good reasons for considering alternatives. Table \ref{tab-vm-size} shows the garbage collector functions in Darjeeling add up to about 3.5 KB, but the actual cost is much higher as many other parts of Darjeeling are influenced by the garbage collector.
 
-Specifically, it is the reason Darjeeling uses a `split-stack' architecture: the operand stack and variables are split into a reference and integer part. This makes it easy for the garbage collector to find live references, but leads to significant code duplication and complexity. When using AOT compilation, the split stack adds overhead to maintain this state, and requires us to reserve two extra registers as a second stack pointer that cannot be used for stack caching.
+Specifically, it is the reason Darjeeling splits references and integers throughout the VM. This makes it easy for the garbage collector to find live references, but leads to significant code duplication and complexity. When using AOT compilation, the split stack adds overhead to maintain this state, and requires us to reserve two extra registers as a second stack pointer that cannot be used for stack caching.
 
 
 

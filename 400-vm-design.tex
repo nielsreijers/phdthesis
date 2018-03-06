@@ -105,7 +105,7 @@ This is an example of something we often see: an optimisation may take a few hun
 \label{fig-object-and-stack-frame-layout}
 \end{figure}
 
-When Darjeeling's garbage collection runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This is then iteratively expanded to also cover all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be freed by the garbage collector.
+When Darjeeling's garbage collector runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This is then iteratively expanded to also cover all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be freed by the garbage collector.
 
 To mark the root set, the garbage collector needs to determine which local variables, static variables, object fields, and values on the operand stack are references. To do this efficiently, Darjeeling separates references and integers throughout the VM: the operand stack, instance variables on the heap, class static variables, and local variables in a method's stack frame are all split in a block for integers and one for references, as shown in Figure \ref{fig-object-and-stack-frame-layout}.
 
