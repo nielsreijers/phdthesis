@@ -14,6 +14,7 @@
 \usepackage{csquotes}
 \usepackage{pdflscape}
 \usepackage{enumitem}
+\usepackage{caption}
 \usepackage[outputdir=.texpadtmp]{minted}
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{2 on 1}[a4paper,border shrink=-8mm,landscape]
@@ -132,14 +133,9 @@
 
 
 \appendix
-\chapter{LEC benchmark source code}
-\label{app-lec-source}
-\chapter{Outlier detection benchmark source code}
-\label{app-outlier-detection-source}
-\chapter{Heat detection benchmark source code}
-\label{app-heat-detection-source}
-\subsection{Calibration}
-\subsection{Detection}
+\input{A00-lec-source}
+\input{B00-outlier-source}
+\input{C00-heat-detection-source}
 
 \backmatter
 
