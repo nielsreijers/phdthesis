@@ -33,7 +33,8 @@
 \newcommand{\xxt}[0] { \makebox[2mm]{} }
 \newcommand{\xxxt}[0] { \makebox[5mm]{} \scriptsize }
 \newcommand{\tblhighlight}[0] {\cellcolor{yellow!40}}
-\newcommand{\mycode}[1]{\texttt{#1}}
+\newcommand{\mycode}[2][java]{\mintinline[fontsize=\normalsize]{#1}{#2}}
+% \newcommand{\mycode}[2][java]{\texttt{\detokenize{#2}}}
 \newcommand{\mybench}[1]{\emph{#1}}
 
 \let\originaltable\table
@@ -126,7 +127,6 @@
 %TODO: check for consistent use of WSN/IoT/wireless sensor networks/sensor networks/Internet-of-Things
 %TODO: check for 'we', 'our', etc
 %TODO: check for VM and replace with virtual machine?
-%TODO: replace \mycode with \mintinline[fontsize=\small]{java} and check result
 
 \appendix
 \chapter{LEC benchmark source code}

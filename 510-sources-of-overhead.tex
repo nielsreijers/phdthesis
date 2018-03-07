@@ -16,7 +16,11 @@ We will briefly discuss each source of overhead below, before introducing optimi
 \subsection{Lack of optimisation in \mycode{javac}}
 A first source of overhead comes from the fact that the standard \mycode{javac} compiler does almost no optimisations.  Since the JVM is an abstract machine, there is no clear performance model to optimise for. Run-time performance depends greatly on the target platform and the VM implementation running the bytecode, which are unknown when compiling Java source code to JVM bytecode.
 
-The \mycode{javac} compiler simply compiles the code 'as is'. For example, the loop '\mycode{while (a < b*c) \{ a*=2; \}}' will evaluate '\mycode{b*c}' on each iteration, while it is clear that the result will be the same every time.
+The \mycode{javac} compiler simply compiles the code 'as is'. For example, the loop 
+
+\centerline{\mycode{while (a < b*c) \{ a*=2; \}}}
+
+\noindent will evaluate '\mycode{b*c}' on each iteration, while it is clear that the result will be the same every time.
 
 In most environments this is not a problem because the bytecode is usually compiled to native code before execution, and using knowledge of the target platform and the run-time behaviour, a desktop JIT compiler can make much better decisions than \mycode{javac}. However, since our AOT compiler simply replaces each instruction with a native equivalent, this leads to significant overhead in our VM.
 
@@ -30,7 +34,7 @@ Assuming we have high quality JVM bytecode, a second source of overhead comes fr
 
 \subsubsection{Type 2: Loading and storing values} The second type is also due to the JVM's stack-based architecture. Each operation consumes its operands from the stack, but often the same value is needed again soon after. In this case, because the value is no longer on the stack, we need to do another load, which will result in another read from memory.
 
-In Table \ref{tbl-basic-translation}, it is clear that the \mycode{SLOAD\_0} instruction at label 5 is unnecessary since the value is already in R1.
+In Table \ref{tbl-basic-translation}, it is clear that the \mycode{SLOAD_0} instruction at label 5 is unnecessary since the value is already in R1.
 
 \subsubsection{Type 3: JVM instruction set limitations} A third source of overhead due to the baseline AOT compilation process comes from optimisations that are done in native code, but are not possible in JVM bytecode, at least not in our resource-constrained environment.
 
@@ -92,7 +96,7 @@ Having identified these sources of overhead, we will use the next three sections
     &\hspace{.5cm} Load/store overhead              & $\bullet$ Popped value caching \\
     &                                               & $\bullet$ Mark loops \\
     &\hspace{.5cm} JVM instruction set limitations  & $\bullet$ Constant bit shift optimisation \\
-    &                                               & $\bullet$ \mycode{GET/PUTFIELD\_A\_FIXED} instructions \\
+    &                                               & $\bullet$ \mycode{GET/PUTFIELD_A_FIXED} instructions \\
     &                                               & $\bullet$ \mycode{SIMUL} instruction \\
     &                                               & $\bullet$ 16-bit array indexes \\
     &                                               & $\bullet$ Support for constant arrays \\

@@ -26,7 +26,7 @@ Looking at the code size data in Table \ref{tbl-codesize-per-benchmark}, we see 
 \subsubsection{MoteTrack}
 The \mybench{MoteTrack} benchmark is by far the slowest of our benchmarks, at a 156\% overhead compared to native C. \mybench{MoteTrack} stores a database of reference signatures in flash memory. In C this is a complex struct containing a number of sub-structures and fixed-sized arrays, while it becomes a collection of objects and arrays in Java, shown in \ref{fig-motetrack-refsignature-objects}.
 
-Since the layout of the complete C structure is known at compile time, the C function to load a reference signature from its database can simply use \mycode{memcpy\_P} to copy a block of 80 bytes from flash memory to RAM. For Java, the method to read from flash memory must follow multiple pointers to follow several indirections to find the locations to put each value. As a result, reading a single signature takes 1455 cycles in Java, and only 735 cycles in C.
+Since the layout of the complete C structure is known at compile time, the C function to load a reference signature from its database can simply use \mycode{memcpy_P} to copy a block of 80 bytes from flash memory to RAM. For Java, the method to read from flash memory must follow multiple pointers to follow several indirections to find the locations to put each value. As a result, reading a single signature takes 1455 cycles in Java, and only 735 cycles in C.
 % 68.5% overhead from reading refSignatures from flash. 68.5 / 1695 * 735 = 29.7
 
 \subsubsection{LEC}

@@ -215,7 +215,7 @@ These instructions both work on an object reference, so a null reference bug cou
 
 In some cases it may be possible to verify of these operations at translation time, but this is hard without extensive analysis that would be too expensive for a sensor node. Therefore a run-time check is added when translating these instructions, which checks the target address is within the heap just before doing the final memory access (\ref{chk-memory-access-within-heap}).
 
-The VM stores the bounds of the heap in two variables: \mycode{heap\_lo\_bound} and \mycode{heap\_hi\_bound} as shown in Figure \ref{fig-memlayout}. Each heap access instruction calculates the address to write in the AVR's Z register. Just before the actual write to the heap, we insert al \mycode{CALL} to the \mycode{heapcheck} function shown in Listing \ref{lst-heap-bounds-check}. This function checks the address in Z is within these bounds. If not, it jumps to the \mycode{illegal\_access\_handler}, allowing the VM to terminate the application. This check adds 22 cycles overhead for each array or object write, and 4 bytes code size overhead for the \mycode{CALL} instruction.
+The VM stores the bounds of the heap in two variables: \mycode{heap_lo_bound} and \mycode{heap_hi_bound} as shown in Figure \ref{fig-memlayout}. Each heap access instruction calculates the address to write in the AVR's Z register. Just before the actual write to the heap, we insert al \mycode{CALL} to the \mycode{heapcheck} function shown in Listing \ref{lst-heap-bounds-check}. This function checks the address in Z is within these bounds. If not, it jumps to the \mycode{illegal_access_handler}, allowing the VM to terminate the application. This check adds 22 cycles overhead for each array or object write, and 4 bytes code size overhead for the \mycode{CALL} instruction.
 
 The actual write to the heap is often done by an offset from Z using the AVR's \mycode{STD}, or 'store indirect with displacement' instruction, that allows us to write to a fixed offset of at most 63 bytes from Z. For example, to write to object fields, who's offset within the object is know at translation time, we simply load the object's address into Z and use \mycode{STD} to write to the correct offset.
 
@@ -241,7 +241,7 @@ We propose two checks to be added to the CPU, causing it to trap to a fixed erro
 \subsection{Stack overflow protection}
 To protect against stack overflow, we propose extending the CPU with a stack bound register. The CPU compares the stack pointer to this stack bound whenever it is modified, either by a direct write or implicitly by a \mycode{PUSH} instruction. If the stack pointer drops below the stack bound, the CPU traps to the error handler.
 
-In our VM, the stack bound register would be set to the value of \mycode{heap\_hi\_bound}, which eliminates the need for \ref{chk-no-nativestack-overflow}.
+In our VM, the stack bound register would be set to the value of \mycode{heap_hi_bound}, which eliminates the need for \ref{chk-no-nativestack-overflow}.
 
 For other embedded code this is also a useful safety measure, since the low amount of RAM makes stack overflows a real risk in any application, which can lead to unpredictable behaviour and hard to diagnose bugs.
 

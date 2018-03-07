@@ -117,7 +117,7 @@ The JVM stores information in three different places:
 
 The JVM is a 32-bit machine. All the places where data may be stored, objects on the heap, operand stacks and local variable slots, and a class' static variables, are blocks of 32-bit wide slots. 64-bit \mycode{long} and \mycode{double} types occupy two slots on the operand stack of local variable space, while the shorter \mycode{byte}, and \mycode{short} types are sign-extended and stored as a 32-bit value.
   
-Figure \ref{fig-jvm-memory} shows a graphical representation of this. An important difference with languages such as C, Pascal or C\# is that in JVM the only value types are the various integer types, and \emph{reference}. There are no compound types like a C \mycode{struct} or Pascal \mycode{record}. Object live in heap, and only there, and the operand stack, and local, static or instance variables only contain references to objects.
+Figure \ref{fig-jvm-memory} shows a graphical representation of this. An important difference with languages such as C, Pascal or C\# is that in JVM the only value types are the various integer types, and \emph{reference}. There are no compound types like a C \mycode[c]{struct} or Pascal \mycode[pascal]{record}. Object live in heap, and only there, and the operand stack, and local, static or instance variables only contain references to objects.
 
 \subsection{Sandbox}
 A sandbox is a security mechanism for isolating a process from the environment in which it runs. They can be used to run code from untrusted sources, without risk of harm to the host machine or other applications running on it.

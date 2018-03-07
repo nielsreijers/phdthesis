@@ -51,7 +51,7 @@ The first column shows a fragment of bytecode which does a shift right of variab
 The example has been slightly simplified for readability. Since the AVR is an 8-bit CPU, in the real code many instructions are duplicated for the high and low bytes of a short. The cycle count is based on the actual number of generated instructions, and for a single iteration.
 
 \begin{table}
-\caption{Translation of \mycode{ do\{A{>}{>}{>}=1;\} while(A>B);}}
+\caption{Translation of \mycode{ do{A>>>=1;} while(A>B);}}
 \label{tbl-basic-translation}
     \scriptsize
     \begin{tabular}{llll} % NO SIMULATION DATA
@@ -116,7 +116,7 @@ We use the AVR's X register as an extra stack pointer for the reference stack.
 \subsection{Peephole optimisation}
 Since our baseline should be as close as possible to Ellul's MSP430 implementation, we implement the same peephole optimisations. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations is shown in Table \ref{tbl-CapeVM-peephole}.
 
-A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode{st X+} or \mycode{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also similarly optimise blocks of pushes followed by blocks of pops, which are very common on the 8-bit ATmega. 
+A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode[c-objdump]{st X+} or \mycode[c-objdump]{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also similarly optimise blocks of pushes followed by blocks of pops, which are very common on the 8-bit ATmega. 
 
 When the push and pop instructions target different registers, this results in multiple \mycode{mov} instructions. Two \mycode{mov} instructions with consecutive registers can be further optimised using the \mycode{movw} instruction to copy a register pair to another register pair in a single cycle.
 
@@ -161,12 +161,12 @@ We made several modifications to the infuser and introduced new bytecode format 
 \begin{itemize}
 	\item The \mycode{BRTARGET} opcode marks targets of branch instructions. All branch instructions are modified to target a \mycode{BRTARGET} id instead of a bytecode offset.
 	\item The \mycode{MARKLOOP} opcode marks inner loops and the variables they use.
-	\item \mycode{PUTFIELD\_A\_FIXED} and \mycode{GETFIELD\_A\_FIXED} are used to access an object's reference fields when the offset is known at compile time. The offset ia always known at compile time for integer fields.
+	\item \mycode{PUTFIELD_A_FIXED} and \mycode{GETFIELD_A_FIXED} are used to access an object's reference fields when the offset is known at compile time. The offset ia always known at compile time for integer fields.
 	\item The \mycode{SIMUL} opcode does 16x16-bit to 32-bit multiplication.
-	\item New \mycode{\_CONST} versions of the (variable) bit shift opcodes support shifting by a constant number of bits.
+	\item New \mycode{_CONST} versions of the (variable) bit shift opcodes support shifting by a constant number of bits.
 	\item The \mycode{INVOKELIGHT} opcode supports an optimised 'lightweight' way of calling methods.
 	\item The \mycode{GETCONSTARRAY} opcodes support reading from arrays of constant data stored in the constant pool.
-	\item Array access opcodes now use 16-bit indexes.
+	\item Array access opcodes use 16-bit instead of 32-bit indexes.
 \end{itemize}
 
 

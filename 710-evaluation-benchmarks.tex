@@ -27,7 +27,7 @@ There are cases where a developer who is aware of the performance characteristic
 The benchmarks exposed some limitations of using a VM instead of native code, which are common to most sensor nodes VMs. Specifically, the lack of support for constant data, high memory overhead for code containing many small objects, and high performance overhead for allocating temporary objects. These are discussed in more detail in Chapter \ref{sec-lessons-from-jvm}, where we also suggest options to solve these limitations. In this section we describe the cases where they forced us to deviate from our preferred direct C to Java mapping.
 
 \subsubsection{FFT}
-Both 8-bit and 16-bit versions of the \mycode{fix\_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
+Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
 
 %TODO: rewrite 8-bit version to use @ConstArray
 Both versions contain a table of precalculated sine wave values, which are stored in flash using the constant array optimisation introduced in Section \ref{sec-opt-constant-arrays}.

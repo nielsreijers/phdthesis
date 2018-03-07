@@ -7,7 +7,7 @@ When we look at the methods in a programme, we typically see a spectrum from a l
 
 For the slow methods at the base, the impact of the method call is not very significant for the overall execution time and we can afford the 540 cycles penalty. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
 
-At the very end of this spectrum are tiny helper functions that may be inlined. However, this is only possible for very small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee\_isdigit} was small enough to inline. When larger methods are inlined, the tradeoff is an increase in code size. There is a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
+At the very end of this spectrum are tiny helper functions that may be inlined. However, this is only possible for very small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee_isdigit} was small enough to inline. When larger methods are inlined, the tradeoff is an increase in code size. There is a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
 
 \subsection{Lightweight methods}
 For these cases we introduce a new type of method call: lightweight methods. These methods differ from normal methods in two ways:
@@ -132,27 +132,27 @@ A normal method that invokes a possible string of lightweight methods, needs to 
 \begin{figure}
 \centering
 \includegraphics[width=0.95\linewidth]{stack-frame-lightweight-method.eps}
-\caption{Stack frame layout for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls lightweight method \mycode{h\_lw}}
+\caption{Stack frame layout for a normal method \mycode{f}, which calls lightweight method \mycode{g_lw}, which in turn calls lightweight method \mycode{h_lw}}
 \label{fig-stack-frame-lightweight-method}
 \end{figure}
 
-An example is shown in Figure \ref{fig-stack-frame-lightweight-method}, which shows the stack frame for a normal method \mycode{f}, which calls lightweight method \mycode{g\_lw}, which in turn calls another lightweight method \mycode{h\_lw}.
+An example is shown in Figure \ref{fig-stack-frame-lightweight-method}, which shows the stack frame for a normal method \mycode{f}, which calls lightweight method \mycode{g_lw}, which in turn calls another lightweight method \mycode{h_lw}.
 
-The stack frame for \mycode{f} contains space for its own locals, and for the locals of the lightweight method it calls: \mycode{g\_lw}. In turn, \mycode{g\_lw}'s locals contain space for \mycode{h\_lw}'s locals, as well as a slot to store the return address back to \mycode{f}. Since \mycode{h\_lw} does not call any other methods, it just keeps its return address in registers.
+The stack frame for \mycode{f} contains space for its own locals, and for the locals of the lightweight method it calls: \mycode{g_lw}. In turn, \mycode{g_lw}'s locals contain space for \mycode{h_lw}'s locals, as well as a slot to store the return address back to \mycode{f}. Since \mycode{h_lw} does not call any other methods, it just keeps its return address in registers.
 
-When a method calls a lightweight method with local variables, it will move the Y register to point at that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g\_lw}'s locals. Since \mycode{g\_lw} may call \mycode{h\_lw}, \mycode{g\_lw}'s prologue will first store the return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
+When a method calls a lightweight method with local variables, it will move the Y register to point at that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g_lw}'s locals. Since \mycode{g_lw} may call \mycode{h_lw}, \mycode{g_lw}'s prologue will first store the return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
 
 \subsubsection{Mark loop}
 Lightweight methods may use any register and do not save call-saved registers like normal methods. The only case where this would be necessary is when it is called inside a \mycode{MARKLOOP} block that uses the same register to pin a variable. In this case we save those variables back to memory before calling the lightweight method and load them after the call returns. Since lightweight methods always come before their invocation in the infusion, the VM already knows which registers it uses, and will only save and restore pinned variables if there is a conflict. Because registers for mark loop are allocated low to high, and for normal stack caching from high to low, in many cases the two may not collide.
 
 \subsubsection{Example call}
-An example of the most complex case for a lightweight call is shown in Listing \ref{lst-full-lighweight-method-call}, which shows how method \mycode{f} from Figure \ref{fig-stack-frame-lightweight-method} would call \mycode{g\_lw}, assuming \mycode{f} is in a markloop block at the time which pinned a variable R14:R15, and these registers are also used by \mycode{g\_lw}.
+An example of the most complex case for a lightweight call is shown in Listing \ref{lst-full-lighweight-method-call}, which shows how method \mycode{f} from Figure \ref{fig-stack-frame-lightweight-method} would call \mycode{g_lw}, assuming \mycode{f} is in a markloop block at the time which pinned a variable R14:R15, and these registers are also used by \mycode{g_lw}.
 
 In the translation of the \mycode{INVOKELIGHT} instruction, first the stack cache is flushed to memory, then the value of the local variable at offset 22 is saved because it was pinned to R14:R15. Next, the Y register is incremented by 26 to skip the caller's own local variables and point Y to the start of the space reserved for lightweight method locals.
 
-In the implementation of \mycode{g\_lw}, the return address is popped off the stack into R18:R19. Since \mycode{g\_lw} may call another lightweight method which will do the same, the return address then is stored in the first local slot, incrementing Y in the process. After \mycode{g\_lw}'s body, the return address is pushed back onto the stack before the final \mycode{ret} instruction.
+In the implementation of \mycode{g_lw}, the return address is popped off the stack into R18:R19. Since \mycode{g_lw} may call another lightweight method which will do the same, the return address then is stored in the first local slot, incrementing Y in the process. After \mycode{g_lw}'s body, the return address is pushed back onto the stack before the final \mycode{ret} instruction.
 
-After \mycode{g\_lw} returns, the reverse process is used to return to the caller: the Y register is restored to point to the caller's locals, and the local variable at offset 22 is loaded back into the pinned register.
+After \mycode{g_lw} returns, the reverse process is used to return to the caller: the Y register is restored to point to the caller's locals, and the local variable at offset 22 is loaded back into the pinned register.
 
 \begin{listing}
 \centering
@@ -204,16 +204,16 @@ We currently support two ways to create lightweight methods:
 \subsubsection{Handwritten bytecode}
 For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in bytecode, which the infuser will simply add to the infusion, and then process it in the same way as it processes a normal method, with one step added:
 
-For lightweight methods, the parameters will be on the stack at the start of the method, but the infusers expects to start with an empty stack. To allow the infuser to process them like other methods, we add a dummy \mycode{LW\_PARAMETER} instruction for each parameter. This instruction is skipped when writing the binary infusion, but it tricks the infuser into thinking the parameters are being put on the stack.
+For lightweight methods, the parameters will be on the stack at the start of the method, but the infusers expects to start with an empty stack. To allow the infuser to process them like other methods, we add a dummy \mycode{LW_PARAMETER} instruction for each parameter. This instruction is skipped when writing the binary infusion, but it tricks the infuser into thinking the parameters are being put on the stack.
 
 \subsubsection{Converting Java methods}
 This handwritten approach is useful for the smallest methods, and allows us to create bytecode that only uses the stack, which produces the most efficient code. But for more complex methods it quickly becomes very cumbersome to write the bytecode by hand.
 
 As a second, slightly slower, but more convenient option, we provide a way to convert normal Java methods to lightweight methods by adding a \mycode{@Lightweight} annotation to it.
 
-The infuser will scan all the methods in an infusion for this annotation. When it finds a method marked \mycode{@Lightweight}, the transformation to turn a normal method into a lightweight one is simple: we first add a dummy \mycode{LW\_PARAMETER} instruction for each parameter, followed by \mycode{STORE} instructions to pop these parameters off the stack and store them in the right local variables. After this, we can use the normal body of the method and call it as a lightweight method.
+The infuser will scan all the methods in an infusion for this annotation. When it finds a method marked \mycode{@Lightweight}, the transformation to turn a normal method into a lightweight one is simple: we first add a dummy \mycode{LW_PARAMETER} instruction for each parameter, followed by \mycode{STORE} instructions to pop these parameters off the stack and store them in the right local variables. After this, we can use the normal body of the method and call it as a lightweight method.
 
-Listing \ref{lst-comparison-of-handwritten-and-converted-java-lw-method} shows the difference for the \mycode{isOdd} method. We can see this approach adds some overhead in the form of a \mycode{SSTORE\_0} and a \mycode{SLOAD\_0} instruction. However, using popped value caching, only the \mycode{SSTORE\_0} will have a run-time cost. Another disadvantage of the converted method is that is has to use a local variable, which will slightly increase memory usage, but in return this approach gives us a very easy way to create lightweight methods.
+Listing \ref{lst-comparison-of-handwritten-and-converted-java-lw-method} shows the difference for the \mycode{isOdd} method. We can see this approach adds some overhead in the form of a \mycode{SSTORE_0} and a \mycode{SLOAD_0} instruction. However, using popped value caching, only the \mycode{SSTORE_0} will have a run-time cost. Another disadvantage of the converted method is that is has to use a local variable, which will slightly increase memory usage, but in return this approach gives us a very easy way to create lightweight methods.
 
 \begin{listing}
  \centering
@@ -341,5 +341,5 @@ We currently do not support lightweight virtual methods, since the overhead of r
 \paragraph{Stack frame usage}
 Finally, while many methods can be made lightweight, we should remember that a method calling a lightweight method will always reserve space for it in its locals. This space is reserved, regardless of whether the method is currently executing or not, and the more nested lightweight calls are made, the more space we need to reserve.
 
-As an example if we have a method \mycode{f1} which may call a lightweight method with a large number of local variables, \mycode{big\_lw}, but is currently calling normal method \mycode{f2}, which may also call \mycode{big\_lw}, we will have reserved space for \mycode{big\_lw} twice, both in \mycode{f1}'s and in \mycode{f2}'s frame.
+As an example if we have a method \mycode{f1} which may call a lightweight method with a large number of local variables, \mycode{big_lw}, but is currently calling normal method \mycode{f2}, which may also call \mycode{big_lw}, we will have reserved space for \mycode{big_lw} twice, both in \mycode{f1}'s and in \mycode{f2}'s frame.
 
