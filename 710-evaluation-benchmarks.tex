@@ -29,7 +29,6 @@ The benchmarks exposed some limitations of using a VM instead of native code, wh
 \subsubsection{FFT}
 Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
 
-%TODO: rewrite 8-bit version to use @ConstArray
 Both versions contain a table of precalculated sine wave values, which are stored in flash using the constant array optimisation introduced in Section \ref{sec-opt-constant-arrays}.
 
 \subsubsection{Outlier detection}
@@ -44,7 +43,6 @@ Note that there is no reason to store the distances in a matrix, and having to a
 Because this benchmark will be used to compare CapeVM's safety cost to Harbor's, we implemented it as described in the paper.
 
 \subsubsection{LEC compression}
-%TODO: rewrite to use @ConstArray
 The LEC algorithm is described in detailed pseudo code in \cite{Marcelloni:2009ja}. Our implementation follows this pseudo code as closely as possible, and is listed in Appendix \ref{app-lec-source}. The input is a set of 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.
 
 \subsubsection{MoteTrack}

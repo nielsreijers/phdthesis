@@ -160,7 +160,6 @@ While Java allows us to declare variables as \mycode{final}, this is only a lang
 
 This is especially important for arrays of constant data, which are common in sensor node applications. For example, the FFT benchmark contains an array of precalculated sine wave values. When we implement this as a \mycode{final} Java array, the compiler emits a static class initialiser that creates a normal Java array object, and then uses the array access instructions to initialise each element individually, as shown in Listing \ref{lst-constant-array-initialisation}. The \mycode{final} keyword only affects the reference to the \mycode{Sinewave} array, but does not cause the contents to be put in flash memory.
 
-%TODO: consistent use of {c} language for bytecode
 \begin{listing}
 \begin{minted}{java}
     private final static byte Sinewave[] = new byte[] {
