@@ -6,9 +6,9 @@ The second goal of this dissertation is to develop a VM that offers a 'safe' exe
 
 A safe execution environment is one that guarantees an application cannot harm the system it is running on or other applications running on the same system. Specifically, an application cannot:
 \begin{enumerate}
-	\item write to memory outside the areas assigned to it,
-	\item execute code it does not have permission for, or
-	\item retain control of the CPU indefinitely
+    \item write to memory outside the areas assigned to it,
+    \item execute code it does not have permission for, or
+    \item retain control of the CPU indefinitely
 \end{enumerate}
 
 Given the first two, the last guarantee is easy to implement: the VM can simply set a timer to trap back to the VM after a certain amount of time. As long as the other guarantees hold, the application will not be able to disable the timer without the VM's permission.
@@ -22,17 +22,17 @@ For an interpreter, the VM is always in control, which makes it is easy to guara
 To guarantee safety we first make the guarantees more concrete and specific to CapeVM:
 
 \begin{itemize}
-	\item \emph{control flow safety}: the VM is always executing either
-		\begin{itemize}
-			\item a translated bytecode instruction from the top, so code cannot jump to a point half-way a generated instruction with undefined results, or
-			\item code in the VM itself, as a result of either a call to the VM from a translated bytecode instruction, or returning from the main method
-		\end{itemize}
-	\item \emph{memory safety}: any write to memory done by the application is to a legal location: either
-		\begin{itemize}
-			\item memory reserved for the operand stack, or
-			\item a valid local or static variable, or
-			\item the area of the heap assigned to the application
-		\end{itemize}
+    \item \emph{control flow safety}: the VM is always executing either
+        \begin{itemize}
+            \item a translated bytecode instruction from the top, so code cannot jump to a point half-way a generated instruction with undefined results, or
+            \item code in the VM itself, as a result of either a call to the VM from a translated bytecode instruction, or returning from the main method
+        \end{itemize}
+    \item \emph{memory safety}: any write to memory done by the application is to a legal location: either
+        \begin{itemize}
+            \item memory reserved for the operand stack, or
+            \item a valid local or static variable, or
+            \item the area of the heap assigned to the application
+        \end{itemize}
 \end{itemize}
 
 Both depend on the other: memory safety is assumed when discussing control flow safety and vice versa. For each, we will examine each bytecode instruction to determine its effect, and what additional checks are necessary to guarantee safety.
@@ -168,30 +168,11 @@ Static variables are allocated globally at the start of the application based on
 \subsection{\mycode{PUTFIELD} and \mycode{PUTARRAY}}
 \label{sec-safety-heap-access}
 
-\begin{listing}
-	\centering
- 	\begin{minted}{c-objdump}
-    heapcheck:
-        lds  r0, heap_lo_bound
-        cp   ZL, r0
-        lds  r0, heap_lo_bound + 1
-        cpc  ZH, r0
-        brlo illegal_access_handler:
-        lds  r0, heap_hi_bound
-        cp   r0, ZL
-        lds  r0, heap_hi_bound + 1
-        cpc  r0, ZH
-        brlo illegal_access_handler:
-        ret
-	\end{minted}
-	\caption{Heap bounds check}
-	\label{lst-heap-bounds-check}
-\end{listing}
 
 
 %\begin{listing}
-%	\centering
-% 	\begin{minted}{c-objdump}
+%   \centering
+%   \begin{minted}{c-objdump}
 %    heapcheck:                               cycles   bytes
 %        lds  r0, heap_lo_bound               2        4
 %        cp   ZL, r0                          1        2
@@ -204,9 +185,9 @@ Static variables are allocated globally at the start of the application based on
 %        cpc  r0, ZH                          1        2
 %        brlo illegal_access_handler:         1        2
 %        ret                                  4        2
-%	\end{minted}
-%	\caption{Heap bounds check}
-%	\label{lst-heap-bounds-check}
+%   \end{minted}
+%   \caption{Heap bounds check}
+%   \label{lst-heap-bounds-check}
 %\end{listing}
 
 The final type of memory access is to the heap. The various \mycode{NEW} instructions used to create arrays and objects are safe since they are fully implemented in the VM, which only allocates new objects at a valid heap location. Writes to heap memory happen using the \mycode{PUTFIELD} and \mycode{PUTARRAY} instructions, which write to object fields and array elements respectively. 
@@ -214,6 +195,26 @@ The final type of memory access is to the heap. The various \mycode{NEW} instruc
 These instructions both work on an object reference, so a null reference bug could easily trick the VM to write to the lowest addresses. Since in the AVR, the lowest 32 bytes of the address space are mapped to the CPU's general purpose registers, this can cause very hard to diagnose bugs. Similarly, using a high out-of-bounds index into an array, malicious code could gain access to the native stack and, for instance, corrupt return addresses.
 
 In some cases it may be possible to verify of these operations at translation time, but this is hard without extensive analysis that would be too expensive for a sensor node. Therefore a run-time check is added when translating these instructions, which checks the target address is within the heap just before doing the final memory access (\ref{chk-memory-access-within-heap}).
+
+\begin{listing}
+    \centering
+    \begin{minted}{c-objdump}
+    heapcheck:
+        lds  r0, heap_lo_bound
+        cp   ZL, r0
+        lds  r0, heap_lo_bound + 1
+        cpc  ZH, r0
+        brlo illegal_access_handler:
+        lds  r0, heap_hi_bound
+        cp   r0, ZL
+        lds  r0, heap_hi_bound + 1
+        cpc  r0, ZH
+        brlo illegal_access_handler:
+        ret
+    \end{minted}
+    \caption{Heap bounds check}
+    \label{lst-heap-bounds-check}
+\end{listing}
 
 The VM stores the bounds of the heap in two variables: \mycode{heap_lo_bound} and \mycode{heap_hi_bound} as shown in Figure \ref{fig-memlayout}. Each heap access instruction calculates the address to write in the AVR's Z register. Just before the actual write to the heap, we insert al \mycode{CALL} to the \mycode{heapcheck} function shown in Listing \ref{lst-heap-bounds-check}. This function checks the address in Z is within these bounds. If not, it jumps to the \mycode{illegal_access_handler}, allowing the VM to terminate the application. This check adds 22 cycles overhead for each array or object write, and 4 bytes code size overhead for the \mycode{CALL} instruction.
 

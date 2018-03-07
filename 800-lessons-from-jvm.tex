@@ -13,8 +13,6 @@ In this chapter we discuss the most pressing issues we encountered, summarised i
 \section{A tailored standard library}
 \label{sec-std-lib}
 
-\input{800-tbl-vm-size} 
-
 A minimum Java APIs for resource-constrained devices, the Connected Limited Device Configuration (CLDC) specification, was proposed by Sun Microsystems \cite{CLDC}. The CLDC was primarily intended for devices larger than typical sensor nodes, and not tailored to the characteristics of typical sensor node code. Providing support for the full CLDC specification would require a substantial amount of memory and programme space for features that are rarely required by sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the original Darjeeling VM.
 
 The largest mismatch comes from the CLDC's string support, which takes up over 8 KB. While string support is one of the most basic features one would expect to find in the standard library of any general purpose language, it is rarely required within sensor node applications that usually do not have a UI and only communicate with the outside world through radio messages.
@@ -23,6 +21,7 @@ On the other hand, the standard library should include abstractions for typical 
 
 We argue that a tailored library should be designed from the ground-up specifically for sensor node applications. Such a library would include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
 
+\input{800-tbl-vm-size} 
 
 
 

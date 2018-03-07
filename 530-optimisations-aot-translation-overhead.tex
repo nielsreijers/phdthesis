@@ -32,6 +32,7 @@ In this case the pair can be eliminated if Rs == Rd, otherwise it is replaced by
 \subsection{Simple stack caching}
 \label{sec-optimisations-simple-stack-caching}
 \input{532-tbl-optimisations-stackcaching}
+
 The improved peephole optimiser can remove part of the type 1 overhead, but still many cases remain where it cannot eliminate the push/pop instructions. We use a form of stack caching \cite{Ertl:1995dv} to eliminate most of the remaining push/pop overhead. Stack caching is not a new technique. It was originally proposed for Forth interpreters in 1995. But the tradeoffs involved are very different depending on the scenario it is applied in, and it turns out to be exceptionally well suited for a sensor node AOT compiler:
 
 First, the VM in the original paper is an interpreter, which means the stack cache has to be very lightweight, or the overhead from managing it at run time will outweigh the time saved by reducing memory accesses. Since we only need to keep track of the cache state at translation time, this restriction does not apply for an AOT compiler and we can afford to spend more time managing it. Second, the simplicity of the approach means it requires very little memory: only 11 bytes of RAM and less than 1 KB of code more than the peephole optimiser.
@@ -57,9 +58,10 @@ This may seem bad for performance, but fortunately the stack is empty at almost 
 
 \subsection{Popped value caching}
 \label{sec-optimisations-popped-value-caching}
+\input{533-tbl-optimisations-poppedvalue}
+
 Stack caching can eliminate most of the push/pop overhead, even when the stack depth increases. We now turn our attention to reducing the overhead resulting from load and store instructions.
 
-\input{533-tbl-optimisations-poppedvalue}
 
 We add a 'value tag' to each register's cache state to keep track of what value is currently held in the register, after it is popped from the stack. Some bytecode instructions have a value tag associated with them to indicate which value or variable they load, store, or modify. Each tag consist of a tuple (type, datatype, number). For example, the instructions \mycode{ILOAD_0} and \mycode{ISTORE_0}, which load and store the local integer variable with id 0, both have tag LI0, short for (local, int, 0). \mycode{SCONST_1} has tag CS1, or (constant, short, 1), etc. These tags are encoded in a 16-bit value.
 
@@ -76,6 +78,7 @@ There are a few more details to get right. For example if we load a value that's
 \subsection{Mark loops}
 \label{sec-optimisation-markloops}
 \input{534-tbl-optimisations-markloops}
+
 Popped value caching reduces the type 2 overhead significantly, but the fact that we have to clear the value tags at branch targets means that a large part of that overhead still remains. This is particularly true for loops, since each iteration often uses the same variables, but the branch to start the next iteration clears those values from the stack cache. This is addressed by the next optimisation.
 
 Again, we modify the infuser to add a new instruction to the bytecode: \mycode{MARKLOOP}. This instruction is used to mark the beginning and end of each inner loop. \mycode{MARKLOOP} has a larger payload than most bytecode instructions: it contains a list of value tags that will appear in the loop and how often each tag appears, sorted in descending order.
@@ -104,6 +107,7 @@ However, the changes made by Darjeeling are primarily aimed at reducing memory c
 \subsubsection{Constant bit shifts}
 \label{sec-opt-constant-shift}
 \input{535-tbl-optimisations-const-shift}
+
 Almost all benchmarks described in Section \ref{sec-evaluation} do bit shifts by a constant number of bits. These appear not only in computation intensive benchmarks, but also as optimised multiplications or divisions by a power of 2, which are common in many programmes.
 
 In JVM bytecode the shift operators take two operands from the stack: the value to shift, and the number of bits to shift by. While this is generic, it is not efficient for constant shifts: we first need to push the constant onto the stack, and the bit shift is implemented as a simple loop which shifts one bit at a time. If the number of bits to shift by is already known, much more efficient code can be generated.

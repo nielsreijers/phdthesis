@@ -42,49 +42,16 @@ This means we can free each message, which can be as small as a single bytecode 
 
 \section{Translating bytecode to native code}
 \label{sec-basic-translation}
+
+\input{401-tbl-basic-translation}
+
 Our baseline AOT compiler is an implementation of Ellul's approach, as described in his thesis \cite{Ellul:2012thesis}, adapted for the Atmel ATmega128 CPU, while Ellul's work uses the Texas Instruments MSP430. 
 
-In this unoptimised version of our translator, each bytecode instruction the VM receives is simply replaced with a fixed, equivalent sequence of native instructions. The native stack is used to mimic the VM's operand stack. An example of this is shown in Table 1.
+In this unoptimised version of our translator, each bytecode instruction the VM receives is simply replaced with a fixed, equivalent sequence of native instructions. The native stack is used to mimic the VM's operand stack. An example of this is shown in Table \ref{tbl-basic-translation}.
 
 The first column shows a fragment of bytecode which does a shift right of variable \mycode{A}, and repeats this while \mycode{A} is greater than \mycode{B}. While this may not be a very useful operation, it is the smallest example that will allow us to illustrate our code generation optimisations in the following chapter. The second column shows the code the AOT compiler will execute for each bytecode instruction. Together, the first and second column match the case labels and body of a big switch statement in the compiler. The third column shows the resulting AVR native code, which is currently almost a 1-on-1 mapping, with the exception of the branch instruction and some optimisations by a simple peephole optimiser, both described below.
 
 The example has been slightly simplified for readability. Since the AVR is an 8-bit CPU, in the real code many instructions are duplicated for the high and low bytes of a short. The cycle count is based on the actual number of generated instructions, and for a single iteration.
-
-\begin{table}
-\caption{Translation of \mycode{ do{A>>>=1;} while(A>B);}}
-\label{tbl-basic-translation}
-    \scriptsize
-    \begin{tabular}{llll} % NO SIMULATION DATA
-    \toprule
-    Bytecode            & AOT compiler                       & AVR        & cycles \\
-    \midrule
-    \midrule
-    0: BRTARGET(0)      & \sccomment{record current address} &            & \\
-    1: SLOAD\_0         & emit\_LDD(R1,Y+0)                  & LDD R1,Y+0 & 4 \\
-                        & emit\_PUSH(R1)                     & PUSH R1    & 4 \\
-    2: SCONST\_1        & emit\_LDI(R1,1)                    & LDI R1,1   & 2 \\
-                        & emit\_PUSH(R1)                     & MOV R2,R1  & 1 \\
-    3: SUSHR            & emit\_POP(R2)                      &            & \\
-                        & emit\_POP(R1)                      & POP R1     & 4 \\
-                        & emit\_RJMP(+2)                     & RJMP +2    & 2 \\
-                        & emit\_LSR(R1)                      & LSR R1     & 2 \\
-                        & emit\_DEC(R2)                      & DEC R2     & 2 \\
-                        & emit\_BRPL(-2)                     & BRPL -2    & 3 \\
-                        & emit\_PUSH(R1)                     &            & \\
-    4: SSTORE\_0        & emit\_POP(R1)                      &            & \\
-                        & emit\_STD(Y+0,R1)                  & STD Y+0,R1 & 4 \\
-    5: SLOAD\_0         & emit\_LDD(R1,Y+0)                  & LDD R1,Y+0 & 4 \\
-                        & emit\_PUSH(R1)                     & PUSH R1    & 4 \\
-    6: SLOAD\_1         & emit\_LDD(R1,Y+2)                  & LDD R1,Y+2 & 4 \\
-                        & emit\_PUSH(R1)                     &            & \\
-    7: IF\_SCMPGT(BT:0) & emit\_POP(R1)                      &            & \\
-                        & emit\_POP(R2)                      & POP R2     & 4 \\
-                        & emit\_CP(R1,R2)                    & CP R1,R2   & 2 \\
-                        & emit\_branchtag(GT,0)              & BRGT 0:    & 2 (taken), \\
-                        &                                    &            & or 1 (not taken) \\
-    \bottomrule
-    \end{tabular}
-\end{table}
 
 \subsection{Branches}
 Forward branches pose a problem for this direct translation approach since the target address is not yet known. A second problem is that on the ATmega, a branch may take 1 to 3 words, depending on the distance to the target, so it is also not known how much space should be reserved for a branch.
@@ -114,13 +81,6 @@ In our AOT compiler we use the native stack for the VM's integer operand stack, 
 We use the AVR's X register as an extra stack pointer for the reference stack.
 
 \subsection{Peephole optimisation}
-Since our baseline should be as close as possible to Ellul's MSP430 implementation, we implement the same peephole optimisations. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations is shown in Table \ref{tbl-CapeVM-peephole}.
-
-A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode[c-objdump]{st X+} or \mycode[c-objdump]{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also similarly optimise blocks of pushes followed by blocks of pops, which are very common on the 8-bit ATmega. 
-
-When the push and pop instructions target different registers, this results in multiple \mycode{mov} instructions. Two \mycode{mov} instructions with consecutive registers can be further optimised using the \mycode{movw} instruction to copy a register pair to another register pair in a single cycle.
-
-
 \begin{table}
 \caption{CapeVM's peephole optimisations}
 \label{tbl-CapeVM-peephole}
@@ -152,6 +112,12 @@ When the push and pop instructions target different registers, this results in m
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
+
+Since our baseline should be as close as possible to Ellul's MSP430 implementation, we implement the same peephole optimisations. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations is shown in Table \ref{tbl-CapeVM-peephole}.
+
+A \mycode{push} directly followed by a \mycode{pop} are either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode[c-objdump]{st X+} or \mycode[c-objdump]{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also similarly optimise blocks of pushes followed by blocks of pops, which are very common on the 8-bit ATmega. 
+
+When the push and pop instructions target different registers, this results in multiple \mycode{mov} instructions. Two \mycode{mov} instructions with consecutive registers can be further optimised using the \mycode{movw} instruction to copy a register pair to another register pair in a single cycle.
 
 
 \subsection{Bytecode modification}

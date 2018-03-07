@@ -339,7 +339,7 @@ While it may be possible to relax this constraint with some effort, in most case
 We currently do not support lightweight virtual methods, since the overhead of resolving the target of the invoke is large compared to the rest of the invoke overhead, but this is something that could be considered in future work.
 
 \paragraph{Stack frame usage}
-Finally, while many methods can be made lightweight, we should remember that a method calling a lightweight method will always reserve space for it in its locals. This space is reserved, regardless of whether the method is currently executing or not, and the more nested lightweight calls are made, the more space we need to reserve.
+Finally, we should remember that a method calling a lightweight method will always reserve space for it in its locals. This space is reserved, regardless of whether the method is currently executing or not, and the more nested lightweight calls are made, the more space we need to reserve.
 
 As an example if we have a method \mycode{f1} which may call a lightweight method with a large number of local variables, \mycode{big_lw}, but is currently calling normal method \mycode{f2}, which may also call \mycode{big_lw}, we will have reserved space for \mycode{big_lw} twice, both in \mycode{f1}'s and in \mycode{f2}'s frame.
 
