@@ -15,7 +15,8 @@ While there is a wide range of IoT devices, they can be roughly divided in two c
 Another decade of miniaturisation since the start of WSN research has allowed us to scale down devices capable of running a normal OS stack, to the size of a few centimetres. Some of the most popular examples include the Raspberry Pi range, for example the only 65x30mm Raspberry Pi Zero, and the Intel Edison at 35.5x25mm.
 
 These devices have capabilities similar to that of desktop PCs only a few generations ago. They can run a normal operating system like Linux and all the standard protocols and tools that come with it. Compared to the traditional resource-constrained sensor nodes, they can perform much more complex tasks, but the smallest devices in this class are still significantly larger than sensor nodes, more expensive, and most importantly, consume significantly more power.
-%TODO add this reference http://ieeexplore.ieee.org/document/7969879/
+
+Tung et al. \cite{Tung:2017tn} report measurements on the Intel Edison, one of the most low-power devices in its class, showing an active power consumption of up to 130 mA and sleep power consumption of 1.8 mA, at 3.7 V. Additionally, the wake-up response time was measured around 380 ms, while the resource-constrained CPUs described below can wake up in a few ms, depending on their configuration.
 
 Since devices in this class are capable of running normal, well established VMs, we do not consider them in this dissertation, but instead focus on the second class of devices: sensor nodes.
 
