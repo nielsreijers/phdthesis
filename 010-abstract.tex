@@ -10,9 +10,9 @@ Many virtual machines have been developed targeting resource-constrained sensor 
 
 In this dissertation we propose CapeVM, a sensor node VM aimed at delivering both high performance and a sandboxed execution environment that guarantees malicious code cannot corrupt the VM's internal state or perform actions not allowed by the VM.
 
-CapeVM uses Ahead-of-Time compilation to native code to improve performance and introduces a range of optimisations to eliminate most of the overhead present in previous work on sensor node AOT compilers. Safety is guaranteed by a set of run-time and translation-time checks. The simplicity of the JVM's instruction set allows us to perform most of these checks when the bytecode is translated to native code, reducing the need for expensive run-time checks.
+CapeVM uses Ahead-of-Time compilation to native code to improve performance and introduces a range of optimisations to eliminate most of the overhead present in previous work on sensor node AOT compilers. Safety is guaranteed by a set of run-time and translation-time checks. The simplicity of the VM's instruction set allows us to perform most of these checks when the bytecode is translated to native code, reducing the need for expensive run-time checks compared to native code approaches.
 
-Using a set of 12 benchmarks with varying characteristic, including the standard \mybench{CoreMark} benchmark and a number of real sensor node applications, we show this results in an average performance roughly 2.1x slower than unsafe native code. Without safety checks, this drops to 1.7x. Thus, CapeVM combines the desirable properties of existing work on both safety and virtual machines for sensor networks, with performance overhead than existing solutions.
+Using a set of 12 benchmarks with varying characteristic, including the standard \mybench{CoreMark} benchmark and a number of real sensor node applications, we show this results in an average performance roughly 2.1x slower than unsafe native code. Without safety checks, this drops to 1.7x. Thus, CapeVM combines the desirable properties of existing work on both safety and virtual machines for sensor networks with significantly improved performance.
 \bigbreak
 \noindent \textbf{Keywords: }{\, \makeatletter \@keywordsen \makeatother}
 \end{abstracten}

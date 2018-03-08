@@ -1,5 +1,5 @@
 \section{Sources of overhead}
-The performance and code size of our baseline approach still suffers from a large overhead compared to optimised native C. To improve on this, it is important to identify the causes of this overhead. The main sources of overhead we found are:
+The performance and code size of the baseline approach still suffers from a large overhead compared to optimised native C. To improve on this, it is important to identify the causes of this overhead. The main sources of overhead we found are:
 \begin{itemize}
 	\item Lack of optimisations in the Java compiler
 	\item AOT code generation overhead
@@ -11,14 +11,12 @@ The performance and code size of our baseline approach still suffers from a larg
 	\item Method call overhead
 \end{itemize}
 
-We will briefly discuss each source of overhead below, before introducing optimisations to reduce it.
+We will briefly discuss each source below, before introducing optimisations to reduce it.
 
 \subsection{Lack of optimisation in \mycode{javac}}
-A first source of overhead comes from the fact that the standard \mycode{javac} compiler does almost no optimisations.  Since the JVM is an abstract machine, there is no clear performance model to optimise for. Run-time performance depends greatly on the target platform and the VM implementation running the bytecode, which are unknown when compiling Java source code to JVM bytecode.
+A first source of overhead comes from the fact that the standard \mycode{javac} compiler does almost no optimisations.  Since the JVM is an abstract machine, there is no clear performance model to optimise for. Run-time performance depends greatly on the target platform and the VM implementation running the bytecode, which are unknown when compiling Java source code to JVM bytecode. The \mycode{javac} compiler simply compiles the code 'as is'. For example, the loop 
 
-The \mycode{javac} compiler simply compiles the code 'as is'. For example, the loop 
-
-\centerline{\mycode{while (a < b*c) \{ a*=2; \}}}
+\centerline{\mycode{while (a < b*c) { a*=2; }}}
 
 \noindent will evaluate '\mycode{b*c}' on each iteration, while it is clear that the result will be the same every time.
 
@@ -30,17 +28,17 @@ We do use the ProGuard optimiser \cite{proguard}, but this only does very basic 
 \label{sec-overhead-aot-translation}
 Assuming we have high quality JVM bytecode, a second source of overhead comes from the way the bytecode is translated to native code. We distinguish three main types of translation overhead, where the first two are a direct result of the JVM's stack-based architecture.
 
-\subsubsection{Type 1: Pushing and popping values} The compilation process initially results in a large number of push and pop instructions. In our simple example in Table \ref{tbl-basic-translation}, the peephole optimiser was able to eliminate some, but two push/pop pairs remain. For more complex expressions this type of overhead is higher, since more values will be on the stack at the same time. This means more corresponding push and pop instructions will not be consecutive, and the peephole optimiser cannot eliminate these cases.
+\subsubsection{Type 1: Pushing and popping values} The compilation process initially results in a large number of push and pop instructions. In our simple example in Table \ref{tbl-basic-translation}, the peephole optimiser was able to eliminate some, but two push/pop pairs remain. For more complex expressions this type of overhead is higher, since more values will be on the stack at the same time. This means more corresponding push and pop instructions will not be consecutive, and the baseline peephole optimiser cannot eliminate these cases.
 
-\subsubsection{Type 2: Loading and storing values} The second type is also due to the JVM's stack-based architecture. Each operation consumes its operands from the stack, but often the same value is needed again soon after. In this case, because the value is no longer on the stack, we need to do another load, which will result in another read from memory.
+\subsubsection{Type 2: Loading and storing values} The second type is also due to the JVM's stack-based architecture. Each operation consumes its operands from the stack, but in many cases the same value is needed again soon after. Because the value is no longer on the stack, this results in another load from memory.
 
-In Table \ref{tbl-basic-translation}, it is clear that the \mycode{SLOAD_0} instruction at label 5 is unnecessary since the value is already in R1.
+In Table \ref{tbl-basic-translation}, it is clear that the \mycode{LDD} instruction at label 5 is unnecessary since the value is already in R1.
 
 \subsubsection{Type 3: JVM instruction set limitations} A third source of overhead due to the baseline AOT compilation process comes from optimisations that are done in native code, but are not possible in JVM bytecode, at least not in our resource-constrained environment.
 
-The JVM instruction set is very simple, which makes it easy to implement, but this also means some things cannot be expressed as efficiently in bytecode as in native code. Given enough processing power, compilers can do the complex transformations necessary to make the compiled JVM code run almost as fast as native C, but on a sensor node we do not have such resources and must simply execute the instructions as they are.
+The JVM instruction set is very simple, which makes it easy to implement, but this also means some things cannot be expressed as efficiently in bytecode as in native code. Given enough processing power, compilers can do the complex transformations necessary to make the compiled JVM code run almost as fast as native C, but a sensor node does not have such resources and must simply execute the instructions as they are.
 
-In Table \ref{tbl-basic-translation} we see that there is no way to express a single bit shift directly. Instead we have to load the constant 1 onto the stack and execute the generic bit shift instruction. Compare this to addition, where the JVM bytecode does have a special INC instruction to add a constant value to a local variable.
+The code in Table \ref{tbl-basic-translation} does a shift right by one bit. In the JVM instruction set there is no way to express a single bit shift directly. Instead the constant 1 is loaded onto the stack, followed by the generic bit shift instruction. Compare this to addition, where the JVM bytecode does have a special INC instruction to add a constant value to a local variable.
 
 A second example is arrays of constant data. Since the JVM has no concept of constant data, any such data is implemented as a normal array, which has two disadvantages: it will use up precious RAM, and it will be initialised using normal JVM instructions, taking up much more code space than the constant data itself.
 
@@ -55,9 +53,9 @@ CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-
 
 \begin{enumerate}
   \small
-  \item flush the stack cache so parameters are in memory and clear value tags (see sections \ref{sec-optimisations-simple-stack-caching} and \ref{sec-optimisations-popped-value-caching})
-  \item save int and ref stack pointers (SP and X)
-  \item call the VM's \mycode{callMethod} function, which will:
+  \item Flush the stack cache so parameters are in memory and clear value tags (see sections \ref{sec-optimisations-simple-stack-caching} and \ref{sec-optimisations-popped-value-caching})
+  \item Save the integer and reference stack pointers (SP and X)
+  \item Call the VM's \mycode{callMethod} function, which will:
   \begin{enumerate}
     \item allocate memory for the callee's frame
     \item initialise the callee's frame
@@ -68,8 +66,8 @@ CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-
     \item reactivate the old frame: set the VM's active frame pointer back to the caller
     \item return to the caller's AOT compiled code the return value (if any) in R22 and higher
   \end{enumerate}
-  \item restore stack pointer and X register
-  \item push the return value onto the stack (using stack caching this will be free)
+  \item Restore stack pointer and X register
+  \item Push the return value onto the stack (using stack caching this will be free)
 \end{enumerate}
 
 Even after considerable effort optimising this process, this requires roughly 540 cycles for the simplest case: a call to a static method without any parameters or return value. For a virtual method the cost is higher because we need to look up the right implementation. While we may be able to save some more cycles with an even more rigorous refactoring, it is clear that the number of steps involved will always take considerably more time than a native function call.

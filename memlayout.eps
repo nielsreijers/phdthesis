@@ -1,7 +1,7 @@
 %!PS-Adobe-3.0 EPSF-3.0
 %%Title: memlayout.fig
 %%Creator: fig2dev Version 3.2 Patchlevel 5e
-%%CreationDate: Sun Jan 28 14:28:02 2018
+%%CreationDate: Fri Mar  9 14:11:40 2018
 %%For: nielsreijers@Nielss-MacBook-Pro.local (Niels Reijers)
 %%BoundingBox: 0 0 628 574
 %Magnification: 1.0000
@@ -102,8 +102,8 @@ pageheader
 % 
 % here starts figure with depth 50
 /Times-Roman ff 200.00 scf sf
-9825 9675 m
-gs 1 -1 sc (: areas the application may write to) col0 sh gr
+4725 6450 m
+gs 1 -1 sc  90.0 rot (Heap) col0 sh gr
 % Polyline
 0 slj
 0 slc
@@ -343,12 +343,6 @@ gs 1 -1 sc (integer operand stack) col0 sh gr
 6225 3600 m
 gs 1 -1 sc (max int stack) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-4725 9150 m
-gs 1 -1 sc  90.0 rot (Globals) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-4725 6450 m
-gs 1 -1 sc  90.0 rot (Heap) col0 sh gr
-/Times-Roman ff 200.00 scf sf
 5175 9675 m
 gs 1 -1 sc (registers and IO) col0 sh gr
 /Times-Roman ff 200.00 scf sf
@@ -384,6 +378,12 @@ gs 1 -1 sc (heap_hi_bound) col0 sh gr
 /Times-Roman ff 200.00 scf sf
 2925 2325 m
 gs 1 -1 sc (Y register) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+9825 9675 m
+gs 1 -1 sc (: areas the application may write to) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+4725 9150 m
+gs 1 -1 sc  90.0 rot (VM Globals) col0 sh gr
 % Polyline
 7.500 slw
 n 4275 3000 m

@@ -6,7 +6,7 @@
 
 In Section \ref{sec-introduction-research-questions} we defined two of our main research questions as how close an AOT compiling sensor node VM can come to native performance, and whether a VM is an efficient way to provide a safe execution environment. These questions are not specific to Java, and the main motivation to base CapeVM on Java was the availability of a rich set of tools and infrastructure to build on, including a solid VM to start from in the form of Darjeeling.
 
-One aspect of Java and the JVM that makes them an attractive choice for sensor nodes is its simplicity, allowing (a subset of) it to be implement in as little as 8 KB \cite{Harbaum}. However, it also lacks some features that make it a less good fit for a typical sensor node code in a number of situations. These range from minor annoyances that reduce code readability, to the lack of support for constant data and high memory consumption for nested data structures that make some applications impossible to implement in Java.
+One aspect of the JVM that makes it an attractive choice for sensor nodes is its simplicity, allowing a useful subset of it to be implement in as little as 8 KB \cite{Harbaum}. However, it also lacks some important features that make it a less good fit for typical sensor node code in a number of situations. These range from minor annoyances that reduce code readability, to the lack of support for constant data and high memory consumption for nested data structures. These last two issues make some applications that can run on a sensor node when written in C, impossible to implement in Java.
 
 In this chapter we discuss the most pressing issues we encountered, summarised in Table \ref{tbl-issues}, and suggest ways they could be improved in future VMs. Although more study is required to turn these suggestions into working solutions, we believe many of the points raised here could be improved with minor changes to Java, leading us to a 'sensor node Java', much like nesC \cite{Gay:2003up} is a sensor node version of C, but some require more drastic changes.
 
@@ -25,22 +25,22 @@ We argue that a tailored library should be designed from the ground-up specifica
 
 
 
-\section{Support for constant data}
+\section{Support for constant arrays}
 \label{sec-const-data}
 Constant data is relatively common in sensor node code. In our benchmarks, they appear as a table of precomputed sine wave values for the \mybench{FFT} benchmark, a database of RSSI signatures in \mybench{MoteTrack}, and a dictionary of codes in the \mybench{LEC} benchmark.
 
-Sensor node CPUs differ from desktop systems in the fact that memory is split in a small amount of RAM for volatile data, and a relatively large amount of flash memory for code and constant data. Because Java was not designed for such systems, it has no way to distinguish between the two, and any data is always placed in RAM.
+Sensor node CPUs differ from desktop systems in the fact that memory is split in a small amount of RAM for volatile data, and a relatively large amount of flash memory for code and constant data. Because Java was not designed for such systems, it has no way to distinguish between the two, so both constant and variable data are always placed in RAM.
 
 There are two problems with Java's approach: (i) an array of constant data will take up RAM, which is a scarce resource, and (ii) the data is not stored as raw data, but as a sequence of bytecode instructions that initialise each element of an array individually. In the worst case, an array of bytes, this means 7 byte of bytecode are needed for each byte of data, which increases even further after AOT compilation.
 
-An extension that allows develops to place arrays of constant data in flash memory was presented in Section \ref{sec-opt-constant-arrays}.
+An extension that allows developers to place arrays of constant data in flash memory was presented in Section \ref{sec-opt-constant-arrays}.
 
 
 
 
 \section{Support for nested data structures}
 \label{sec-nested-data}
-Besides the need to support constant data, the \mybench{MoteTrack} benchmark exposes another weakness of Java: it does not support data structures of many small objects efficiently.
+Besides the need to support constant data, the \mybench{MoteTrack} benchmark clearly exposes another weakness of Java: it does not support data structures of many small objects efficiently.
 
 Listing \ref{lst-motetrack-data-structure} shows the main \mycode{RefSignature} data structure used in \mybench{MoteTrack}. This structure consists of a location, which is a simple struct of 3 shorts, and a signature, which has an id, and an array of 18 signals. A signal is defined by a source ID, and an array of 2 elements with RSSI values.
 
@@ -91,11 +91,11 @@ Java does not have the concept of a struct. As described in Section \ref{sec-bac
 
 There are two problems with this. First, since the location of these Java objects is not known until run time, there is a performance penalty for having to follow the chain of references. \mybench{MoteTrack} will loop over the signals in the \mycode{rfSignals} array. Starting from this array, Java needs to do 3 lookups to get to the right RSSI value: the address of the current \mycode{RFSignal} object, the address of the \mycode{rssi} array, and then the actual RSSI value. For the C version, all the offsets are known at compile time, so the compiler can generate a much more efficient loop, directly reading from the right locations.
 
-The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes. In addition, the 19 arrays have a 3 byte header, and the whole structure contains a total of 39 references, which take up 2 bytes each. In total, the collection of Java objects takes up $80 + 40*5 + 19*3 + 39*2 = 415$ bytes.
+The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes. In addition, the 19 arrays have a 3 byte header, and the whole structure contains a total of 39 references, which each take up 2 bytes. In total, the collection of Java objects use $80 + 40*5 + 19*3 + 39*2 = 415$ bytes.
 
-Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variable stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 235 bytes, and reading a RSSI value still takes two lookups.
+Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variable stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 235 bytes, and reading a RSSI value still takes two lookups instead of one.
 
-Generally, arrays of primitive types do not suffer from this problem and can be stored efficiently, but programmes containing large arrays of objects can cause significant overhead. In some cases we can work around this problem by flattening the structure, for instance in \mybench{MoteTrack}'s case we could replace the array of \mycode{RFSignal}s with three separate arrays for \mycode{sourceID}s, \mycode{rssi_0} and \mycode{rssi_1}, but only at a significant cost in readability.
+Generally, large arrays of primitive types do not suffer from this problem and can be stored efficiently, but for programmes containing large arrays of objects this causes significant overhead. In some cases we can work around this problem by flattening the structure, for instance in \mybench{MoteTrack}'s case we could replace the array of \mycode{RFSignal}s with three separate arrays for \mycode{sourceID}s, \mycode{rssi_0} and \mycode{rssi_1}, but only at a significant cost in readability.
 
 
 
@@ -120,7 +120,7 @@ While seemingly a small annoyance, in more complex code that frequently uses of 
 \paragraph{Possible solutions}
 %If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.
 
-We suggest that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: Declaring variable \mycode{a} as \mycode{unchecked short} would implictly narrow to short when needed, so \mycode{a=b+c;} would not need an explicit cast, while declaring it as a normal \mycode{short} would.
+We suggest that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: declaring variable \mycode{a} as \mycode{unchecked short} would implictly narrow to short when needed, so \mycode{a=b+c;} would not need an explicit cast, while it would if \mycode{a} is declared as a normal \mycode{short}.
 
 
 
@@ -212,7 +212,7 @@ On desktop JVMs, escape analysis \cite{Choi:1999uw, Goetz:2005uy} is used to det
 
 While the analysis of the bytecode required for this is far too complex for a sensor node, it could be done offline, similar to TakaTuka's offline garbage collector analysis. The bytecode can then be extended by adding special versions of the \mycode{new} opcodes to instruct the VM to place an object in the stack frame instead of the heap. A field should also be added to the method header to tell the VM how much extra space for stack objects needs to be reserved in the stack frame.
 
-There is a risk to doing this automatically. In our sensor node VM, the split between heap and stack memory is fixed, and both are limited. If the compiler automatically puts all objects that could be on the stack in the stack frame instead of the heap, we may end up with an empty heap, and a stack overflow. Therefore, it is better to leave this optimisation to the developer by also introducing a new keyword at the language level, so the developer can explicitly indicate which objects go on the stack and which in the heap. Of course escape analysis is still necessary to check at compile time this keyword is only used in places where it is legal for the object to be allocated on the stack.
+There is a risk to doing this automatically. In our sensor node VM, the split between heap and stack memory is fixed, and both are limited. If the compiler automatically puts all objects that could be on the stack in the stack frame instead of the heap, we may end up with an empty heap, and a stack overflow. Therefore, it is better to leave this optimisation to the developer by also introducing a new keyword at the language level, so developers can explicitly indicate which objects go on the stack and which in the heap. Of course escape analysis is still necessary to check at compile time this keyword is only used in places where it is legal for the object to be allocated on the stack.
 
 
 
@@ -223,7 +223,7 @@ Finally, we conclude with some discussion on more fundamental language design ch
 
 While features like threads and garbage collection are all useful, they come at a cost. The trade-off for a sensor node VM is significantly different from a desktop VM: many of Java's more advanced features are vital to large-scale software development, but the size of sensor nodes programmes is much smaller. And while VM size is not an issue on the desktop, these features are relatively expensive to implement on a sensor node with limited flash memory. We believe a VM developed from scratch, with the aim of providing platform independence, safety, and performance through AOT compilation, would end up with a design very different from the JVM.
 
-In Table \ref{tab-vm-size} we show the code size in Darjeeling for some features we discuss below. These were determined by only counting the size of functions directly related to specific features. The actual cost is higher since some, especially garbage collection, also add complexity to other functions throughout the VM. Combined, the features below and the string functions mentioned in Section \ref{sec-std-lib} make up about half the VM.
+Table \ref{tab-vm-size} shows the code size in Darjeeling for some features we discuss below. This was determined by only counting the size of functions directly related to specific features. The actual cost is higher since some, especially garbage collection, also add complexity to other functions throughout the VM. Combined, the features below and the string functions mentioned in Section \ref{sec-std-lib} make up about half the original Darjeeling VM.
 
 Besides an increase in VM size, these features also cause a performance penalty, and features such as threads and exceptions are much harder in an AOT compiler where we cannot implement them in the interpreter loop. This means that if we care about performance and the corresponding reduction in CPU energy consumption, we either have to give them up, or spend considerably more in terms of VM complexity and size.
 
@@ -235,7 +235,7 @@ A more cooperative concurrency model is more appropriate for sensor nodes, where
 
 
 \subsection{Exceptions}
-In terms of code size, exceptions are not very expensive to implement in an interpreter, but they are hard to implement in an AOT compiler. We also feel the advantage of having exceptions is much lower than the other features mentioned in this section, and they could be easily replaced with return values to signal errors.
+In terms of code size, exceptions are not very expensive to implement in an interpreter, but they are hard to implement in an AOT compiler. We also feel the advantage of having exceptions is much lower than the other features mentioned in this section, since they could be easily replaced with return values to signal errors.
 
 
 \subsection{Virtual methods}
@@ -245,11 +245,11 @@ In practice we seldom use virtual methods in sensor node code, but some form of 
 
 
 \subsection{Garbage collection}
-Finally, garbage collection is clearly the most intrusive one to change. While the first three features could be changed with minor modifications to Java, the managed heap is at its very core.
+Finally, garbage collection is clearly the most intrusive aspect of the JVM to change. While the first three features could be changed with minor modifications to Java, the managed heap is at its very core.
 
 Still, there are good reasons for considering alternatives. Table \ref{tab-vm-size} shows the garbage collector functions in Darjeeling add up to about 3.5 KB, but the actual cost is much higher as many other parts of Darjeeling are influenced by the garbage collector.
 
-Specifically, it is the reason Darjeeling splits references and integers throughout the VM. This makes it easy for the garbage collector to find live references, but leads to significant code duplication and complexity. When using AOT compilation, the split stack adds overhead to maintain this state, and requires us to reserve two extra registers as a second stack pointer that cannot be used for stack caching.
+Specifically, it is the reason Darjeeling splits references and integers throughout the VM. This makes it easy for the garbage collector to find live references, but leads to significant code duplication and complexity. Using AOT compilation, the split stack adds overhead to maintain this state, and requires two extra registers as a second stack pointer that cannot be used for stack caching.
 
 
 
@@ -263,4 +263,4 @@ There are two possible paths to follow: a number of issues can be solved by impr
 
 However some of the issues require more invasive changes to both the source language and VM. If the goal is to run platform independent code safely and efficiently, rather than running Java, we should start from the specific requirements and constraints of sensor node software development, which would lead to more lightweight features and a more predictable memory model.
 
-For either path, we hope the points presented in this chapter can help in the development better future sensor node VMs.
+For either path, we hope the points presented in this chapter can help in the development of better future sensor node VMs.

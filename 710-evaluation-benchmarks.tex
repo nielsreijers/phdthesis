@@ -2,9 +2,9 @@
 \section{Benchmarks and experimental setup}
 \label{sec-evaluation-benchmarks}
 
-This section describes our experimental setup, and the benchmarks used and how the source code for each benchmark was obtained, and any relevant details in their implementation.
+This section describes our experimental setup, the benchmarks used and how the source code for each benchmark was obtained, and any relevant details in their implementation.
 
-A set of twelve different benchmarks is used to measure the effect of our optimisations, shown in Table \ref{tbl-benchmarks}
+A set of twelve different benchmarks is used to measure the effect of the optimisations, shown in Table \ref{tbl-benchmarks}
 
 This mix of benchmarks was chosen for several reasons. A number of benchmarks, \mybench{bubble sort}, \mybench{binary search}, \mybench{MD5}, \mybench{FFT}, and \mybench{Outlier detection} were chosen because they are used in various related work, enabling us to compare CapeVM to their results.
 
@@ -18,13 +18,13 @@ Finally, the \mybench{Outlier detection}, \mybench{LEC}, \mybench{MoteTrack} and
 \subsection{Implementation details}
 To ensure the results can be reproduced, we describe the implementation of our benchmarks in this section. For most benchmarks a C version is available in the sources mentioned in Table \ref{tbl-benchmarks}. The sources for \mybench{heat detection}, \mybench{LEC} and \mybench{outlier detection} are not available online, but are listed in the appendices.
 
-The \mybench{bubble sort}, \mybench{heap sort}, \mybench{FFT}, \mybench{binary search}, and \mybench{outlier detection} benchmarks could all be implemented for different data sizes. In the rest of this evaluations 16-bit data is used. 8-bit data is too small for many tasks, for example the ATmega's has 10-bit ADCs, while the memory constraints of sensor nodes mean developers will often be reluctant to use 32-bit variables where 16 bits are sufficient. Therefore, the middle option is used for the main evaluation, and the effect on the performance of 8-bit or 32-bit data is discussed in Section \ref{sec-evaluation-other-platforms}.
+The \mybench{bubble sort}, \mybench{heap sort}, \mybench{FFT}, \mybench{binary search}, and \mybench{outlier detection} benchmarks could all be implemented for different data sizes. In this evaluations 16-bit data is used. 8-bit data is too small for many tasks, for example the ATmega's has 10-bit ADCs, while the memory constraints of sensor nodes mean developers will often be reluctant to use 32-bit variables where 16 bits are sufficient. Therefore, the middle option is used for the main evaluation, and the effect on the performance of 8-bit or 32-bit data is discussed in Section \ref{sec-evaluation-other-platforms}.
 
 The C versions of these benchmarks were translated directly to Java, keeping both implementations as close as possible, and manually optimised as described in Section \ref{sec-optimisations-manual-java-source-optimisation}. These optimisations did not affect the performance of the C version significantly, indicating \mycode{avr-gcc} already does similar transformations on the original code.
 
 There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when developing a Java implementation directly. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-unfair-optimisations}, including two choices that would have lead to better performance. The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat detection} benchmarks, since these could not be directly translated.
 
-The benchmarks exposed some limitations of using a VM instead of native code, which are common to most sensor nodes VMs. Specifically, the lack of support for constant data, high memory overhead for code containing many small objects, and high performance overhead for allocating temporary objects. These are discussed in more detail in Chapter \ref{sec-lessons-from-jvm}, where we also suggest options to solve these limitations. In this section we describe the cases where they forced us to deviate from our preferred direct C to Java mapping.
+The benchmarks exposed some limitations of using a VM instead of native code, which are common to most sensor nodes VMs. Specifically, the lack of support for constant data, high memory overhead for code containing many small objects, and high performance overhead for allocating temporary objects. These are discussed in more detail in Chapter \ref{sec-lessons-from-jvm}, where we also suggest options to solve some of these limitations. In this section we describe the cases where they forced us to deviate from our preferred direct C to Java mapping.
 
 \subsubsection{FFT}
 Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
@@ -38,7 +38,7 @@ We implemented the outlier detection algorithm as described in \cite{Kumar:2007g
 "The outlier detector samples a set of sensor values and stores them in a buffer. Once the buffer is filled, it computes the distance between all pairs of samples in the buffer and stores the result in a matrix. Using a distance threshold, the algorithm marks the distance measurements in the matrix that are greater than the threshold. If the majority of the distance measurements for a sensor readings are marked, then the sensor reading is classified as an outlier."
 \end{displayquote}
 
-Note that there is no reason to store the distances in a matrix, and having to allocate this matrix limits us to only short arrays of input data. The same result can be calculated directly, without the distance matrix, by examining the samples one at a time, and counting the number of other samples with a distance higher than the threshold.
+Note that there is no reason to store the distances in a matrix, and having to allocate this matrix limits us to only small arrays of input data. The same result can be calculated directly, without the distance matrix, by examining the samples one at a time, and counting the number of other samples with a distance higher than the threshold.
 
 Because this benchmark will be used to compare CapeVM's safety cost to Harbor's, we implemented it as described in the paper.
 
@@ -47,20 +47,20 @@ The LEC algorithm is described in detailed pseudo code in \cite{Marcelloni:2009j
 
 \subsubsection{MoteTrack}
 \label{sec-evaluation-benchmark-implementation-motetrack}
-The \mybench{MoteTrack} application uses received signal strength (RSSI) measurements from a number of beacon nodes to do indoor localisation. It contains a small database in flash memory of reference RSSI signatures, stored in a complex structure of many small structs and arrays in C.
+The \mybench{MoteTrack} application uses received signal strength (RSSI) measurements from a number of beacon nodes to do indoor localisation. It contains a database in flash memory of reference RSSI signatures, stored in a complex structure of many small structs and arrays in C.
 
-The memory overhead when translating this directly to Java was too high to run the application, forcing us to make two modifications. First, the original source has the option to list RSSI signatures at different transmission powers, but the authors note this may not always improve results. The original C code only uses a single transmission power setting, which results in arrays of a single element that get optimised away at compile time. We replaces these arrays in the Java version with simple variables. Second, we flattened a two element array with RSSI values for different channels into two separated variables to eliminate the overhead for allocating too many small arrays.
+The memory overhead when translating this directly to Java was too high to run the application, forcing us to make two modifications. First, the original source has the option to list RSSI signatures at different transmission powers, but the authors note this may not always improve results. The original C code only uses a single transmission power setting, which results in arrays of a single element that get optimised away at compile time. In the Java version there were replaced with simple variables. Second, a two element array with RSSI values for different channels was flattened into two separated variables to eliminate the overhead from allocating too many small arrays.
 
 Again, the constant array optimisation was used to place the data in flash memory. Since this only allows arrays of integer types, the single array of C nested structs was split into 7 arrays for the individual fields. Without this optimisation, it would be impossible to implement this application in Java because the 20 KB database is too large to fit in RAM.
 
-These changes do not affect the results of the current version of the code, but we note that while it would be possible to use multiple transmission powers or more channels in the C version, this would require too much memory for the Java version. Thus, while our Java implementation of \mybench{MoteTrack} does execute the same algorithm as the C version, we were force to modify its implementation significantly, which clearly highlights some of the weaknesses of current sensor node VMs.
+Thus, while our Java implementation of \mybench{MoteTrack} does execute the same algorithm as the C version, we were force to modify its implementation significantly, which clearly highlights some of the weaknesses of current sensor node VMs. These changes do not affect the results of the current version of the code, but we note that while it would be possible to use multiple transmission powers or more channels in the C version, this would require too much memory for the Java version.
 
 \subsubsection{Heat detection}
 The \mybench{heat detection} application is adapted from code used by a different project in our group to track persons and fire hazards using Raspberry Pi devices equipped with an 8x8 heat sensor.
 
 It contains two phases: first the heat sensor is calibrated with no heat sources in view to determine the average and standard deviation of the sensor readings. In the next phase the algorithm tracks the position of a person moving within the field of view of the sensor, and detects extreme temperatures that may indicate a fire. In the evaluation both phases are listed separately.
 
-The calibration phase was modified to allow it to run on the more resource-constrained sensor node, but the resulting calibration data is identical. The code for the detection phase was copied directly from the source used on the Raspberry Pi, but modified slightly to avoid repeatedly allocating temporary objects as described in Section \ref{sec-no-gc}.
+The calibration phase was modified to allow it to run on the more resource-constrained sensor node, but the results of the calibration are identical. The code for the detection phase was copied directly from the source used on the Raspberry Pi, but modified slightly to avoid repeatedly allocating temporary objects as described in Section \ref{sec-no-gc}.
 
 Our implementation reads sensor measurements using a native call to read from a table in flash memory, simulating to how a real version would use a library call to read from a sensor.
 
