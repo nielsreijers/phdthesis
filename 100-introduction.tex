@@ -196,7 +196,7 @@ Our focus on sensor nodes raises the question of how platform independent our VM
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\linewidth]{compilation-process-highlevel.eps}
+\includegraphics[width=0.8\linewidth]{compilation-process-highlevel.eps}
 \caption{Highlevel overview of the compilation process}
 \label{fig-compilation-process-highlevel}
 \end{figure}
@@ -214,10 +214,13 @@ Note that in Figure \ref{fig-compilation-process-highlevel} we use 'source code'
 We will see that in fact Java, in its current form, is not well suited for sensor node applications, and we will end this dissertation with a number of suggestions on how to remedy some of these issues.
 
 
+\newpage
 \section{Research questions and contributions}
 \label{sec-introduction-research-questions}
-The main focus of this dissertation is on assessing the suitability of virtual machines as a means to programme sensor node devices. The main research questions we will answer are:
-%TODO: add sentence according to prof Shih's suggestions
+There are clear advantages from using virtual machines, especially in heterogeneous and dynamic IoT scenarios, but these come at a cost. On a sensor node, this cost is especially significant since they are already very resource-constrained and cannot do many of the optimisations used in VMs on larger devices.
+
+The main research question of this dissertation is whether virtual machines are a suitable means to programme sensor node devices.
+Specifically:
 \begin{enumerate}
     \item[a.] How close can an Ahead-of-Time compiling sensor node VM come to native C performance, and what are the tradeoffs?
     \item[b.] Can a VM be an efficient way to provide a safe, sandboxed execution environment on a sensor node?
@@ -225,7 +228,7 @@ The main focus of this dissertation is on assessing the suitability of virtual m
 \end{enumerate}
 
 \noindent
-Specifically, this dissertation makes the following contributions:
+This dissertation makes the following contributions:
 \begin{enumerate}
     \item We identify the major sources of overhead when using the baseline approach to Ahead-of-Time compilation described by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}.
     \item Using the results of this analysis, we propose a set of eleven optimisations to address each source of overhead. These include improvements to Ellul's AOT approach, modifications to the VM's bytecode, and a lightweight alternative to standard Java method invocation.    
