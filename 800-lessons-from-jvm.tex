@@ -1,6 +1,6 @@
 \chapter{Lessons from JVM}
 
-\input{800-tbl-issues}
+\input{801-tbl-issues}
 
 \label{sec-lessons-from-jvm}
 
@@ -8,7 +8,12 @@ In Section \ref{sec-introduction-research-questions} we defined two of our main 
 
 One aspect of the JVM that makes it an attractive choice for sensor nodes is its simplicity, allowing a useful subset of it to be implement in as little as 8 KB \cite{Harbaum}. However, it also lacks some important features that make it a less good fit for typical sensor node code in a number of situations. These range from minor annoyances that reduce code readability, to the lack of support for constant data and high memory consumption for nested data structures. These last two issues make some applications that can run on a sensor node when written in C, impossible to implement in Java.
 
-In this chapter we discuss the most pressing issues we encountered, summarised in Table \ref{tbl-issues}, and suggest ways they could be improved in future VMs. Although more study is required to turn these suggestions into working solutions, we believe many of the points raised here could be improved with minor changes to Java, leading us to a 'sensor node Java', much like nesC \cite{Gay:2003up} is a sensor node version of C, but some require more drastic changes.
+In this chapter we discuss the most pressing issues we encountered, summarised in Table \ref{tbl-issues}, and suggest ways they could be improved in future VMs. Where possible, the impact of these issues is quantified in Table \ref{tbl-quantitative-results}.
+
+Although more study is required to turn these suggestions into working solutions, we believe many of the points raised here could be improved with minor changes to Java, leading us to a 'sensor node Java', much like nesC \cite{Gay:2003up} is a sensor node version of C, but some require more drastic changes.
+
+
+
 
 \section{A tailored standard library}
 \label{sec-std-lib}
@@ -19,10 +24,13 @@ The largest mismatch comes from the CLDC's string support, which takes up over 8
 
 On the other hand, the standard library should include abstractions for typical sensor node operations that are missing from the CLDC. The CLDC \mycode{Stream} abstraction is intended to facilitate file, network and memory operations. The abstraction is not well suited for communication protocols required by WSN applications, such as I$^{2}$C and SPI. In CLDC, connections between devices can be initiated by specifying URI-like strings. However, processing these is relatively expensive, and WSN nodes often identify other nodes using a 16 or 32-bit identifier.
 
-We argue that a tailored library should be designed from the ground-up specifically for sensor node applications. Such a library would include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
+Aslam \cite{Aslam:2011thesis} discusses a method for dead code removal that could be used to remove unused code from a library. While a useful technique, such code becomes part of the application that is uploaded to a device, which is less efficient compared to a natively implemented standard library, and not possible for library functions to access the hardware.
 
-\input{800-tbl-vm-size} 
+Therefore we argue a minimal tailored library is necessary that may be efficiently implemented in native code and present on all devices, and that this library should be designed from the ground-up specifically for sensor node applications. Such a library would include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
 
+
+
+\input{802-tbl-quantitative-results}
 
 
 \section{Support for constant arrays}
@@ -37,6 +45,7 @@ An extension that allows developers to place arrays of constant data in flash me
 
 
 
+\input{803-tbl-vm-size} 
 
 \section{Support for nested data structures}
 \label{sec-nested-data}
@@ -115,7 +124,7 @@ Passing literal integer values to a method call treats them as ints, even if the
 
 \mycode{f((byte)1);}
 
-While seemingly a small annoyance, in more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read.
+While seemingly a small annoyance, in more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read. Table \ref{tbl-quantitative-results} shows that over 25 casts per 100 lines of code can appear in some benchmarks.
 
 \paragraph{Possible solutions}
 %If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.

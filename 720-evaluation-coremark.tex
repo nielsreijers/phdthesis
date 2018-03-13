@@ -65,8 +65,8 @@ The effect depends greatly on the characteristics of the code. The matrix part o
 
 We also applied all these optimisations to the native C version to ensure a fair comparison, but the difference in performance was negligible. In the rest of the evaluation, all the results presented are for the manually optimised code.
 
-\subsection{'Unfair' optimisations}
-\label{sec-evaluation-coremark-unfair-optimisations}
+\subsection{Non-automatic optimisations}
+\label{sec-evaluation-coremark-non-automatic-optimisations}
 After these optimisations, \mybench{CoreMark} is still one of the slower benchmarks. We can improve performance further if we relax our constraint of only doing optimisations that a compiler could do automatically without changing the code significantly.
 
 Table \ref{tbl-coremark-manual-optimisation} shows that in the native version, over half of the time is spent in the matrix part of the benchmark, but for the final Java version all three parts are much closer together. The state machine and linked list processing both suffer from a much larger slowdown than the matrix part, which by itself would be the third fastest of all our benchmarks.

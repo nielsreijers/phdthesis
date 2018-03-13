@@ -22,7 +22,7 @@ The \mybench{bubble sort}, \mybench{heap sort}, \mybench{FFT}, \mybench{binary s
 
 The C versions of these benchmarks were translated directly to Java, keeping both implementations as close as possible, and manually optimised as described in Section \ref{sec-optimisations-manual-java-source-optimisation}. These optimisations did not affect the performance of the C version significantly, indicating \mycode{avr-gcc} already does similar transformations on the original code.
 
-There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when developing a Java implementation directly. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-unfair-optimisations}, including two choices that would have lead to better performance. The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat detection} benchmarks, since these could not be directly translated.
+There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when developing a Java implementation directly. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-non-automatic-optimisations}, including two choices that would have lead to better performance. The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat detection} benchmarks, since these could not be directly translated.
 
 The benchmarks exposed some limitations of using a VM instead of native code, which are common to most sensor nodes VMs. Specifically, the lack of support for constant data, high memory overhead for code containing many small objects, and high performance overhead for allocating temporary objects. These are discussed in more detail in Chapter \ref{sec-lessons-from-jvm}, where we also suggest options to solve some of these limitations. In this section we describe the cases where they forced us to deviate from our preferred direct C to Java mapping.
 
@@ -63,6 +63,8 @@ It contains two phases: first the heat sensor is calibrated with no heat sources
 The calibration phase was modified to allow it to run on the more resource-constrained sensor node, but the results of the calibration are identical. The code for the detection phase was copied directly from the source used on the Raspberry Pi, but modified slightly to avoid repeatedly allocating temporary objects as described in Section \ref{sec-no-gc}.
 
 Our implementation reads sensor measurements using a native call to read from a table in flash memory, simulating to how a real version would use a library call to read from a sensor.
+
+The two phases are listed separately in the evaluation.
 
 
 \subsection{Experimental setup}

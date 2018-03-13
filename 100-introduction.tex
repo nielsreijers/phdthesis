@@ -155,6 +155,35 @@ Where exactly this break-even point lies depends on many factors. The CPUs and r
 
 This calculation is a good example of a situation where the slowdown caused by current sensor node VMs will be a problem. For Mercury's feature extraction, the break-even point is around 27x slowdown, while for this case of LEC compression it is at only 2.6x. While the exact numbers depend on the application, it is clear that a slowdown of one to two orders of magnitude will affect battery lifetime in many applications.
 
+\subsubsection{Amulet}
+A final example to motivate both the usefulness of a VM and the need for good performance is the smart watch platform Amulet \cite{Hester:2016je}. Amulet aims to provide a week-long or month-long battery life time. To do so it uses a typical low-power resource-constrained CPU, the MSP430.
+
+Amulet supports multiple concurrent applications. Currently these are written in Amulet C, and are compiled together into a single firmware image that is loaded onto a watch. However, the authors envision a future with multiple vendors of Amulet devices, who will no doubt use different hardware platforms, and many developers submitting applications to a sort of app store. In such a scenario the platform independence a VM can provide is a valuable property.
+
+However, one of the main design goals of Amulet is long battery life, and although the authors do not provide a breakdown of energy consumption per component like Mercury, they do note that "Energy consumption is significantly impacted by the fraction of time the application microcontroller (MSP430) is active". This suggests a large performance overhead would also significantly reduce battery lifetime.
+
+\begin{table}
+\caption[Sleep and active time for Amulet applications]{Sleep and active time for Amulet applications, source: \cite{Hester:2016je}}
+\label{tbl-amulet-applications-sleep}
+    \begin{tabular}{lrrr} % NO SIMULATION DATA
+        \toprule
+        Application        & \%Sleep & \%OS & \%App \\
+        \midrule
+        \midrule
+        Clock              & 98.1    & 0.9  & 1.0 \\
+        EMA                & 98.2    & 1.0  & 0.8 \\
+        Heart rate         & 91.1    & 0.9  & 8.0 \\
+        Pedometer          & 93.8    & 2.2  & 4.0 \\
+        Pedometer+HR       & 87.5    & 1.9  & 10.6 \\
+        Pedometer+HR+Clock & 85.4    & 2.8  & 11.8 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The paper provides an overview of the percentage of time spent in sleep mode, in the OS, or in application code for a few different applications. This is reproduced in Table \ref{tbl-amulet-applications-sleep}. The percentage of time the CPU is executing application code varies between 0.8\% and 11.8\%. Combined with the one to two orders of magnitude slowdown seen in Table \ref{tbl-slowdown-for-sensornode-vms}, there are many cases where the slowdown of a VM would mean the CPU has to be active for more than 100\% of the time, indicating it does not have enough time to run all its tasks in time.
+
+For the most expensive configuration that spends 11.8\% executing application code, this happens at a slowdown of roughly 8.5x. The lighter applications can tolerate more overhead, but the highest slowdowns seen in Table \ref{tbl-slowdown-for-sensornode-vms} are a problem for even the lightest application.
+
 \subsubsection{Ahead-of-Time compilation}
 Thus, a better performing VM is needed, preferably one that performs as close to native performance as possible. Translating bytecode to native code is a common technique to improve performance in desktop VMs. Translation can occur at three moments: offline, ahead-of-time (AOT), or just-in-time (JIT).
 
@@ -180,6 +209,15 @@ To guard against both buggy code and malicious attacks, a desirable property wou
 Note that these guarantees do not say anything about the correctness of the application itself: buggy code may still corrupt its own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds run-time checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this does not protect against malicious code being sent to the device and depends on the correctness of the host.
 
 Our approach depends only on the correctness of our VM, and guarantees it can always regain control of the node and terminate any misbehaving application before it executes an illegal write or performs an action it is not permitted to.
+
+\subsubsection{Amulet}
+The Amulet \cite{Hester:2016je} smart watch platform is also a good motivating example for the need for a safe execution environment. Since it aims to run multiple concurrent applications possibly developed by different developers, it is important to isolate these applications from each other and from the OS.
+
+Amulet does this by using a restricted dialect of C, Amulet C, which has several limitations that make it easier to guarantee safety. For example, there is no access to arbitrary memory location through pointers, no goto statements, no dynamic memory allocation, and no recursion. The Amulet compiler then adds runtime checks where static safety checks are not sufficient.
+
+Although the authors do not provide any data on the overhead caused by the restrictions in Amulet C and added run time checks, it is significant enough to motivate them to investigate the use of memory protection units found on some CPUs \cite{Hardin:2017cq} to reduce this overhead. However these MPUs are only available on a limited number of CPUs.
+
+To use a VM in a project such as Amulet, it must be able to provide the same level of isolation, and do so at an acceptable cost.
 
 
 \section{Scope}

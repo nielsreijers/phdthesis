@@ -1,0 +1,43 @@
+\clearpage
+\newgeometry{margin=1cm}
+\thispagestyle{empty}
+\begin{landscape}
+\begin{table}[t!]
+\caption{Quantitative impact}
+\label{tbl-quantitative-results}
+    \centerline{
+    \begin{tabular}{llrrrrrrrrrrrrrrr} % UPDATED 20180313
+    \toprule
+    % Section                    & Issue                                     &                          Measure & B.sort & H.sort & Bin.Search & XXTEA &   MD5 &  RC5 & FFT   & Outlier &   LEC & CoreMark & MoteTrack & HeatCalib & HeatDetect \\
+    % \midrule
+    % \midrule
+    % \ref{sec-const-data}       & Support for constant data                 &            Size of constant data &        &        &            &       &       &  200 & 2048  &         &    51 &          &     20 KB &           &            \\
+    %                            &                                           &         Const array RAM overhead &        &        &            &       &       &  208 & 2056  &         &    67 &          &   too big &           &            \\
+    %                            &                                           & Const array flash overhead (AOT) &        &        &            &       &       & 1998 & 26714 &         &   930 &          &   too big &           &            \\
+    % \ref{sec-small-datatypes}  & Better lang. support for shorts and bytes &                            Casts &      1 &      6 &          5 &     8 &     8 &    8 & 16    & 3       &     8 &       41 &        33 &         4 &         70 \\
+    %                            &                                           &                              LOC &     11 &     24 &         16 &    38 &   165 &   27 & 73    & 43      &    48 &      637 &       475 &        47 &        272 \\
+    %                            &                                           &                Casts per 100 LOC &      9 &     25 &         31 &    21 &     5 &   30 & 22    & 7       &    17 &        6 &         7 &         9 &         26 \\
+    % \ref{sec-inlining}         & Explicit and efficient inlining           &     Slowdown non-inlined version &        &   69\% &            &  57\% &  25\% & 37\% & 20\%  &         &       &      8\% &           &           &            \\
+    %                            &                                           &         Size non-inlined version &        &     42 &            &  -224 & -1502 &  -94 & -20   &         &       &       48 &           &           &            \\
+    % \ref{sec-optimising-javac} & An optimising compiler                    &       Slowdown w/o optimisations &   91\% &   52\% &      544\% &   3\% &       &      & 3\%   & 23\%    &       &    116\% &      76\% &           &        2\% \\
+    % \ref{sec-no-gc}            & Allocating objects on stack               &         Slowdown heap allocation &        &        &            &       &       &      &       &         & 330\% &      6\% &      65\% &           &            \\    \bottomrule
+    Section                    & Measure                          &             B.sort &             H.sort &          Bin.Search &              XXTEA &   MD5 &              RC5 &                 FFT & Outlier & LEC                  &            CoreMark &             MoteTrack & HeatCalib &       HeatDetect \\
+    \midrule
+    \midrule
+    \ref{sec-const-data}       & Size of constant data            &                    &                    &                     &                    &       &              200 &                2048 &         & 51                   &                     &                 20 KB &           &                  \\
+                               & Const array RAM overhead         &                    &                    &                     &                    &       &              208 &  \tblhighlight 2056 &         & 67                   &                     & \tblhighlight too big &           &                  \\
+                               & Const array flash overhead (AOT) &                    &                    &                     &                    &       &             1998 & \tblhighlight 26714 &         & 930                  &                     & \tblhighlight too big &           &                  \\
+    \ref{sec-small-datatypes}  & Casts                            &                  1 &                  6 &                   5 &                  8 &     8 &                8 &                  16 &       3 & 8                    &                  41 &                    33 &         4 &               70 \\
+                               & LOC                              &                 11 &                 24 &                  16 &                 38 &   165 &               27 &                  73 &      43 & 48                   &                 637 &                   475 &        47 &              272 \\
+                               & Casts per 100 LOC                &                  9 &   \tblhighlight 25 &    \tblhighlight 31 &                 21 &     5 & \tblhighlight 30 &                  22 &       7 & 17                   &                   6 &                     7 &         9 & \tblhighlight 26 \\
+    \ref{sec-inlining}         & Slowdown non-inlined version     &                    & \tblhighlight 69\% &                     & \tblhighlight 57\% &  25\% &             37\% &                20\% &         &                      &                 8\% &                       &           &                  \\
+                               & Size non-inlined version         &                    &                +42 &                     &               -224 & -1502 &              -94 &                 -20 &         &                      &                 +48 &                       &           &                  \\
+    \ref{sec-optimising-javac} & Slowdown w/o optimisations       & \tblhighlight 91\% & \tblhighlight 52\% & \tblhighlight 544\% &                3\% &       &                  &                 3\% &    23\% &                      & \tblhighlight 116\% &    \tblhighlight 76\% &           &              2\% \\
+    \ref{sec-no-gc}            & Slowdown heap allocation         &                    &                    &                     &                    &       &                  &                     &         & \tblhighlight  330\% &                 6\% &                  65\% &           &                  \\
+    \bottomrule
+    \end{tabular}
+    }
+\end{table}
+\end{landscape}
+\clearpage
+\restoregeometry

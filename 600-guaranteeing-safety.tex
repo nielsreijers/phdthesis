@@ -230,39 +230,39 @@ If the top and bottom boundaries of the heap are aligned at 256 bytes, this elim
 Finally, 8 cycles can be saved by keeping the bounds in registers instead of memory, which removes the need for the \mycode{LDS} instructions. However this reduces the performance of the stack cache since these registers would not be available for stack caching. Which of these affects performance more depends on the code being run. We evaluate the difference in Section \ref{sec-evaluation-run-time-cost}. Since having the bounds in registers is more complex to implement, thus increasing VM size, we choose to keep the bounds in registers.
 
 
-\section{Hardware acceleration}
-Sensor node CPUs do not have features such as memory management units (MMUs) and privileged-mode execution used in desktop CPUs. While the added complexity for these cannot be justified in a market driven by extreme pressure to minimise chip cost and area, some more lightweight support from the hardware could significantly reduce the cost of providing safe execution environments, with or without a VM.
+% \section{Hardware acceleration}
+% Sensor node CPUs do not have features such as memory management units (MMUs) and privileged-mode execution used in desktop CPUs. While the added complexity for these cannot be justified in a market driven by extreme pressure to minimise chip cost and area, some more lightweight support from the hardware could significantly reduce the cost of providing safe execution environments, with or without a VM.
 
-In this section we consider two possible extensions to the CPU that can be implemented at little cost in terms of chip surface area, and we believe to be generic enough to justify their inclusion in these CPUs.
+% In this section we consider two possible extensions to the CPU that can be implemented at little cost in terms of chip surface area, and we believe to be generic enough to justify their inclusion in these CPUs.
 
-The two most expensive checks are \ref{chk-no-nativestack-overflow} and \ref{chk-memory-access-within-heap}. The last is the cause of most of the run-time overhead, and both require us to keep a safety margin in between the heap and stack. While this margin is small, RAM memory is a scarce resource we would prefer not to waste.
+% The two most expensive checks are \ref{chk-no-nativestack-overflow} and \ref{chk-memory-access-within-heap}. The last is the cause of most of the run-time overhead, and both require us to keep a safety margin in between the heap and stack. While this margin is small, RAM memory is a scarce resource we would prefer not to waste.
 
-We propose two checks to be added to the CPU, causing it to trap to a fixed error handler when the check fails to allow the node to terminate a faulty programme.
+% We propose two checks to be added to the CPU, causing it to trap to a fixed error handler when the check fails to allow the node to terminate a faulty programme.
 
-\subsection{Stack overflow protection}
-To protect against stack overflow, we propose extending the CPU with a stack bound register. The CPU compares the stack pointer to this stack bound whenever it is modified, either by a direct write or implicitly by a \mycode{PUSH} instruction. If the stack pointer drops below the stack bound, the CPU traps to the error handler.
+% \subsection{Stack overflow protection}
+% To protect against stack overflow, we propose extending the CPU with a stack bound register. The CPU compares the stack pointer to this stack bound whenever it is modified, either by a direct write or implicitly by a \mycode{PUSH} instruction. If the stack pointer drops below the stack bound, the CPU traps to the error handler.
 
-In our VM, the stack bound register would be set to the value of \mycode{heap_hi_bound}, which eliminates the need for \ref{chk-no-nativestack-overflow}.
+% In our VM, the stack bound register would be set to the value of \mycode{heap_hi_bound}, which eliminates the need for \ref{chk-no-nativestack-overflow}.
 
-For other embedded code this is also a useful safety measure, since the low amount of RAM makes stack overflows a real risk in any application, which can lead to unpredictable behaviour and hard to diagnose bugs.
+% For other embedded code this is also a useful safety measure, since the low amount of RAM makes stack overflows a real risk in any application, which can lead to unpredictable behaviour and hard to diagnose bugs.
 
-\subsection{Heap write protection}
-To eliminate the need to call \mycode{heapcheck} before each write, we propose adding two more registers containing the lower and upper bounds of the area the application is allowed to write to. The CPU then checks that writes to memory fall within these bounds, and otherwise traps to the error handler.
+% \subsection{Heap write protection}
+% To eliminate the need to call \mycode{heapcheck} before each write, we propose adding two more registers containing the lower and upper bounds of the area the application is allowed to write to. The CPU then checks that writes to memory fall within these bounds, and otherwise traps to the error handler.
 
-The question then is which writes should be checked, since the VM itself, or any other runtime hosting a sandboxed application, should still be able to write to any location, and CPU is not aware of which instructions are part of the VM or runtime, or part of the application. Two options may be considered:
+% The question then is which writes should be checked, since the VM itself, or any other runtime hosting a sandboxed application, should still be able to write to any location, and CPU is not aware of which instructions are part of the VM or runtime, or part of the application. Two options may be considered:
 
-\subsubsection{Checked store instructions}
-The ATmega's instruction set contains several blocks of unused opcodes \cite{Atmel:AVRInstructionSetManual}. Indirect stores can be done using an address in three register pairs: X, Y, or Z. There is enough space to add checked versions of the 'store indirect with displacement' instruction through one of these register pairs. When a store happens using these checked versions, the CPU does the bounds checks, while stores using the unchecked versions can write to anywhere in memory.
+% \subsubsection{Checked store instructions}
+% The ATmega's instruction set contains several blocks of unused opcodes \cite{Atmel:AVRInstructionSetManual}. Indirect stores can be done using an address in three register pairs: X, Y, or Z. There is enough space to add checked versions of the 'store indirect with displacement' instruction through one of these register pairs. When a store happens using these checked versions, the CPU does the bounds checks, while stores using the unchecked versions can write to anywhere in memory.
 
-The VM can then use these checked versions when generating code for \mycode{PUTFIELD} and \mycode{PUTARRAY} to implement \ref{chk-memory-access-within-heap} at no run-time cost, and use the unchecked versions for stores that are known to be safe at translation time, such as \mycode{PUTSTATIC}.
+% The VM can then use these checked versions when generating code for \mycode{PUTFIELD} and \mycode{PUTARRAY} to implement \ref{chk-memory-access-within-heap} at no run-time cost, and use the unchecked versions for stores that are known to be safe at translation time, such as \mycode{PUTSTATIC}.
 
-Native code systems like Harbor, which normally verifies all writes to memory are guarded by a check similar to ours, can now allow direct stores as well, as long as the checked store instructions are used, and avoid the run-time overhead for these cases.
+% Native code systems like Harbor, which normally verifies all writes to memory are guarded by a check similar to ours, can now allow direct stores as well, as long as the checked store instructions are used, and avoid the run-time overhead for these cases.
 
-However, using the majority of the currently unused opcodes for this feature may be too high a price to pay.
+% However, using the majority of the currently unused opcodes for this feature may be too high a price to pay.
 
-\subsubsection{Protected mode}
-Alternatively, a status bit may be added to the CPU to indicate a protected mode, and only two instructions to set or clear this protected mode bit. When the CPU is in protected mode, all stores are required to fall within the heap bounds, while in unprotected mode the entire address range is accessible.
+% \subsubsection{Protected mode}
+% Alternatively, a status bit may be added to the CPU to indicate a protected mode, and only two instructions to set or clear this protected mode bit. When the CPU is in protected mode, all stores are required to fall within the heap bounds, while in unprotected mode the entire address range is accessible.
 
-Instead of emitting a call to \mycode{heapcheck}, our VM may now protect the stores for \mycode{PUTFIELD} and \mycode{PUTARRAY} by setting and unsetting the protected mode bit. Since these instructions should only take a single cycle, this would reduce the cost of such checks from 22 to just 2 cycles.
+% Instead of emitting a call to \mycode{heapcheck}, our VM may now protect the stores for \mycode{PUTFIELD} and \mycode{PUTARRAY} by setting and unsetting the protected mode bit. Since these instructions should only take a single cycle, this would reduce the cost of such checks from 22 to just 2 cycles.
 
-Similar to the previous case, native code systems can also benefit by allowing both writes to memory through the existing guard methods, as well as direct stores preceded by the instruction to turn on protected mode.
+% Similar to the previous case, native code systems can also benefit by allowing both writes to memory through the existing guard methods, as well as direct stores preceded by the instruction to turn on protected mode.
