@@ -26,7 +26,7 @@ Cornell's MagnetOS \cite{Liu:2005wsa}, proposes a novel programming model which 
 
 LooCI \cite{Hughes:dg} is a component infrastructure middleware for WSNs with standard support for run-time reconfiguration. The LooCI component model supports dynamic binding and interoperability between different hardware platforms, in their case a typical sensor node and the slightly more powerful Sun SPOT, and different languages, with implementations in C and Java. LooCI defines a list of requirements for WSN middleware, which includes supporting run-time reconfiguration to respond to changing environmental conditions, supporting heterogeneous sets of hardware, good performance, and minimal memory consumption. LooCI currently uses C to programme the smallest devices and Java for the more powerful Sun SPOT. A fast sensor node virtual machine would be a useful addition to allow more flexible and platform independent reprogramming of the smallest devices as well.
 
-\subsection{WuKong}
+\section{WuKong}
 \label{sec-state-of-the-art-wukong}
 A final example that we will look at in more detail at is WuKong \cite{Reijers:2013ut, Lin:2013dc}.
 
@@ -82,7 +82,7 @@ Darjeeling \cite{Brouwers:2009cj} from Delft University of Technology runs a mod
 
 Sun's Squawk VM \cite{Shaylor:2003ws} is significantly larger than Darjeeling and TakaTuka, requiring at least 160 KB of programme memory, but offers full CLDC compliance. The Java Card VM \cite{javacard} runs on more typical sensor node hardware and achieves this by also switching to a 16-bit architecture, dropping support for various features, and modifying the instructionset. At the smallest end of the spectrum is NanoVM \cite{Harbaum}, which takes a minimal approach, trading support for a large number of java opcodes for simplicity and code size. The whole VM fits in the 8K flash of an ATmega8 CPU, leaving 512bytes of EEPROM and 75\% of the CPU's 1K RAM to the application.
 
-\subsection{Darjeeling}
+\section{Darjeeling}
 Since our VM is based on Darjeeling, we will examine it in more detail in this section.
 
 \paragraph{Split VM architecture}
@@ -134,7 +134,7 @@ Since JIT compilers work at run time, much effort has gone into making the compi
 
 Given our extreme size constraints - ideally we only want to use in the order of 100 bytes of RAM to allow our approach to be useful on a broad range of devices, and leave ample space for concurrent tasks running on the device - almost all AOT and JIT techniques found in literature require too much resources. Indeed, some authors suggest sensor nodes are too restricted to make AOT or JIT compilation feasible \cite{Aslam:2011thesis, Wirjawan:2008}.
 
-\subsection{AOT compilation for sensor nodes}
+\section{AOT compilation for sensor nodes}
 \label{sec-state-of-the-art-elluls-aot}
 On the desktop, VM performance has been studied extensively, but for sensor node VMs this aspect has been mostly ignored. To the best of our knowledge AOT compilation on a sensor node has only been tried by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}, and our work builds on their work.
 
@@ -164,7 +164,7 @@ Their approach is both simple and effective. To translate the JVM bytecode, each
 
 Table \ref{tbl-ellul-aot-example} shows how a simple statement is translated to native code. The blocks each JVM bytecode instruction translates to are fixed. This simple translation to native code removes the interpreter loop, which is by far the biggest source of overhead in interpreting VMs, but it is clear from the native pseudo code in Table \ref{tbl-ellul-aot-example} that this approach results in many unnecessary push and pop instructions. Since the JVM is a stack-based VM, each instruction first obtains its operands by popping them from the stack and pushes any result back onto it. As a result, over half the instructions are push or pop instructions.
 
-\subsubsection{Peephole optimisation}
+\subsection{Peephole optimisation}
 To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:2012thesis} which does 4 optimisation, for each of which an example is shown in Table \ref{tbl-ellul-peephole}. The first to are the most important for improving performance: if a push is immediately followed by a pop to the same register, both are removed since they have no net effect. If the source and destination registers differ, the two instructions are replaced by a move. Note that the assembly code shown here is for the MSP430 CPU used in Ellul's work.
 
 \begin{table}
@@ -195,7 +195,7 @@ To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:
     \end{threeparttable}
 \end{table}
 
-\subsubsection{Resulting performance}
+\subsection{Resulting performance}
 Ellul's approach improves performance considerably compared to the interpreters, but using the standard \mybench{CoreMark} benchmark \cite{coremark}, it generates code that is still up to 9.1x slower than optimised native C.
 
 It is important to further improve this for a number of reasons. First, even if an application is asleep for a large percentage of the time, it may at times want to measure something at high resolution, similar to how ADAE \cite{Chang:2010ek} responds to what it calls 'interesting events' by taking extra measurements as long as its energy budget permits. Any slowdown in the VM will affect the maximum rate at which such samples can be taken. Similarly, Table \ref{tbl-amulet-applications-sleep} shows that at a 9.1x slowdown in the application code, the CPU is not fast enough to finish the application's tasks in time. At best this would result in slower response time or sampling rates, at worst in could result in incorrect behaviour.

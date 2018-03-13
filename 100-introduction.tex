@@ -31,15 +31,13 @@ Thus, many IoT applications are inherently heterogeneous, and as Gu points out \
 
 
 \section{Virtual machines}
-The use of virtual machines has been common in desktop computing for a long time, with Java and .Net being the most well-known examples. There are several advantages to using VMs, the most obvious one being platform independence. Java enables a vast number of different models of Android phones to run the same applications. In a heterogenous environment as IoT applications are expected to be, a VM can significantly ease the deployment of these applications if the same programme can be run on any node, regardless of its hardware platform.
-
-A second advantage is that a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device.
+The use of virtual machines has been common in desktop computing for a long time, with Java and .Net being the most well-known examples. There are several advantages to using VMs, the most obvious one being platform independence. Java enables a vast number of different models of Android phones to run the same applications. In a heterogenous environment as IoT applications are expected to be, a VM can significantly ease the deployment of these applications if the same programme can be run on any node, regardless of its hardware platform. A second advantage is that a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device.
 
 % A final often mentioned advantage is ease of programming. Many VMs allow the developer to write programmes at a higher level of abstraction than the bare-metal C programming that is still common for sensor nodes. However, it could be argued that this could also be achieved using more high level languages that compile to native code, so the two advantages of VMs that we will focus on in this dissertation are safety and platform independent reprogramming.
 
 Since the early days of WSN research, many VMs, some based on Java and .Net, have been developed to run on resource-constrained sensor nodes. They manage to pack an impressive set of features on such a limited platform, but sacrifice performance, and usually do not provide a safe execution environment.
 
-\subsection{Performance}
+\subsection{Performance degradation}
 \label{sec-introduction-performance}
 The VMs for which we have found concrete performance data are shown in Table \ref{tbl-slowdown-for-sensornode-vms}. The best case, the 4x slowdown seen in one of SensorScheme's benchmarks, is a tiny benchmark that only does a single call to a random number generator, so this only tells us a function call costs about 3 times longer than generating the random number. Apart from this single data point, all interpreting VM are between one and two orders of magnitude slower than native code.
 
@@ -71,7 +69,7 @@ Perhaps more importantly, one of the main reasons for using such tiny devices is
 To illustrate this we will look at two concrete examples below.
 
 \subsubsection{Mercury}
-Few applications report a detailed breakdown of their power consumption. One that does is a platform for motion analysis called Mercury \cite{Lorincz:2009kt}. The data reported in their paper is copied in Table \ref{tbl-mercury-energy}. The greatest energy consumer is the sampling of a gyroscope, at 53,163 μJ. Only 1,664 μJ is spent in the CPU on application code for an activity recognition filter and feature extraction. When multiplied by 10 or 100 however, the CPU becomes a very significant, or even by far the largest energy consumer.
+Few WSN or IoT applications report a detailed breakdown of their power consumption. One that does is a platform for motion analysis called Mercury \cite{Lorincz:2009kt}. The data reported in their paper is copied in Table \ref{tbl-mercury-energy}. The greatest energy consumer is the sampling of a gyroscope, at 53,163 μJ. Only 1,664 μJ is spent in the CPU on application code for an activity recognition filter and feature extraction. When multiplied by 10 or 100 however, the CPU becomes a very significant, or even by far the largest energy consumer.
 
 \begin{table}
 \caption[Energy consumption breakdown for the Mercury motion analysis application]{Energy consumption breakdown for the Mercury motion analysis application, source: \cite{Lorincz:2009kt}}
@@ -101,7 +99,7 @@ Few applications report a detailed breakdown of their power consumption. One tha
 \end{table}
 
 
-Table \ref{tbl-mercury-energy} also shows us that transmitting raw data is a major energy consumer. To reduce this, Mercury has the option of first extracting features from the sensor data, and transmitting these instead, achieving a 1:60 compression. Mercury has five feature detection algorithms built in: maximum peak-to-peak amplitude; mean; RMS; peak velocity; and RMS of the jerk time series. But they note that the exact feature extractor may be customised by an application.
+Table \ref{tbl-mercury-energy} also shows that transmitting raw data is a major energy consumer. To reduce this, Mercury has the option of first extracting features from the raw sensor data, and transmitting these instead, achieving a 1:60 compression. Mercury has five feature detection algorithms built in: maximum peak-to-peak amplitude; mean; RMS; peak velocity; and RMS of the jerk time series. But they note that the exact feature extractor may be customised by an application.
 
 This is the kind of code we may want to update at a later time, where using a VM could be useful to provide safety and platform independence. However, at more than a 27x slowdown in the feature extraction algorithm, which is in the range seen for most VMs, this would not work anymore, because more energy would then be spent in the CPU than we would save on transmission.
 
@@ -197,7 +195,7 @@ Therefore, this dissertation will focus on the middle option: translating the by
 \label{sec-introduction-safety}
 Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes. Instead, the entire address range is accessible from any part of the code running on the device.
 
-At the same time, sensor node code can be quite complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit as much functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects, or a few cases where we have had to explicitly set a variable to null to allow a object to be garbage collected earlier than it otherwise would have been. In such an environment, mistakes are easily made, and with full access to the entire address space can have catastrophic consequences. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
+At the same time, sensor node code can be quite complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit as much functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects, or a few cases where we have had to explicitly set a variable to null to allow an object to be garbage collected earlier than it otherwise would have been. In such an environment, mistakes are easily made, and with full access to the entire address space can have catastrophic consequences. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
 
 To guard against both buggy code and malicious attacks, a desirable property would be the ability to execute code in a sand boxed manner to isolate untrusted application code from the VM itself. Specifically, we would like to guarantee that malicious code cannot:
 \begin{enumerate}
@@ -206,7 +204,7 @@ To guard against both buggy code and malicious attacks, a desirable property wou
     \item Retain control of the CPU indefinitely
 \end{enumerate}
 
-Note that these guarantees do not say anything about the correctness of the application itself: buggy code may still corrupt its own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds run-time checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this does not protect against malicious code being sent to the device and depends on the correctness of the host.
+Note that these guarantees do assure the correctness of the application itself: buggy code may still corrupt its own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds run-time checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this does not protect against malicious code being sent to the device and depends on the correctness of the host.
 
 Our approach depends only on the correctness of our VM, and guarantees it can always regain control of the node and terminate any misbehaving application before it executes an illegal write or performs an action it is not permitted to.
 
@@ -222,12 +220,12 @@ To use a VM in a project such as Amulet, it must be able to provide the same lev
 
 \section{Scope}
 \label{sec-introduction-scope}
-Internet-of-Things devices come in a wide range with varying capabilities. The larger IoT platforms are powerful enough to run standard operating systems, tools and languages, and VMs are well established as a good way to programme devices powerful enough to run advanced JIT compilers. This dissertation focusses specifically on small sensor nodes for which no such standards exists. These platforms have the following characteristics:
+Internet-of-Things devices come in a wide range with varying capabilities. The larger IoT platforms are powerful enough to run standard operating systems, tools and languages, and VMs are well established as a good way to programme devices powerful enough to run advanced JIT compilers. This dissertation focusses specifically on small sensor nodes for which no such standards exist. These platforms have the following characteristics:
 \begin{itemize}
     \item Separate data and programme memory: Memory is split into RAM for data, and flash memory for code. While some device can execute code from both RAM and flash \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, others cannot \cite{Atmel:ATmega128Datasheet}.
-    \item Very limited memory: Since RAM consumes energy even when the CPU is in sleep mode, it is typically restricted to 10 KB of RAM or less. More flash memory is available to hold programmes, but at 32 to 256 KB this is still very limited.
-    \item Simple CPUs: While usually rich in IO to drive actuators and read from sensors, the rest of the CPUs used in these devices is very simple in design to save cost and power consumption. Instructions usually take a fixed number of cycles, since memory is on chip access times are constant and fast, and there are no complicating factors like deep pipelines, caches, or branch predictions.
-    \item Very limited energy budget: Typical usage scenarios for WSNs demand a long battery lifetime, since frequent replacement or recharging would be too impractical or costly. All aspects of WSN software design are therefore focused towards minimizing energy use.
+    \item Very limited memory: Since volatile memory consumes energy even when the CPU is in sleep mode, it is typically restricted to 10 KB of RAM or less. More non-volatile flash memory is available to hold programmes, but at 32 to 256 KB this is still very limited.
+    \item Low complexity CPUs: While usually rich in IO to drive actuators and read from sensors, the rest of the CPUs used in these devices is very simple in design to save cost and power consumption. Instructions usually take a fixed number of cycles, since memory is on chip access times are constant and fast, and there are no complicating factors like deep pipelines, caches, or branch predictions.
+    \item Very limited energy budget: Typical usage scenarios demand a long battery lifetime, since frequent replacement or recharging would be too impractical or costly. All aspects of WSN software design are therefore focused towards minimizing energy use.
 \end{itemize}
 
 Our focus on sensor nodes raises the question of how platform independent our VM is, since IoT applications may mix both classes, and the ability to use a single binary to programme multiple classes of devices is exactly one of the advantages of using a VM. While the optimisations we propose are specifically developed to work in a resource-constrained sensor device, the bytecode is very close to standard Java, so a more powerful device would have no problem running it just as efficiently as it runs normal Java code.
@@ -240,11 +238,11 @@ Our focus on sensor nodes raises the question of how platform independent our VM
 \end{figure}
 
 \paragraph{AOT compiler}
-Figure \ref{fig-compilation-process-highlevel} shows the high level compilation process. The host PC will compile some source code to bytecode, which is uploaded to the target node. Instead of interpreting this bytecode, our VM will translate it at load time, and then execute the resulting native code.
+Figure \ref{fig-compilation-process-highlevel} shows the high level process from source code to native code running on the node. The host PC will compile some source code to bytecode, which is uploaded to the target node. Instead of interpreting this bytecode, our VM will translate it at load time and store the resulting native code in flash, which is then executed.
 
-We will see that in order to achieve good performance, an optimising compiler is necessary to generate high quality bytecode. However, the focus in this dissertation is on the AOT compiler running on the sensor node, and on what performance it can deliver, given good quality bytecode.
+We will see that in order to achieve good performance, an optimising source-to-bytecode compiler is necessary to generate high quality bytecode. However, the focus in this dissertation is on the AOT compiler running on the sensor node, and on what performance it can deliver, given good quality bytecode.
 
-Although we will make some changes to the way the bytecode is produced, building a full optimising compiler is clearly outside the scope of this dissertation. To determine what level of performance is possible, we will do some manual optimisations to the source code to produce better quality bytecode. But we limit these to optimisations that an optimising compiler could be expected to do automatically.
+Although we will make some changes to the way the bytecode is produced, building a full optimising source-to-bytecode compiler is outside the scope of this dissertation. To determine what level of performance is possible, we will do some manual optimisations to the source code to produce better quality bytecode. But we limit these to optimisations that an optimising compiler could be expected to do automatically.
 
 \paragraph{Source language}
 Note that in Figure \ref{fig-compilation-process-highlevel} we use 'source code' and 'bytecode' instead of Java or JVM bytecode, since the use of Java was only motivated by the availability of existing work to build upon, most notably the Darjeeling VM \cite{Brouwers:2009cj}, not because we believe Java to be a particularly good choice.
@@ -257,12 +255,12 @@ We will see that in fact Java, in its current form, is not well suited for senso
 \label{sec-introduction-research-questions}
 There are clear advantages from using virtual machines, especially in heterogeneous and dynamic IoT scenarios, but these come at a cost. On a sensor node, this cost is especially significant since they are already very resource-constrained and cannot do many of the optimisations used in VMs on larger devices.
 
-The main research question of this dissertation is whether virtual machines are a suitable means to programme sensor node devices.
+The main research question of this dissertation is whether virtual machines are a suitable means to programme sensor node devices from three perspectives.
 Specifically:
 \begin{enumerate}
-    \item[a.] How close can an Ahead-of-Time compiling sensor node VM come to native C performance, and what are the tradeoffs?
-    \item[b.] Can a VM be an efficient way to provide a safe, sandboxed execution environment on a sensor node?
-    \item[c.] Is Java a suitable language for a sensor node VM, and how may it be improved?
+    \item[a.] Performance: How close can an Ahead-of-Time compiling sensor node VM come to native C performance, and what are the tradeoffs?
+    \item[b.] Safety: Can a VM be an efficient way to provide a safe, sandboxed execution environment on a sensor node?
+    \item[c.] Language: Is Java a suitable language for a sensor node VM, and how may it be improved?
 \end{enumerate}
 
 \noindent
@@ -309,14 +307,14 @@ Part of the work presented in this dissertation is based on previously published
 \end{itemize}
 
 \section{Naming}
-In literature various names are used for our target devices. The word \emph{mote} was common in early research on wireless sensor networks, as was \emph{sensor node}, or simply \emph{device}, although the latter is also used for larger, more powerful devices. In this dissertation we will use the terms \emph{sensor node} or just \emph{node} interchangeably to refer solely to the type of severely resource-constrained devices described above.
+In literature various names are used for our target devices. The word \emph{mote} was common in early research on wireless sensor networks, as was \emph{sensor node}, or simply \emph{device}, although the latter is also used for larger, more powerful devices. In this dissertation we will use the terms \emph{sensor node} or just \emph{node} interchangeably to refer solely to the type of severely resource-constrained devices used in both WSN and IoT applications.
 
 %TODO: do we? actually right now neither term is used very often. Maybe drop this, but should be more consistent.
 %The terms \emph{wireless sensor networks}, \emph{cyber-physical systems} and \emph{internet-of-things} are all commonly used to describe sensor node applications. We will use WSN since it is the longer established term, and more clearly focussed on resource-constrained devices, but note that this also covers a large portion of IoT applications.
 
 When reprogramming these nodes, a new programme must be sent to them by a more powerful device. This role is refered to in literature by various names, including \emph{server}, \emph{gateway}, \emph{master}, \emph{controller}, or \emph{host}, depending on the exact design of the network and the way it is reconfigured. For the work in this dissertation these differences are not relevant, and we will use \emph{host} to refer to the source of the code that is uploaded to the sensor node, which is assumed to be a more powerful device with desktop-class processing capabilities.
 
-Since our VM is an ahead-of-time compiler, the Java source code is transformed into native code in two steps. We will use \emph{compile time} to refer to the compilation of Java code into Java bytecode on the host, and \emph{translation time} to refer to the translation of this bytecode into native code on the device.
+Since our VM is an Ahead-of-Time compiler, the Java source code is transformed into native code in two steps. We will use \emph{compile time} to refer to the compilation of Java code into Java bytecode on the host, and \emph{translation time} to refer to the translation of this bytecode into native code on the device.
 
 Finally, we follow Dalvik in naming our virtual machine after a coastal town. In this case the beautiful city of Cape Town, where parts of CapeVM were developed over the course of two trips.
 
