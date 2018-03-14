@@ -51,7 +51,7 @@
                   which is what they would cost on a 64-bit machine. But on the AVR with
                   16-bit pointers, elements only take up 8 bytes.
                   This means the list algorithm only uses 252 of its 666 bytes.
-        static_memblk USED: 2000 - 666 + 252 = 1586
+        static_memblk USED: 2000 - 666 + 252 + 47 = 1633
 
     Java
         CoreResults (1 obj)                 : 36+5 = 41  (actually 39, so Proguard must have eliminated a field)

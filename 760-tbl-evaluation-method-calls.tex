@@ -5,54 +5,54 @@
     \begin{threeparttable}
     \begin{tabular}{lllllll} % UPDATED 20180305
     \toprule
-                                 & \# calls                     & C                 & Java                          & Java                            & Java                            \\
-                                 &                              &                   & Base version                  & Alternative version             & Using normal method calls       \\
+                                 & \# calls                 & C                & Java                          & Java                          & Java                            \\
+                                 &                          &                  & Base version                  & Alternative version           & Using normal method calls       \\
     \midrule
     \midrule
     \\
     \mybench{CoreMark} \\
-    ee\_isdigit                  & \multicolumn{1}{r}{3920}     & normal (inlined)  & manually inlined              & \tblhighlight lightweight (handw.) & manually inlined                \\
-    core\_state\_transition      & \multicolumn{1}{r}{1024}     & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
-    crcu8                        & \multicolumn{1}{r}{584}      & normal (inlined)  & manually inlined              & manually inlined                & manually inlined                \\
-    crcu16                       & \multicolumn{1}{r}{292}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
-    calc\_func                   & \multicolumn{1}{r}{220}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
-    compare\_idx                 & \multicolumn{1}{r}{209}      & normal (inlined)  & normal (virtual)              & normal (virtual)                & normal (virtual)                \\
-    core\_list\_find             & \multicolumn{1}{r}{206}      & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
-    compare\_complex             & \multicolumn{1}{r}{110}      & normal            & normal (virtual)              & normal (virtual)                & normal (virtual)                \\
-    crcu32                       & \multicolumn{1}{r}{64}       & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
-    matrix\_sum                  & \multicolumn{1}{r}{16}       & normal            & lightweight                   & lightweight                     & \tblhighlight normal            \\
-    others (<16 calls each)      & \multicolumn{1}{r}{39}       & normal            & normal                        & normal                          & normal                          \\
+    ee\_isdigit                  & \multicolumn{1}{r}{3920} & normal (inlined) & manually inlined              & \tblhl lightweight (handw.)   & manually inlined                \\
+    core\_state\_transition      & \multicolumn{1}{r}{1024} & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
+    crcu8                        & \multicolumn{1}{r}{584}  & normal (inlined) & manually inlined              & manually inlined              & manually inlined                \\
+    crcu16                       & \multicolumn{1}{r}{292}  & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
+    calc\_func                   & \multicolumn{1}{r}{220}  & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
+    compare\_idx                 & \multicolumn{1}{r}{209}  & normal (inlined) & normal (virtual)              & normal (virtual)              & normal (virtual)                \\
+    core\_list\_find             & \multicolumn{1}{r}{206}  & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
+    compare\_complex             & \multicolumn{1}{r}{110}  & normal           & normal (virtual)              & normal (virtual)              & normal (virtual)                \\
+    crcu32                       & \multicolumn{1}{r}{64}   & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
+    matrix\_sum                  & \multicolumn{1}{r}{16}   & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
+    others (<16 calls each)      & \multicolumn{1}{r}{39}   & normal           & normal                        & normal                        & normal                          \\
     \\
     % The cycles from the simulation are for 50 iterations. Just divide by 50 here so the cycle count + the number of invokes produces the right overhead. An actual simulation run with 1 iteration is a bit slower, but only a few % so it is not significant enough to worry about here.
     %                                                                                 coremk                          coremk_lw                         coremk_fn
-    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{3,353,474} & \multicolumn{1}{r}{3,523,967}   & \multicolumn{1}{r}{4,488,847}   \\
-    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{97.0\%}    & \multicolumn{1}{r}{107.0\%}     & \multicolumn{1}{r}{163.6\%}     \\
-    \emph{code size}             &                              &                   & \multicolumn{1}{r}{9,234}     & \multicolumn{1}{r}{9,280}       & \multicolumn{1}{r}{9,540}       \\
+    \emph{cycles}                &                          &                  & \multicolumn{1}{r}{3,353,474} & \multicolumn{1}{r}{3,523,967} & \multicolumn{1}{r}{4,488,847}   \\
+    \emph{overhead v native C}   &                          &                  & \multicolumn{1}{r}{97.0\%}    & \multicolumn{1}{r}{107.0\%}   & \multicolumn{1}{r}{163.6\%}     \\
+    \emph{code size}             &                          &                  & \multicolumn{1}{r}{9,234}     & \multicolumn{1}{r}{9,280}     & \multicolumn{1}{r}{9,540}       \\
     \\
     \midrule
     \\
     \mybench{FFT} \\
-    FIX\_MPY                     & \multicolumn{1}{r}{768}      & marked inline     & manually inlined              & \tblhighlight lightweight(handw.)  & \tblhighlight normal            \\
+    FIX\_MPY                     & \multicolumn{1}{r}{768}  & marked inline    & manually inlined              & \tblhl lightweight(handw.)    & \tblhl normal            \\
     \\
     %                                                                                 fft                             fft_lw                            fft_fn
-    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{179,692}   & \multicolumn{1}{r}{215,020}     & \multicolumn{1}{r}{661,360}     \\
-    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{17.7\%}    & \multicolumn{1}{r}{40.8\%}      & \multicolumn{1}{r}{333.1\%}     \\
-    \emph{code size}             &                              &                   & \multicolumn{1}{r}{1,342}     & \multicolumn{1}{r}{1,320}       & \multicolumn{1}{r}{1,408}       \\
+    \emph{cycles}                &                          &                  & \multicolumn{1}{r}{179,692}   & \multicolumn{1}{r}{215,020}   & \multicolumn{1}{r}{661,360}     \\
+    \emph{overhead v native C}   &                          &                  & \multicolumn{1}{r}{17.7\%}    & \multicolumn{1}{r}{40.8\%}    & \multicolumn{1}{r}{333.1\%}     \\
+    \emph{code size}             &                          &                  & \multicolumn{1}{r}{1,342}     & \multicolumn{1}{r}{1,320}     & \multicolumn{1}{r}{1,408}       \\
     \\
     \midrule
     \\
     \mybench{heap sort} \\
-    SWAP                         & \multicolumn{1}{r}{1642}     & \#define          & manually inlined              & manually inlined                & manually inlined                \\
-    siftDown                     & \multicolumn{1}{r}{383}      & normal            & lightweight                   & \tblhighlight manually inlined  & \tblhighlight normal            \\
+    SWAP                         & \multicolumn{1}{r}{1642} & \#define         & manually inlined              & manually inlined              & manually inlined                \\
+    siftDown                     & \multicolumn{1}{r}{383}  & normal           & lightweight                   & \tblhl manually inlined       & \tblhl normal            \\
     \\
     %                                                                                 hsort16                         hsort16_cht                       hsort16_fn
-    \emph{cycles}                &                              &                   & \multicolumn{1}{r}{208,239}   & \multicolumn{1}{r}{184,071}     & \multicolumn{1}{r}{437,264}     \\
-    \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{88.5\%}    & \multicolumn{1}{r}{66.6\%}      & \multicolumn{1}{r}{295.8\%}     \\
-    \emph{code size}             &                              &                   & \multicolumn{1}{r}{596}       & \multicolumn{1}{r}{662}         & \multicolumn{1}{r}{602}         \\
+    \emph{cycles}                &                          &                  & \multicolumn{1}{r}{208,239}   & \multicolumn{1}{r}{184,071}   & \multicolumn{1}{r}{437,264}     \\
+    \emph{overhead v native C}   &                          &                  & \multicolumn{1}{r}{88.5\%}    & \multicolumn{1}{r}{66.6\%}    & \multicolumn{1}{r}{295.8\%}     \\
+    \emph{code size}             &                          &                  & \multicolumn{1}{r}{596}       & \multicolumn{1}{r}{662}       & \multicolumn{1}{r}{602}         \\
     % Data for hsort32:
-    % \emph{cycles}                &                              &                   & \multicolumn{1}{r}{289,268}   & \multicolumn{1}{r}{286,200}     & \multicolumn{1}{r}{568,889}     \\ 
-    % \emph{overhead v native C}   &                              &                   & \multicolumn{1}{r}{66.2\%}    & \multicolumn{1}{r}{64.4\%}      & \multicolumn{1}{r}{226.8\%}     \\ 
-    % \emph{code size}             &                              &                   & \multicolumn{1}{r}{702}       & \multicolumn{1}{r}{890}         & \multicolumn{1}{r}{722}         \\ 
+    % \emph{cycles}              &                          &                  & \multicolumn{1}{r}{289,268}   & \multicolumn{1}{r}{286,200}   & \multicolumn{1}{r}{568,889}     \\
+    % \emph{overhead v native C} &                          &                  & \multicolumn{1}{r}{66.2\%}    & \multicolumn{1}{r}{64.4\%}    & \multicolumn{1}{r}{226.8\%}     \\
+    % \emph{code size}           &                          &                  & \multicolumn{1}{r}{702}       & \multicolumn{1}{r}{890}       & \multicolumn{1}{r}{722}         \\
     \bottomrule
     \end{tabular}
     \begin{tablenotes}
