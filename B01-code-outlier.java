@@ -1,9 +1,5 @@
 public class OutlierDetection {
-    public static void benchmark_main(short NUMNUMBERS,
-                                 short[] buffer,
-                                 short[] distance_matrix,
-                                 short distance_threshold,
-                                 boolean[] outliers) {
+    public static void benchmark_main(short NUMNUMBERS, short[] buffer, short[] distance_matrix, short distance_threshold, boolean[] outliers) {
         // Calculate distance matrix
         short sub_start=0;
         for (short i=0; i<NUMNUMBERS; i++) {

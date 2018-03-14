@@ -1,0 +1,121 @@
+# B.sort
+    array of 256 shorts
+# H.sort
+    array of 256 shorts
+# Bin.Search
+    array of 100 shorts
+# XXTEA
+    array of 32 ints for input data, array of 4 ints for key
+# MD5
+    Arrays:
+        input 14 bytes
+        output 16 bytes
+        buffer 64 bytes
+        x 16 ints
+        state 4 ints
+    C = 14 + 16 + 64 + 16*4 + 4*4 = 174
+    Java = 174 + 5*8 (for array overhead) = 214
+# RC5
+    Arrays:
+        test_key 16 bytes
+        test_pt 8 bytes
+        tmp0 8 ints
+        skey_K 50 ints
+    C = 16 + 8 + 8*4 + 50*4 = 256
+    Java = 256 + 4*8 (for array overhead) = 288
+# FFT16
+    2 arrays of 64 shorts
+# Outlier
+    Arrays:
+        20 shorts input buffer
+        20*20=400 shorts distance matrix
+        20 booleans output
+    C = 20*2 + 400*2 + 20 = 860
+    Java = 860 + 3*8 = 884
+# LEC
+    C
+        input 256 shorts
+        512 bytes reserved for output
+        256*2 + 512 = 1024 bytes
+    Java
+        Stream 528 (512+8 (data+array overhead) + 3+5 (stream obj+overhead))
+        input 520 (256 shorts)
+        BSI 10 (5+5 bsi obj+overhead)
+        528+520+10 = 1058 bytes
+# CoreMark
+    C
+        core_results struct: 47
+        static_memblk: 2000
+            NOTE: Coremark splits this memory over 3 algorithms, giving each 666 bytes.
+                  The initialisation for the list processing counts elements as 20 bytes,
+                  which is what they would cost on a 64-bit machine. But on the AVR with
+                  16-bit pointers, elements only take up 8 bytes.
+                  This means the list algorithm only uses 252 of its 666 bytes.
+        static_memblk USED: 2000 - 666 + 252 = 1586
+
+    Java
+        CoreResults (1 obj)                 : 36+5 = 41  (actually 39, so Proguard must have eliminated a field)
+        CoreResults.statememblock3 (1 arr)  : 666+8 = 674
+        MatParams   (1 obj)                 : 8+5  = 13
+        MatParams.A (1 array)               : 9*9*2+8  = 170
+        MatParams.B (1 array)               : 9*9*2+8  = 170
+        MatParams.C (1 array)               : 9*9*4+8  = 332
+        32 list elements
+            ListHead (30 obj)               : 30 * (4+5) = 270
+            ListData (31 obj)               : 31 * (4+5) = 279
+        TmpData (1 obj)                     : 13
+        ShortWrapper (3 obj)                : 3*7 = 21
+
+        Total: 1983
+
+# MoteTrack
+    C
+        RFSignalAvgHT (2 obj, incl data)                      : 2*6+400 = 412
+        Signature (1 obj, incl signals)                       : 74
+        RefSignature (1 obj, incl signature, point)           : 80
+        SignalSpaceDiff (4 obj in a 2x2 array)                : 4*4 = 16        
+        Point (2 arrays of 2 Points each in estimateLoc)      : 4*6 = 24
+
+        Total = 606
+
+    Java
+        RFSignalAvgHT (2 obj, incl RFSignalAvg)               : 2*395 =  790
+        Signature (1 obj, incl signals)                       : 216
+        RefSignature (1 obj, incl signature, point)           : 9+216+11  = 236
+        SignalSpaceDiff (3 2 elem. ref arrays, 4 obj)         : 3*13 + 4*9 = 75
+        Point (2 arrays of 2 Points each in estimateLoc)      : 2*13 + 4*11 = 70
+
+        Total = 1387
+
+# HeatCalib
+    C
+        3 64 element short arrays: 3*(64*2) = 384
+        1 64 element int array   : 64*4     = 256
+        2 global shorts          : 4
+
+        Total 644
+
+    Java
+        3 64 element short arrays: 3*(64*2+8) = 408
+        1 64 element int array   : 64*4+8     = 264
+        2 global shorts          : 4
+
+        Total 676
+
+# HeatDetect
+    C
+        3 64 element byte/bool arrays  : 3*64       = 192
+        1 64 element short array       : 64*2       = 128
+        3 64 element int arrays        : 3*64*4     = 768
+
+        Total 1088
+
+    Java
+        3 64 element byte/bool arrays  : 3*(64+8)   = 216
+        1 64 element short array       : 64*2+8     = 136
+        3 64 element int arrays        : 3*(64*4+8) = 792
+        ShortWrapper (2 obj)           : 2*(2+5)    =  14
+
+        Total 1158
+
+
