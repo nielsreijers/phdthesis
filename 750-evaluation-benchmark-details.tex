@@ -8,7 +8,7 @@ The improved peephole optimiser and stack caching both target the push/pop overh
 
 The benchmarks on the left spend more time on load/store instructions. This results in higher load/store overhead, and the two optimisations that target this overhead, popped value caching and mark loops, have a big impact. For the computation intensive benchmarks, the load/store overhead is much smaller, but the higher stack size means stack caching is very important for these benchmarks.
 
-The smaller benchmarks highlight certain specific aspects of our approach, while the larger \mybench{CoreMark} benchmark covers a mix of different types of processing. As a result, it is an average case in almost every row in Table \ref{tbl-performance-per-benchmark}. The reason it ends up being the third slowest after all optimisations was discussed in \ref{sec-evaluation-coremark-unfair-optimisations}. With the 'unfair' optimisations described there, \mybench{CoreMark}'s performance overhead would be 60\%, close to the average of the other benchmarks.
+The smaller benchmarks highlight certain specific aspects of our approach, while the larger \mybench{CoreMark} benchmark covers a mix of different types of processing. As a result, it is an average case in almost every row in Table \ref{tbl-performance-per-benchmark}. The reason it ends up being the third slowest after all optimisations was discussed in \ref{sec-evaluation-coremark-non-automatic-optimisations}. With the non-automatic optimisations described there, \mybench{CoreMark}'s performance overhead would be 60\%, close to the average of the other benchmarks.
 
 \subsubsection{Bubble sort}
 \label{sec-evaluation-bubble-sort}
