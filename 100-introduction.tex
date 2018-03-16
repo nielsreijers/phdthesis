@@ -116,7 +116,7 @@ Using the power consumption data from the datasheets for the Atmel ATmega128 \ci
     7.5mA * 2.7V / 8MHz = 2.53nJ / cycle  
 \end{equation}
 
-We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 IEEE 802.15.4 transceiver. This radio can transmit at 250 kbps, but the small frame size of the 802.15.4 protocol introduces a relatively large overhead, and Latre\'e et al. calculate a maximum throughput of 163 kpbs \cite{Latre:2006wr}. The CC2420 can also operate at 2.7 V, and consumes between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
+We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 IEEE 802.15.4 transceiver \cite{Chipcon:CC2420Datasheet}. This radio can transmit at 250 kbps, but the small frame size of the 802.15.4 protocol introduces a relatively large overhead, and Latre\'e et al. calculate a maximum throughput of 163 kpbs \cite{Latre:2006wr}. The CC2420 can also operate at 2.7 V, and consumes between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
 
 \begin{equation}
   17.4 mA * 2.7 V / 163 kbps = 288.2 nJ / bit
