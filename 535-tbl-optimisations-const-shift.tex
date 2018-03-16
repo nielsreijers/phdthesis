@@ -14,7 +14,7 @@
     2: SLOAD\_0        & \sccomment{skip codegen, just update cache state}    &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     3: SUSHR\_CONST(1) & \sccomment{operand\_1 = sc\_pop\_destructive()}      & MOV R3,R1           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
                        & \sccomment{emit\_LSR(operand\_1)}                    & LSR R3              & 2      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{\use}{   }{   } & \sce{    }{   }{   } \\
-                       & \sccomment{\_push(operand\_1)}                       &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{Int1}{   }{   } & \sce{    }{   }{   } \\
+                       & \sccomment{sc\_push(operand\_1)}                     &                     &        & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{Int1}{   }{   } & \sce{    }{   }{   } \\
     4: SSTORE\_0       & \sccomment{emit MOV, update cache state}             & MOV R1,R3           & 1      & \sce{    }{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     5: SLOAD\_0        & \sccomment{skip codegen, just update cache state}    &                     &        & \sce{Int1}{LS0}{PIN} & \sce{    }{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\
     6: SLOAD\_1        & \sccomment{skip codegen, just update cache state}    &                     &        & \sce{Int2}{LS0}{PIN} & \sce{Int1}{LS1}{PIN} & \sce{    }{   }{   } & \sce{    }{   }{   } \\

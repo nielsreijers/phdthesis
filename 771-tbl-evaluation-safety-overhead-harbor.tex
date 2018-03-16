@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Comparison of overhead in Harbor and CapeVM}
+\label{tbl-safety-overhead-harbor}
+    \begin{tabular}{lrrrrrrr} % UPDATED 20180316
+    \toprule
+    Benchmark    & \makebox[3mm]{} & \multicolumn{3}{c}{CapeVM overhead} & \makebox[2mm]{} & \multicolumn{2}{c}{Harbor overhead} \\
+    \\
+                 &                 & VM      & + safety checks & = safe VM   &                 & current & hypothetical              \\
+    \midrule
+    \midrule
+    Array writes &                 & 182.8\% & 268.7\%       & 451.5\%   &                 & 1230\%  & 416\%                     \\
+    Outlier      &                 & 75.8\%  & 52.7\%        & 128.5\%   &                 & 690\%   & 234\%                     \\
+    16-bit FFT   &                 & 17.7\%  & 12.6\%        & 30.3\%    &                 & 380\%   & 129\%                     \\
+    \bottomrule
+    \end{tabular}
+\end{table}

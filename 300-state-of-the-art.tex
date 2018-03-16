@@ -136,7 +136,7 @@ Given our extreme size constraints - ideally we only want to use in the order of
 
 \section{AOT compilation for sensor nodes}
 \label{sec-state-of-the-art-elluls-aot}
-On the desktop, VM performance has been studied extensively, but for sensor node VMs this aspect has been mostly ignored. To the best of our knowledge AOT compilation on a sensor node has only been tried by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}, and our work builds on their work.
+On the desktop, VM performance has been studied extensively, but for sensor node VMs this aspect has been mostly ignored. To the best of our knowledge AOT compilation on a sensor node has only been tried by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}, and this work builds on theirs.
 
 Their approach is both simple and effective. To translate the JVM bytecode, each bytecode instruction is replaced by a fixed sequence of native instructions that implements it. This can be done in a single pass, as the bytecode is being received by the node, writing blocks of native code to flash memory instead of JVM bytecode. Like Darjeeling, they use a split stack architecture, with the CPU's native stack doubling as integer operand stack for each access, while reference operands are still stored in the stack frame.
 
