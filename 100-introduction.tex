@@ -158,7 +158,7 @@ A final example to motivate both the usefulness of a VM and the need for good pe
 
 Amulet supports multiple concurrent applications. Currently these are written in Amulet C, and are compiled together into a single firmware image that is loaded onto a watch. However, the authors envision a future with multiple vendors of Amulet devices, who will no doubt use different hardware platforms, and many developers submitting applications to a sort of app store. In such a scenario the platform independence a VM can provide is a valuable property.
 
-However, one of the main design goals of Amulet is long battery life, and although the authors do not provide a breakdown of energy consumption per component like Mercury, they do note that "Energy consumption is significantly impacted by the fraction of time the application microcontroller (MSP430) is active". This suggests a large performance overhead would also significantly reduce battery lifetime.
+One of the main design goals of Amulet is long battery life, and although the authors do not provide a breakdown of energy consumption per component like Mercury, they do note that "Energy consumption is significantly impacted by the fraction of time the application microcontroller (MSP430) is active". This suggests a large performance overhead would also significantly reduce battery lifetime.
 
 \begin{table}
 \caption[Sleep and active time for Amulet applications]{Sleep and active time for Amulet applications, source: \cite{Hester:2016je}}
