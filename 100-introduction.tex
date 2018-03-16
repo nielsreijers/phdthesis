@@ -66,7 +66,7 @@ In many scenarios this may not be acceptable for two reasons: for many tasks suc
 
 Perhaps more importantly, one of the main reasons for using such tiny devices is their extremely low power consumption. In many applications the CPU is expected to be in sleep mode most of the time, so little energy is spent on the CPU compared to communication or sensors. However, if the slowdown incurred by a VM means the CPU has to stay in active mode 10 to 100 times longer, this means 10 to 100 times more energy is spent on the CPU and it may suddenly become the dominant factor and reduce battery lifetime.
 
-To illustrate this we will look at two concrete examples below.
+To illustrate this we will look at three concrete examples below.
 
 \subsubsection{Mercury}
 Few WSN or IoT applications report a detailed breakdown of their power consumption. One that does is a platform for motion analysis called Mercury \cite{Lorincz:2009kt}. The data reported in their paper is copied in Table \ref{tbl-mercury-energy}. The greatest energy consumer is the sampling of a gyroscope, at 53,163 μJ. Only 1,664 μJ is spent in the CPU on application code for an activity recognition filter and feature extraction. When multiplied by 10 or 100 however, the CPU becomes a very significant, or even by far the largest energy consumer.
