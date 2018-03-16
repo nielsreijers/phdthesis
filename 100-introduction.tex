@@ -101,7 +101,7 @@ Few WSN or IoT applications report a detailed breakdown of their power consumpti
 
 Table \ref{tbl-mercury-energy} also shows that transmitting raw data is a major energy consumer. To reduce this, Mercury has the option of first extracting features from the raw sensor data, and transmitting these instead, achieving a 1:60 compression. Mercury has five feature detection algorithms built in: maximum peak-to-peak amplitude; mean; RMS; peak velocity; and RMS of the jerk time series. But they note that the exact feature extractor may be customised by an application.
 
-This is the kind of code we may want to update at a later time, where using a VM could be useful to provide safety and platform independence. However, at more than a 27x slowdown in the feature extraction algorithm, which is in the range seen for most VMs, this would not work anymore, because more energy would then be spent in the CPU than we would save on transmission.
+This is the kind of code we may want to update at a later time, where using a VM could be useful to provide safety and platform independence. However, at more than a 34x slowdown in the feature extraction algorithm, which is in the range seen for most VMs, this would not work anymore, because more energy would then be spent in the CPU than we would save on transmission.
 
 Finally, a more complex operation such as a 512 point FFT costs 12,920 mJ. For tasks like this, even a slowdown by a much smaller factor will have a significant impact on the total energy consumption.
 
