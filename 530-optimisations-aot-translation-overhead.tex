@@ -180,7 +180,7 @@ This is especially important for arrays of constant data, which are common in se
     ...
     adup; bspush(255); bspush(-3); bastore;    // set index 255
 \end{minted}
-\caption{Array of constant data from the 8-bit FFT benchmark, and the resulting bytecode}
+\caption{Array of constant data from the 8-bit FFT benchmark, and the resulting bytecode without the constant array optimisation}
 \label{lst-constant-array-initialisation}
 \end{listing}
 
