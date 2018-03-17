@@ -195,7 +195,7 @@ Therefore, this dissertation will focus on the middle option: translating the by
 \label{sec-introduction-safety}
 Low-cost low-power sensor node CPUs have a very simple architecture. They typically do not have a memory management unit (MMU) or privileged execution modes to isolate processes. Instead, the entire address range is accessible from any part of the code running on the device.
 
-At the same time, sensor node code can be quite complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit as much functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects, or a few cases where we have had to explicitly set a variable to null to allow an object to be garbage collected earlier than it otherwise would have been. In such an environment, mistakes are easily made, and with full access to the entire address space can have catastrophic consequences. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
+At the same time, sensor node code can be quite complex. While programming in a high-level language can reduce the risk of programming errors, the limited resources on a sensor device still often force us to use more low-level style approaches to fit as much functionality and data on a device. For example by storing data in simple byte arrays instead of using more expensive objects, or a few cases where we have had to explicitly set a variable to \mycode{null} to allow an object to be garbage collected earlier than it otherwise would have been. In such an environment, mistakes are easily made, and with full access to the entire address space can have catastrophic consequences. A second threat comes from malicious code. As IoT applications become more widespread, so do the attacks against them, and the unprotected execution environment of sensor node CPUs makes them an attractive target.
 
 To guard against both buggy code and malicious attacks, a desirable property would be the ability to execute code in a sand boxed manner to isolate untrusted application code from the VM itself. Specifically, we would like to guarantee that malicious code cannot:
 \begin{enumerate}
@@ -206,7 +206,7 @@ To guard against both buggy code and malicious attacks, a desirable property wou
 
 Note that these guarantees do assure the correctness of the application itself: buggy code may still corrupt its own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds run-time checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this does not protect against malicious code being sent to the device and depends on the correctness of the host.
 
-Our approach depends only on the correctness of our VM, and guarantees it can always regain control of the node and terminate any misbehaving application before it executes an illegal write or performs an action it is not permitted to.
+Our approach depends only on the correctness of the VM, and guarantees it can always regain control of the node and terminate any misbehaving application before it executes an illegal write or performs an action it is not permitted to.
 
 \subsubsection{Amulet}
 The Amulet \cite{Hester:2016je} smart watch platform is also a good motivating example for the need for a safe execution environment. Since it aims to run multiple concurrent applications possibly developed by different developers, it is important to isolate these applications from each other and from the OS.
@@ -265,6 +265,7 @@ Specifically:
 
 \noindent
 This dissertation makes the following contributions:
+% TODO: read these again
 \begin{enumerate}
     \item We identify the major sources of overhead when using the baseline approach to Ahead-of-Time compilation described by Ellul and Martinez \cite{Ellul:2010iw, Ellul:2012thesis}.
     \item Using the results of this analysis, we propose a set of eleven optimisations to address each source of overhead. These include improvements to Ellul's AOT approach, modifications to the VM's bytecode, and a lightweight alternative to standard Java method invocation.    
@@ -273,7 +274,7 @@ This dissertation makes the following contributions:
     \item We evaluate our optimisations using a set of benchmarks with varying characteristics, including the commonly used \mybench{CoreMark} benchmark \cite{coremark} and a number of real sensor node applications. We show these optimisations:
     \begin{itemize}
     	\item Reduce the size of the generated code by 40\%, allowing larger programmes to be loaded, and quickly compensating for the increase in VM size due to these optimisation, 
-    	\item Allow constant data to be placed in flash memory, enabling applications with constant tables that could otherwise not be implemented.
+    	\item Allow constant data to be placed in flash memory, enabling applications with constant tables that could otherwise not be implemented,
     	\item Eliminate 90\% of the performance overhead caused by the VM's stack-based architecture, and 79\% of performance overhead overall.
     \end{itemize}
     \item Using the same benchmarks we evaluate the cost of our safety checks, and show this cost to be comparable to, or lower than the two existing approaches to provide a safe execution environment on a sensor node, while providing platform independence at the same time.

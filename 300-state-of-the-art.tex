@@ -75,6 +75,7 @@ The Python-on-a-chip project \cite{python-on-a-chip} developed a Python bytecode
 
 LISP is one of the first high-level languages, developed at a time when room-sized computers had only slightly more capabilities than current sensor nodes. SensorScheme \cite{Evers:2010ur} implements a fully functioning LISP interpreter in under 41 KB, and is one of the few sensor node VMs to provide a safe execution environment.
 
+CILIX \cite{Kishino:2010} is a small VM for the .Net Common Intermediate Language implemented on the MSP430. MoteRunner \cite{Caracas:2009} runs on similar devices. Instead of implementing an existing VM it targets all strictly typed programming languages and supports both Java and C\#.
 
 The smallest official Java standard is the Connected Device Limited Configuration \cite{CLDC}, but since it targets devices with at least a 16 or 32-bit CPU and 160-512 KB of flash memory available, it is still too large for most sensor nodes. As a result, the available Java VMs that have been developed for sensor nodes, all offer some subset of the standard Java functionality, occupying different points in the tradeoff between the features they provide, and the resources they require.
 
