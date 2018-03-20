@@ -6,7 +6,7 @@ In a future version, these three steps should be merged into an 'optimising infu
 
 Since our goal is to find out what level of performance is possible on a sensor node, the Java source were manually optimised to get better quality JVM bytecode from \mycode{javac}. While these changes are not an automatic optimisation we developed, we find it imporant to mention them explicitly and analyse their impact, since many developers may expect these optimisations to happen automatically, and without this step it would be impossible to reproduce our results.
 
-We have been careful to limit ourselves to 'fair' optimisations, by which we mean optimisations that an optimising infuser could reasonably be expected to do automatically, given some basic, conservative assumptions about the performance model. 
+% We have been careful to limit ourselves to 'fair' optimisations, by which we mean optimisations that an optimising infuser could reasonably be expected to do automatically, given some basic, conservative assumptions about the performance model. 
 
 The most common optimisations we performed are:
 \begin{itemize}
@@ -17,7 +17,7 @@ The most common optimisations we performed are:
 	\item Use bit shifts for multiplications by a power of two.
 \end{itemize}
 
-We will examine the effect of some other optimisations on the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark}. These are optimisations that the infuser most likely could not do automatically, but a developer who's aware of the performance of the VM could easily do manually.
+We will examine the effect of some other optimisations on the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark}. These are optimisations that the infuser cannot do automatically, but a developer who's aware of the performance of the VM could easily do manually.
 
 \paragraph{Temporary variables}
 The first two optimisations generate extra store instructions, which means they may not always be beneficial if the value is never used again. But a value often only needs to be reused only once for it to be faster to store in a local variable than to calculate it twice or do two array accesses. If we use the mark loops optimisation discussed in Section \ref{sec-optimisation-markloops}, in many cases the variable may be stored in registers, making accessing them either very cheap, or completely free.

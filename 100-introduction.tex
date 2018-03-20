@@ -242,7 +242,7 @@ Figure \ref{fig-compilation-process-highlevel} shows the high level process from
 
 We will see that in order to achieve good performance, an optimising source-to-bytecode compiler is necessary to generate high quality bytecode. However, the focus in this dissertation is on the AOT compiler running on the sensor node, and on what performance it can deliver, given good quality bytecode.
 
-Although we will make some changes to the way the bytecode is produced, building a full optimising source-to-bytecode compiler is outside the scope of this dissertation. To determine what level of performance is possible, we will do some manual optimisations to the source code to produce better quality bytecode. But we limit these to optimisations that an optimising compiler could be expected to do automatically.
+Although we will make some changes to the way the bytecode is produced, building a full optimising source-to-bytecode compiler is outside the scope of this dissertation. To determine what level of performance is possible, we will do some manual optimisations to the source code to produce better quality bytecode, most of which an optimising compiler could be expected to do automatically.
 
 \paragraph{Source language}
 Note that in Figure \ref{fig-compilation-process-highlevel} we use 'source code' and 'bytecode' instead of Java or JVM bytecode, since the use of Java was only motivated by the availability of existing work to build upon, most notably the Darjeeling VM \cite{Brouwers:2009cj}, not because we believe Java to be a particularly good choice.
