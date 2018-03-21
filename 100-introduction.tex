@@ -1,4 +1,5 @@
 \chapter{Introduction}
+\label{sec-introduction}
 
 Production of integrated circuits has advanced at a consistent and rapid pace for over half a century, doubling the transistors density every one to two years in accordance with Moore's law. Only in recent years has the cadence slowed as we approach fundamental physical limits.
 
@@ -52,7 +53,7 @@ The VMs for which we have found concrete performance data are shown in Table \re
     Darjeeling      & Delft University                 & ATmega128                  & 30x-113x slower \cite{Brouwers:2009cj} \\
                     & ~~ of Technology                 &                            & \\
     TakaTuka        & University of Freiburg           & Mica2 (AVR) and            & 230x slower \cite{Ellul:2012thesis} \\
-                    &                                  & JCreate (MSP)                           & \\
+                    &                                  & JCreate (MSP)              & \\
     TinyVM          & Yonsei University                & ATmega128                  & 14x-72x slower \cite{Hong:2012wj} \\
     DVM             & UCLA                             & ATmega128L                 & 108x slower \cite{Balani:2006} \\
                     &                                  &                            & 555x slower \cite{Kumar:2007ge} \\
@@ -151,7 +152,7 @@ This shows that for this combination of hardware and sensor data, LEC compressio
 
 Where exactly this break-even point lies depends on many factors. The CPUs and radio used in this calculation are very common in typical sensor nodes, for example the widely used Telos platform \cite{Polastre:2005ut} is based on the CC2420 radio and the ATmega CPU is found in many Arduinos. However many parameters will affect the results. Power consumption is roughly linear in relation to clock frequency, so at the same voltage the cost per cycle will be similar, but at lower frequencies the CPU can operate at a lower voltage which lowers the cost per cycle. The cost per bit depends on many factors including the link quality. A bad link will increase the cost per bit due to retransmissions, but if the node transmits at a lower power, for example to reduce the number of neighbours and collisions, the cost per bit will be lower than calculated.
 
-This calculation is a good example of a situation where the slowdown caused by current sensor node VMs will be a problem. For Mercury's feature extraction, the break-even point is around 27x slowdown, while for this case of LEC compression it is at only 2.6x. While the exact numbers depend on the application, it is clear that a slowdown of one to two orders of magnitude will affect battery lifetime in many applications.
+This calculation is another example of a situation where the slowdown caused by current sensor node VMs will be a problem. For Mercury's feature extraction, the break-even point is around 27x slowdown, while for this case of LEC compression it is at only 2.6x. The exact numbers depend on the application, but it is clear that a slowdown of one to two orders of magnitude will affect battery lifetime in many applications.
 
 \subsubsection{Amulet}
 A final example to motivate both the usefulness of a VM and the need for good performance is the smart watch platform Amulet \cite{Hester:2016je}. Amulet aims to provide a week-long or month-long battery life time. To do so it uses a typical low-power resource-constrained CPU, the MSP430.
