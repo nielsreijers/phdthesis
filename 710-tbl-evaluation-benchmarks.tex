@@ -20,17 +20,17 @@
                                 & \emph{Input:} the string 'message digest' as in the original source.                                               &                  &                & \\
     \mybench{RC5}               & LibTomCrypt \cite{libtomcrypt}                                                                                     & single function  & no             & \\
                                 & \emph{Input:} first test case in libtomcrypt sources (64 bit)                                                      &                  &                & \\
-    \mybench{FFT}               & fixed point FFT using the widespread \mintinline[fontsize=\footnotesize]{c}{fix_fft.c} \cite{sos-operating-system} & two functions    & yes            & \cite{Kumar:2007ge}                      \\
+    \mybench{FFT}               & Fixed point FFT using the widespread \mintinline[fontsize=\footnotesize]{c}{fix_fft.c} \cite{sos-operating-system} & two functions    & yes            & \cite{Kumar:2007ge}                      \\
                                 & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                                      &                  &                & \\
-    \mybench{Outlier detection} & our implementation of the algorithm described in \cite{Kumar:2007ge}                                               & single function  & yes            & \cite{Kumar:2007ge}                      \\
+    \mybench{Outlier detection} & Our implementation of the algorithm described in \cite{Kumar:2007ge}                                               & single function  & yes            & \cite{Kumar:2007ge}                      \\
                                 & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11.         &                  &                & \\
-    \mybench{LEC}               & our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                              & three functions  & yes            & \\
+    \mybench{LEC}               & Our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                              & three functions  & yes            & \\
                                 & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.                     &                  &                & \\
     \mybench{CoreMark 1.0}      & EEMBC \cite{coremark}                                                                                              & full application & no             & \\
                                 & \emph{Input:} defined in CoreMark source.                                                                          &                  &                & \\
     \mybench{MoteTrack}         & Lorincz \cite{Lorincz:2006fc, motetrack}                                                                           & full application & yes            & \\
                                 & \emph{Input:} defined in MoteTrack source.                                                                         &                  &                & \\
-    \mybench{Heat detection}    & adapted from code used in our group to track objects using an 8x8 pixel heat sensor                                & full application & yes            & \\
+    \mybench{Heat detection}    & Adapted from code used in our group to track objects using an 8x8 pixel heat sensor                                & full application & yes            & \\
                                 & \emph{Input:} 101 frames of 8x8 16-bit values for calibration, 25 frames for detection.                            &                  &                & \\
     \bottomrule
     \end{tabular}
