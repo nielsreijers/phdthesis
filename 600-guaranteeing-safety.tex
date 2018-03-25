@@ -238,10 +238,11 @@ If the top and bottom boundaries of the heap are aligned at 256 bytes, this elim
 Finally, 8 cycles can be saved by keeping the bounds in registers instead of memory, which removes the need for the \mycode{LDS} instructions. However this reduces the performance of the stack cache since these registers would not be available for stack caching. Which of these affects performance more depends on the code being run. We evaluate the difference in Section \ref{sec-evaluation-run-time-cost}. Since having the bounds in registers is more complex to implement, thus increasing VM size, we choose to keep the bounds in registers.
 
 \paragraph{Heap corruption}
-Note that the heap access check only verifies a write is to an address within the heap, but not that the address is a correct address within the target object. Code may still corrupt parts of the heap, including the heap headers that mark each heap chunk and are used during garbage collection.
+Since the garbage collector compacts the heap when it frees any memory, the heap is always split into an in-use part and a free part. A pointer in the VM points to the first free byte. This pointer is moved forward when memory is allocated, and moved backward when the garbage collector compacts the heap.
 
-This does not break the safety guarantees since these heap headers are not used until control is returned to the VM. But it does depend on the VM handling this case correctly by checking the intergrity of the heap before using the heap headers and terminating the application if it finds the heap to be corrupted.
+The in-use part of the heap is made up of chunks, which have a small header indicating their size. The heap access check only verifies a write is to an address within the heap, but not that the address is a correct address within the target object. Code may still corrupt parts of the heap, including these heap headers.
 
+This does not break the safety guarantees since these heap headers are not used until control is returned to the VM. The headers are only used by the garbage collector, so before the garbage collector starts, the VM must check the intergrity of the heap headers (\ref{chk-gc-heap-integrity}), which must form a consistent chain of chunks ending at the first free byte.
 
 
 
