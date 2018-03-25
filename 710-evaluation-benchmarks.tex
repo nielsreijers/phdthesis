@@ -4,15 +4,14 @@
 
 This section describes our experimental setup, the benchmarks used and how the source code for each benchmark was obtained, and any relevant details in their implementation.
 
-A set of twelve different benchmarks is used to measure the effect of the optimisations, shown in Table \ref{tbl-benchmarks}
-
-This mix of benchmarks was chosen for several reasons. A number of benchmarks, \mybench{bubble sort}, \mybench{binary search}, \mybench{MD5}, \mybench{FFT}, and \mybench{Outlier detection} were chosen because they are used in various related work, enabling us to compare CapeVM to their results.
+A set of twelve different benchmarks is used to measure the effect of the optimisations, shown in Table \ref{tbl-benchmarks}. This mix of benchmarks was chosen for several reasons. A number of benchmarks, \mybench{bubble sort}, \mybench{binary search}, \mybench{MD5}, \mybench{FFT}, and \mybench{Outlier detection} were chosen because they are used in various related work, enabling us to compare CapeVM to their results.
 
 Nine of the benchmarks are all small benchmarks that process an array of data. Processing arrays of data is common to many sensor node application, and likely to be performance sensitive. While the actual processing done may not be typical for sensor network (although the \mybench{MoteTrack} benchmark does do a bubble sort), the small size of these benchmarks make them useful to highlights specific behaviours that would be lost in the averages of a larger benchmark.
 
-The \mybench{CoreMark} benchmark is a standard benchmark to measure embedded CPU performance, containing many different methods, enabling us to evaluate the effect of method calls. Since it mixes several kinds of processing, specifically linked list processing, a state machine, and matrix operations, it is a good example of the expected average behaviour.
+The \mybench{CoreMark} benchmark is an industry standard benchmark to measure CPU performance. It mixes several kinds of processing: linked list processing, a state machine, and matrix operations.
+It contains many different methods, which enables us to evaluate the effect of method calls. Since  it is a good example of the expected average behaviour.
 
-Finally, the \mybench{Outlier detection}, \mybench{LEC}, \mybench{MoteTrack} and \mybench{heat detection} benchmarks are all examples of code that was specifically developed for sensor nodes, and \mybench{FFT} is a typical signal processing operation, which is a common task for sensor nodes.
+Finally, the \mybench{Outlier detection}, \mybench{LEC}, \mybench{MoteTrack} and \mybench{heat detection} benchmarks are all code that was specifically developed for sensor nodes, and \mybench{FFT} is a typical signal processing operation, which is a common task for sensor nodes.
 
 
 \subsection{Implementation details}
