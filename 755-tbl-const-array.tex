@@ -4,14 +4,14 @@
 \label{tbl-const-array}
 	\scriptsize
     \centerline{
-    \begin{tabular}{lrrrrrrrr} % UPDATED 20180314
+    \begin{tabular}{lrrrrrrrr} % UPDATED 20180327
     \toprule
                                 & \multicolumn{2}{c}{RC5}   & \multicolumn{2}{c}{FFT}   & \multicolumn{2}{c}{LEC} & \multicolumn{2}{c}{MoteTrack} \\
 Size of constant data           & \multicolumn{2}{c}{200}   & \multicolumn{2}{c}{2,048} & \multicolumn{2}{c}{51}  & \multicolumn{2}{c}{20,560}    \\
     \midrule
     \midrule
 Using constant arrays           &       no &            yes &       no &            yes &        no &         yes &          no &             yes \\
-Performance overhead            &   19.5\% &         19.5\% &   17.8\% &         17.7\% &    86.5\% &      84.7\% &  cannot run &         156.3\% \\
+Performance overhead            &   19.5\% &         19.5\% &   17.7\% &         17.7\% &    86.5\% &      84.6\% &  cannot run &         156.3\% \\
 % Size in flash for @ConstArray version: 4 byte overhead per array for string table forward pointers and length fields
 % Size in flash for _nca version       : the AOT size of the <clinit> taken from stdoutlog.txt
 Size of constant data in flash  &     1998 &            204 &   26,714 &          2,052 &       930 &          59 &  cannot run &          20,588 \\

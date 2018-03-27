@@ -3,27 +3,27 @@
 \label{tbl-coremark-manual-optimisation}
     \centerline{
     \begin{threeparttable}
-    \begin{tabular}{lrrrrrrrr} % UPDATED 20180305
+    \begin{tabular}{lrrrrrrrr} % UPDATED 20180327
     \toprule
                                                                           & \multicolumn{2}{l}{list}   & \multicolumn{2}{l}{matrix} & \multicolumn{2}{l}{state}  & \multicolumn{2}{l}{total}     \\
                                                                           & \scriptsize time \tnote{a} & \scriptsize vs nat. C      & \scriptsize time \tnote{a} & \scriptsize vs nat. C            & \scriptsize time \tnote{a} & \scriptsize vs nat. C  & \scriptsize time \tnote{a} & \scriptsize vs nat. C \\
     \midrule
     \midrule
     native C                                                              &  17.9                      &                            &  49.2                      &                                  &  18.0                      &                        &  85.1                      & \\
-    baseline                                                              & 124.3                      & (+594\%)                   & 361.3                      & (+634\%)                         & 288.8                      & (+1504\%)              & 775.0                      & (+811\%) \\
-    optimised, using original source                                      &  55.9                      & (+212\%)                   & 232.0                      & (+372\%)                         &  75.7                      &  (+321\%)              & 363.8                      & (+327\%) \\
+    baseline                                                              & 124.3                      & (+594\%)                   & 360.5                      & (+633\%)                         & 289.0                      & (+1506\%)              & 774.4                      & (+810\%) \\
+    optimised, using original source                                      &  55.9                      & (+212\%)                   & 231.4                      & (+370\%)                         &  75.9                      &  (+322\%)              & 363.4                      & (+327\%) \\
     % CHANGE COMPARED TO PREVIOUS, SIMILAR TO MAIN TABLES ON PERF/CODE SIZE
-    \makebox[5mm]{} \scriptsize manually inline small methods             & \scriptsize  -0.8          & \scriptsize   (-4\%)       & \scriptsize   -37.2        & \scriptsize  (-76\%)             & \scriptsize   -17.5        & \scriptsize    (-97\%) & \scriptsize  -55.5         & \scriptsize  (-65\%) \\
-    \makebox[5mm]{} \scriptsize use short array index variables           & \scriptsize   0.0          & \scriptsize    (0\%)       & \scriptsize  -104.7        & \scriptsize (-213\%)             & \scriptsize     0.0        & \scriptsize      (0\%) & \scriptsize -104.7         & \scriptsize (-123\%) \\
-    \makebox[5mm]{} \scriptsize avoid recalculating expressions in a loop & \scriptsize   0.0          & \scriptsize    (0\%)       & \scriptsize    -7.5        & \scriptsize  (-15\%)             & \scriptsize     0.0        & \scriptsize      (0\%) & \scriptsize   -7.5         & \scriptsize   (-9\%) \\
-    \makebox[5mm]{} \scriptsize reduce array and object access            & \scriptsize   0.0          & \scriptsize    (0\%)       & \scriptsize   -18.1        & \scriptsize  (-37\%)             & \scriptsize    -2.4        & \scriptsize    (-13\%) & \scriptsize  -20.5         & \scriptsize  (-24\%) \\
-    \makebox[5mm]{} \scriptsize reduce branch cost in crcu8               & \scriptsize  -3.5          & \scriptsize  (-20\%)       & \scriptsize    -0.5        & \scriptsize   (-1\%)             & \scriptsize    -3.2        & \scriptsize    (-18\%) & \scriptsize   -7.3         & \scriptsize   (-9\%) \\
-    using optimised source                                                & 51.6                       & (+188\%)                   & 64.0                       & (+30\%)                          & 52.6                       & (+192\%)               & 168.3                      & (+98\%) \\
+    \makebox[5mm]{} \scriptsize manually inline small methods             & \scriptsize  -0.8          & \scriptsize   (-4\%)       & \scriptsize   -37.3        & \scriptsize  (-76\%)             & \scriptsize   -17.4        & \scriptsize    (-97\%) & \scriptsize  -55.5         & \scriptsize  (-65\%) \\
+    \makebox[5mm]{} \scriptsize use short array index variables           & \scriptsize  -0.1          & \scriptsize   (-1\%)       & \scriptsize  -104.6        & \scriptsize (-213\%)             & \scriptsize     0.0        & \scriptsize      (0\%) & \scriptsize -104.7         & \scriptsize (-123\%) \\
+    \makebox[5mm]{} \scriptsize avoid recalculating expressions in a loop & \scriptsize  +0.1          & \scriptsize   (+1\%)       & \scriptsize    -7.6        & \scriptsize  (-15\%)             & \scriptsize     0.0        & \scriptsize      (0\%) & \scriptsize   -7.5         & \scriptsize   (-9\%) \\
+    \makebox[5mm]{} \scriptsize reduce array and object access            & \scriptsize  -0.1          & \scriptsize   (-1\%)       & \scriptsize   -18.0        & \scriptsize  (-37\%)             & \scriptsize    -2.4        & \scriptsize    (-13\%) & \scriptsize  -20.5         & \scriptsize  (-24\%) \\
+    \makebox[5mm]{} \scriptsize reduce branch cost in crcu8               & \scriptsize  -3.6          & \scriptsize  (-20\%)       & \scriptsize    -0.5        & \scriptsize   (-1\%)             & \scriptsize    -3.2        & \scriptsize    (-18\%) & \scriptsize   -7.3         & \scriptsize   (-9\%) \\
+    using optimised source                                                & 51.4                       & (+187\%)                   & 63.4                       & (+29\%)                          & 52.9                       & (+194\%)               & 167.9                      & (+97\%) \\
     \midrule
     % CHANGE COMPARED TO PREVIOUS, SIMILAR TO MAIN TABLES ON PERF/CODE SIZE
-    \makebox[5mm]{} \scriptsize (non-autom.) avoid creating objects       & \scriptsize   0.6          & \scriptsize   (+3\%)       & \scriptsize     0.0        & \scriptsize    (0\%)             & \scriptsize   -10.3        & \scriptsize    (-57\%) & \scriptsize   -9.6         & \scriptsize  (-11\%) \\
-    \makebox[5mm]{} \scriptsize (non-autom.) avoid virtual calls          & \scriptsize -22.7          & \scriptsize (-127\%)       & \scriptsize     0.0        & \scriptsize    (0\%)             & \scriptsize     0.0        & \scriptsize      (0\%) & \scriptsize  -22.8         & \scriptsize  (-27\%) \\
-    after non-automatic optimisations                                     & 29.5                       & (+65\%)                    & 64.0                       & (+30\%)                          & 42.3                       & (+135\%)               & 135.9                      & (+60\%) \\
+    \makebox[5mm]{} \scriptsize (non-autom.) avoid creating objects       & \scriptsize   0.8          & \scriptsize   (+4\%)       & \scriptsize     0.0        & \scriptsize    (0\%)             & \scriptsize   -10.6        & \scriptsize    (-59\%) & \scriptsize   -9.9         & \scriptsize  (-12\%) \\
+    \makebox[5mm]{} \scriptsize (non-autom.) avoid virtual calls          & \scriptsize -22.8          & \scriptsize (-127\%)       & \scriptsize     0.0        & \scriptsize    (0\%)             & \scriptsize     0.0        & \scriptsize      (0\%) & \scriptsize  -22.7         & \scriptsize  (-27\%) \\
+    after non-automatic optimisations                                     & 29.4                       & (+64\%)                    & 63.4                       & (+29\%)                          & 42.3                       & (+135\%)               & 135.3                      & (+59\%) \\
     \bottomrule
     \end{tabular}
     \begin{tablenotes}

@@ -7,7 +7,7 @@
 \label{tbl-quantitative-results}
     \centerline{
     \begin{threeparttable}
-    \begin{tabular}{llrrrrrrrrrrrrrrr} % UPDATED 20180313
+    \begin{tabular}{llrrrrrrrrrrrrrrr} % UPDATED 20180327
     \toprule
     Section                    & Measure \tnote{a}                    &      B.sort &      H.sort &   Bin.Search &       XXTEA &    MD5 &       RC5 &           FFT & Outlier &           LEC &       CoreMark &                MoteTrack & HeatCalib & HeatDetect \\
     \midrule
@@ -16,14 +16,14 @@
                                & Const array RAM overhead             &             &             &              &             &        &       208 &  \tblhl 2,056 &         &            67 &                &           \tblhl too big &           &            \\
                                & Const array flash overhead           &             &             &              &             &        &     1,998 & \tblhl 26,714 &         &           930 &                &           \tblhl too big &           &            \\
     \ref{sec-nested-data}      & Size of main data structures in C    &         512 &         512 &          200 &         144 &    174 &       256 &           256 &     860 &          1024 & 1633 \tnote{b} &                      606 &       644 &       1088 \\
-                               & Size of main data structures in Java &         520 &         520 &          208 &         160 &    214 &       288 &           272 &     884 &          1058 &           1983 & \tblhl    1387 \tnote{c} &       676 &       1158 \\
-                               & Size increase                        &       1.6\% &       1.6\% &        4.0\% &      11.1\% & 23.0\% &    12.5\% &         6.3\% &   2.8\% &         3.3\% &         21.4\% &           \tblhl 128.9\% &     5.0\% &      6.4\% \\
-    \ref{sec-small-datatypes}  & Casts                                &           1 &           6 &            5 &           8 &      8 &         8 &            16 &       3 &             8 &             41 &                       33 &         4 &         70 \\
-                               & Lines of code \tnote{d}              &          11 &          24 &           16 &          38 &    165 &        27 &            73 &      43 &            48 &            637 &                      475 &        47 &        272 \\
-                               & Casts per 100 LOC                    &           9 &   \tblhl 25 &    \tblhl 31 &          21 &      5 & \tblhl 30 &            22 &       7 &            17 &              6 &                        7 &         9 &  \tblhl 26 \\
-    \ref{sec-inlining}         & Slowdown non-inlined version         &             & \tblhl 69\% &              & \tblhl 57\% &   25\% &      37\% &          20\% &         &               &            8\% &                          &           &            \\
+                               & Size of main data structures in Java &         520 &         520 &          208 &         160 &    214 &       288 &           272 &     884 &          1058 &           1996 & \tblhl    1387 \tnote{c} &       676 &       1158 \\
+                               & Size increase                        &       1.6\% &       1.6\% &        4.0\% &      11.1\% & 23.0\% &    12.5\% &         6.3\% &   2.8\% &         3.3\% &         22.2\% &           \tblhl 128.9\% &     5.0\% &      6.4\% \\
+    \ref{sec-small-datatypes}  & Casts                                &           1 &           6 &            5 &           8 &      8 &         8 &            16 &       3 &             8 &             70 &                       33 &         4 &         70 \\
+                               & Lines of code \tnote{d}              &          11 &          24 &           16 &          38 &    165 &        27 &            73 &      43 &            48 &            849 &                      475 &        47 &        272 \\
+                               & Casts per 100 LOC                    &           9 &   \tblhl 25 &    \tblhl 31 &          21 &      5 & \tblhl 30 &            22 &       7 &            17 &              8 &                        7 &         9 &  \tblhl 26 \\
+    \ref{sec-inlining}         & Slowdown non-inlined version         &             & \tblhl 69\% &              & \tblhl 57\% &   25\% &      37\% &          20\% &         &               &           13\% &                          &           &            \\
                                & Size difference non-inlined version  &             &         +42 &              &        -224 &  -1502 &       -94 &           -20 &         &               &            +48 &                          &           &            \\
-    \ref{sec-optimising-javac} & Slowdown w/o optimisations           & \tblhl 91\% & \tblhl 52\% & \tblhl 544\% &         3\% &        &           &           3\% &    23\% &               &   \tblhl 116\% &              \tblhl 76\% &           &        2\% \\
+    \ref{sec-optimising-javac} & Slowdown w/o optimisations           & \tblhl 91\% & \tblhl 52\% & \tblhl 544\% &         3\% &        &           &           3\% &    23\% &               &   \tblhl 117\% &              \tblhl 76\% &           &        2\% \\
     \ref{sec-no-gc}            & Slowdown heap allocation             &             &             &              &             &        &           &               &         & \tblhl  330\% &            6\% &                     65\% &           &            \\
     \bottomrule
     \end{tabular}

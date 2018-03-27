@@ -5,40 +5,40 @@
 \begin{table}[t!]
 \caption{Code size data per benchmark}
 \label{tbl-codesize-per-benchmark}
-    \begin{tabular}{lrrrrrrrrrrrrrrr} % UPDATED 20180305
+    \begin{tabular}{lrrrrrrrrrrrrrrr} % UPDATED 20180327
     \toprule
                                         & B.sort     & H.sort     & Bin.Search & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
     \midrule
     \midrule
     \multicolumn{10}{l}{CODE SIZE (BYTES)} \\
     % Take JVM, Native C and AOT original from results_0BASE_R___P__C0_A0_S0_G1 (Java interpeter for JVM)
-    \xxt Bytecode                       &         74 &        136 &         83 &        379 &       2983 &        453 &        441 &        287 &        334 &       2701 &       2563 &        311 &       2733 &                   &           \\
+    \xxt Bytecode                       &         74 &        134 &         83 &        379 &       2983 &        453 &        441 &        287 &        334 &       2788 &       2552 &        310 &       2661 &                   &           \\
     \xxt Native C                       &        118 &        298 &        146 &       1442 &       9458 &        910 &       1292 &        380 &        560 &       6128 &       3906 &       1944 &       5294 &                   &           \\
-    \xxt AOT original                   &        418 &       1000 &        412 &       3792 &      29502 &       4090 &       2576 &       1402 &       1628 &      13792 &      12724 &       2474 &      17972 &                   &           \\
+    \xxt AOT original                   &        418 &       1012 &        412 &       3792 &      29502 &       4090 &       2576 &       1402 &       1628 &      13982 &      12784 &       2454 &      17248 &                   &           \\
     % Take AOT optimised from results_4MARK_R11_P7_C1_A1_S1_G1
-    \xxt AOT optimised                           258 &        596 &        310 &       2236 &      14654 &       2018 &       1324 &        800 &       1056 &       9234 &       8478 &       1610 &      10994 &                   &           \\
+    \xxt AOT optimised                  &        258 &        596 &        310 &       2236 &      14654 &       2018 &       1324 &        800 &       1056 &       8990 &       8478 &       1610 &      10346 &                   &           \\
     \midrule
     \multicolumn{10}{l}{CODE SIZE OVERHEAD BEFORE OPTIMISATIONS (\% of native C)} \\
     % Take this from code-size-table.xlsx 
-    \xxt Total                          &      254.2 &      235.6 &      182.2 &      163.0 &      211.9 &      349.5 &       99.4 &      268.9 &      190.7 &      125.1 &      225.8 &       27.3 &      239.5 &                   &     197.9 \\
-      \xxxt push/pop                    & \xt   71.2 & \xt   85.9 & \xt   60.3 & \xt  103.7 & \xt  133.3 & \xt  165.3 & \xt   52.6 & \xt   86.3 & \xt   63.6 & \xt   57.3 & \xt   74.6 & \xt   35.0 & \xt   95.1 & \xt               & \xt  83.4 \\
-      \xxxt load/store                  & \xt   88.1 & \xt   79.2 & \xt   74.0 & \xt   28.4 & \xt   56.7 & \xt   67.9 & \xt   19.7 & \xt  101.1 & \xt   72.9 & \xt   45.4 & \xt   69.9 & \xt   23.5 & \xt   56.4 & \xt               & \xt  60.2 \\
-      \xxxt mov(w)                      & \xt   10.2 & \xt    8.1 & \xt    4.1 & \xt    2.6 & \xt   -1.0 & \xt    2.2 & \xt    4.3 & \xt    4.7 & \xt    5.7 & \xt   -3.7 & \xt   19.0 & \xt  -14.5 & \xt   15.1 & \xt               & \xt   4.4 \\
-      \xxxt other                       & \xt   84.7 & \xt   62.4 & \xt   43.8 & \xt   28.2 & \xt   22.9 & \xt  114.1 & \xt   22.8 & \xt   76.8 & \xt   48.6 & \xt   26.0 & \xt   62.2 & \xt  -16.7 & \xt   72.8 & \xt               & \xt  49.9 \\
+    \xxt Total                          &      254.2 &      235.6 &      182.2 &      163.0 &      211.9 &      349.5 &       99.4 &      268.9 &      190.7 &      123.1 &      225.8 &       27.3 &      226.8 &                   &     196.8 \\
+      \xxxt push/pop                    & \xt   71.2 & \xt   85.9 & \xt   60.3 & \xt  103.7 & \xt  133.3 & \xt  165.3 & \xt   52.6 & \xt   86.3 & \xt   63.6 & \xt   56.5 & \xt   74.6 & \xt   35.0 & \xt   84.5 & \xt               & \xt  82.5 \\
+      \xxxt load/store                  & \xt   88.1 & \xt   79.2 & \xt   74.0 & \xt   28.4 & \xt   56.7 & \xt   67.9 & \xt   19.7 & \xt  101.1 & \xt   72.9 & \xt   47.7 & \xt   69.9 & \xt   23.5 & \xt   60.1 & \xt               & \xt  60.7 \\
+      \xxxt mov(w)                      & \xt   10.2 & \xt    8.1 & \xt    4.1 & \xt    2.6 & \xt   -1.0 & \xt    2.2 & \xt    4.3 & \xt    4.7 & \xt    5.7 & \xt   -3.8 & \xt   19.0 & \xt  -14.5 & \xt   16.3 & \xt               & \xt   4.5 \\
+      \xxxt other                       & \xt   84.7 & \xt   62.4 & \xt   43.8 & \xt   28.2 & \xt   22.9 & \xt  114.1 & \xt   22.8 & \xt   76.8 & \xt   48.6 & \xt   22.7 & \xt   62.2 & \xt  -16.7 & \xt   65.9 & \xt               & \xt  49.1 \\
     \multicolumn{10}{l}{CODE SIZE OVERHEAD REDUCTION PER OPTIMISATION (\% of native C)} \\
-    \xxt Impr. peephole                 &      -67.8 &      -53.0 &      -45.2 &      -38.3 &      -49.4 &      -62.5 &      -32.2 &      -77.8 &      -33.9 &      -24.9 &      -28.2 &      -13.7 &      -51.0 &                   &     -44.4 \\
-    \xxt Stack caching                  &      -25.4 &      -28.9 &      -24.7 &      -59.4 &      -85.4 &     -111.2 &      -20.9 &      -30.6 &      -39.7 &      -27.4 &      -26.9 &      -16.3 &      -43.4 &                   &     -41.6 \\
-    \xxt Pop. val. caching              &      -16.9 &      -37.6 &       -6.8 &       -6.2 &      -18.7 &      -18.7 &      -13.5 &       -5.2 &      -18.5 &      -11.2 &      -28.4 &       -8.1 &      -20.0 &                   &     -16.1 \\
-    \xxt Mark loops                     &       +1.7 &      +10.1 &      +21.9 &       +5.9 &       -1.2 &       -2.6 &       -4.2 &      -16.4 &       +2.5 &       +1.5 &       -8.6 &       -2.5 &       -6.0 &                   &       0.1 \\
-    \xxt Const shift                    &        0.0 &       -3.4 &       -6.9 &       +1.7 &       +2.8 &      -16.0 &       -4.6 &       -2.6 &       -1.8 &       -1.5 &        0.0 &       -1.7 &       -0.7 &                   &      -2.6 \\
-    \xxt 16-bit array index             &      -27.2 &      -22.8 &       -8.2 &      -11.6 &       -5.1 &      -16.7 &      -11.6 &      -25.8 &      -10.7 &       -7.5 &      -16.6 &       -2.2 &      -10.7 &                   &     -13.6 \\
+    \xxt Impr. peephole                 &      -67.8 &      -53.0 &      -45.2 &      -38.3 &      -49.4 &      -62.5 &      -32.2 &      -77.8 &      -33.9 &      -24.7 &      -28.2 &      -13.7 &      -49.9 &                   &     -44.4 \\
+    \xxt Stack caching                  &      -25.4 &      -28.9 &      -24.7 &      -59.4 &      -85.4 &     -111.2 &      -20.9 &      -30.6 &      -39.7 &      -28.7 &      -26.9 &      -16.3 &      -38.6 &                   &     -41.2 \\
+    \xxt Pop. val. caching              &      -16.9 &      -37.6 &       -6.8 &       -6.2 &      -18.7 &      -18.7 &      -13.5 &       -5.2 &      -18.5 &      -11.3 &      -28.4 &       -8.1 &      -20.6 &                   &     -16.2 \\
+    \xxt Mark loops                     &       +1.7 &      +10.1 &      +21.9 &       +5.9 &       -1.2 &       -2.6 &       -4.2 &      -16.4 &       +2.5 &       +0.8 &       -8.6 &       -2.5 &      -11.4 &                   &      -0.3 \\
+    \xxt Const shift                    &        0.0 &       -3.4 &       -6.9 &       +1.7 &       +2.8 &      -16.0 &       -4.6 &       -2.6 &       -1.8 &       -1.5 &        0.0 &       -1.7 &       -0.2 &                   &      -2.7 \\
+    \xxt 16-bit array index             &      -27.2 &      -22.8 &       -8.2 &      -11.6 &       -5.1 &      -16.7 &      -11.6 &      -25.8 &      -10.7 &       -7.6 &      -16.6 &       -2.2 &      -10.7 &                   &     -13.6 \\
     \xxt SIMUL                          &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &       -9.9 &        0.0 &        0.0 &       -3.4 &        0.0 &        0.0 &        0.0 &                   &      -1.0 \\
     \multicolumn{10}{l}{CODE SIZE OVERHEAD AFTER OPTIMISATIONS (\% of native C)} \\
-    \xxt Total                          &      118.6 &      100.0 &      112.3 &       55.1 &       54.9 &      121.8 &        2.5 &      110.5 &       88.6 &       50.7 &      117.1 &      -17.2 &      107.7 &                   &      78.7 \\
-      \xxxt push/pop                    & \xt   23.7 & \xt   16.1 & \xt   27.4 & \xt   13.3 & \xt    0.0 & \xt    6.2 & \xt    1.9 & \xt   -2.1 & \xt   -5.0 & \xt    4.2 & \xt   16.3 & \xt    3.9 & \xt    0.2 & \xt               & \xt   8.2 \\
-      \xxxt load/store                  & \xt   33.9 & \xt   41.6 & \xt   49.3 & \xt   14.8 & \xt   37.2 & \xt   25.3 & \xt   -2.6 & \xt   57.9 & \xt   45.0 & \xt   28.3 & \xt   40.9 & \xt    8.0 & \xt   37.2 & \xt               & \xt  32.1 \\
-      \xxxt mov(w)                      & \xt    1.7 & \xt    6.7 & \xt    6.8 & \xt    2.5 & \xt   -2.4 & \xt   11.9 & \xt   -0.8 & \xt    1.1 & \xt    7.1 & \xt   -0.3 & \xt   15.4 & \xt  -10.7 & \xt   15.0 & \xt               & \xt   4.2 \\
-      \xxxt other                       & \xt   59.3 & \xt   35.6 & \xt   28.8 & \xt   24.4 & \xt   20.1 & \xt   78.5 & \xt    4.0 & \xt   53.7 & \xt   41.4 & \xt   18.5 & \xt   44.5 & \xt  -18.4 & \xt   55.2 & \xt               & \xt  34.3 \\
+    \xxt Total                          &      118.6 &      100.0 &      112.3 &       55.1 &       54.9 &      121.8 &        2.5 &      110.5 &       88.6 &       46.7 &      117.1 &      -17.2 &       95.4 &                   &      77.4 \\
+      \xxxt push/pop                    & \xt   23.7 & \xt   16.1 & \xt   27.4 & \xt   13.3 & \xt    0.0 & \xt    6.2 & \xt    1.9 & \xt   -2.1 & \xt   -5.0 & \xt    1.7 & \xt   16.3 & \xt    3.9 & \xt   -3.1 & \xt               & \xt   7.7 \\
+      \xxxt load/store                  & \xt   33.9 & \xt   41.6 & \xt   49.3 & \xt   14.8 & \xt   37.2 & \xt   25.3 & \xt   -2.6 & \xt   57.9 & \xt   45.0 & \xt   30.1 & \xt   40.9 & \xt    8.0 & \xt   37.6 & \xt               & \xt  32.2 \\
+      \xxxt mov(w)                      & \xt    1.7 & \xt    6.7 & \xt    6.8 & \xt    2.5 & \xt   -2.4 & \xt   11.9 & \xt   -0.8 & \xt    1.1 & \xt    7.1 & \xt   -0.2 & \xt   15.4 & \xt  -10.7 & \xt   13.3 & \xt               & \xt   4.0 \\
+      \xxxt other                       & \xt   59.3 & \xt   35.6 & \xt   28.8 & \xt   24.4 & \xt   20.1 & \xt   78.5 & \xt    4.0 & \xt   53.7 & \xt   41.4 & \xt   15.1 & \xt   44.5 & \xt  -18.4 & \xt   47.6 & \xt               & \xt  33.4 \\
     \midrule
                                         & B.sort     &  H.sort    & Bin.Search & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
     \bottomrule

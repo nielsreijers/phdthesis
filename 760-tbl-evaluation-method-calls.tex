@@ -3,7 +3,7 @@
 \label{tbl-evaluation-method-calls}
     \scriptsize
     \begin{threeparttable}
-    \begin{tabular}{lllllll} % UPDATED 20180305
+    \begin{tabular}{lllllll} % UPDATED 20180327
     \toprule
                                  & \# calls                 & C                & Java                          & Java                          & Java                            \\
                                  &                          &                  & Base version                  & Alternative version           & Using normal method calls       \\
@@ -16,18 +16,18 @@
     crcu8                        & \multicolumn{1}{r}{584}  & normal (inlined) & manually inlined              & manually inlined              & manually inlined                \\
     crcu16                       & \multicolumn{1}{r}{292}  & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
     calc\_func                   & \multicolumn{1}{r}{220}  & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
-    compare\_idx                 & \multicolumn{1}{r}{209}  & normal (inlined) & normal (virtual)              & normal (virtual)              & normal (virtual)                \\
+    compare\_idx                 & \multicolumn{1}{r}{209}  & normal (inlined) & Proguard inlined              & Proguard inlined              & Proguard inlined                \\
     core\_list\_find             & \multicolumn{1}{r}{206}  & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
-    compare\_complex             & \multicolumn{1}{r}{110}  & normal           & normal (virtual)              & normal (virtual)              & normal (virtual)                \\
+    compare\_complex             & \multicolumn{1}{r}{110}  & normal           & Proguard inlined              & Proguard inlined              & Proguard inlined                \\
     crcu32                       & \multicolumn{1}{r}{64}   & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
     matrix\_sum                  & \multicolumn{1}{r}{16}   & normal           & lightweight                   & lightweight                   & \tblhl normal            \\
     others (<16 calls each)      & \multicolumn{1}{r}{39}   & normal           & normal                        & normal                        & normal                          \\
     \\
     % The cycles from the simulation are for 50 iterations. Just divide by 50 here so the cycle count + the number of invokes produces the right overhead. An actual simulation run with 1 iteration is a bit slower, but only a few % so it is not significant enough to worry about here.
     %                                                                                 coremk                          coremk_lw                         coremk_fn
-    \emph{cycles}                &                          &                  & \multicolumn{1}{r}{3,353,474} & \multicolumn{1}{r}{3,523,967} & \multicolumn{1}{r}{4,488,847}   \\
-    \emph{overhead v native C}   &                          &                  & \multicolumn{1}{r}{97.0\%}    & \multicolumn{1}{r}{107.0\%}   & \multicolumn{1}{r}{163.6\%}     \\
-    \emph{code size}             &                          &                  & \multicolumn{1}{r}{9,234}     & \multicolumn{1}{r}{9,280}     & \multicolumn{1}{r}{9,540}       \\
+    \emph{cycles}                &                          &                  & \multicolumn{1}{r}{2,705,654} & \multicolumn{1}{r}{2,863,302} & \multicolumn{1}{r}{3,855,242}   \\
+    \emph{overhead v native C}   &                          &                  & \multicolumn{1}{r}{58.9\%}    & \multicolumn{1}{r}{68.2\%}    & \multicolumn{1}{r}{126.4\%}     \\
+    \emph{code size}             &                          &                  & \multicolumn{1}{r}{8990}      & \multicolumn{1}{r}{9006}      & \multicolumn{1}{r}{9,328}       \\
     \\
     \midrule
     \\
