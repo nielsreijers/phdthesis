@@ -1,4 +1,4 @@
-# UPDATED 20180305
+# UPDATED 20180327
 
 Title           , "bounds in memory" , "bounds in registers" , "difference"
 "Bubble sort"   ,              247.5 ,                 207.6 ,       -39.9
@@ -10,8 +10,8 @@ Title           , "bounds in memory" , "bounds in registers" , "difference"
 "FFT"           ,               30.3 ,                  27.5 ,        -2.8
 "Outlier"       ,              128.4 ,                 140.0 ,        11.6
 "LEC"           ,              118.4 ,                 107.0 ,       -11.4
-"CoreMark"      ,              124.0 ,                 123.2 ,        -0.8
+"CoreMark"      ,               76.7 ,                  79.3 ,         2.6
 "MoteTrack"     ,              266.1 ,                 226.2 ,       -39.9
 "HeatCalib"     ,               33.9 ,                  39.4 ,         5.5
-"HeatDetect"    ,               91.3 ,                  85.9 ,        -5.4
-"average"       ,              108.4 ,                 102.0 ,        -6.4
+"HeatDetect"    ,               88.2 ,                  84.4 ,        -3.8
+"average"       ,              104.6 ,                  98.5 ,        -6.1

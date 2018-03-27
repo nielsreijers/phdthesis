@@ -1,4 +1,4 @@
-# UPDATED 20180305
+# UPDATED 20180327
 
 Title           , "unsafe" , "safe writes" , "safe reads and writes"
 "Bubble sort"   , 101.2    ,    247.5      , 393.9
@@ -10,8 +10,8 @@ Title           , "unsafe" , "safe writes" , "safe reads and writes"
 "FFT"           ,  17.7    ,     30.3      ,    43
 "Outlier"       ,  75.7    ,    128.4      , 226.6
 "LEC"           ,  84.6    ,    118.4      , 179.8
-"CoreMark"      ,    97    ,      124      , 202.2
+"CoreMark"      ,  58.9    ,     76.7      ,   155
 "MoteTrack"     , 156.3    ,    266.1      , 445.1
 "HeatCalib"     ,  30.5    ,     33.9      ,  43.9
-"HeatDetect"    ,  73.4    ,     91.3      , 126.9
-"average"       ,  70.2    ,    108.4      ,   178
+"HeatDetect"    ,  70.2    ,     88.2      , 120.8
+"average"       ,    67    ,    104.6      , 173.9
