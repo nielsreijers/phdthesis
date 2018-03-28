@@ -8,7 +8,7 @@ A safe execution environment is one that guarantees an application cannot harm t
 \begin{enumerate}
     \item Execute code it does not have permission for,
     \item Write to memory outside the areas assigned to it, or
-    \item Retain control of the CPU indefinitely
+    \item Retain control of the CPU indefinitely.
 \end{enumerate}
 
 Given the first two, the last guarantee is easy to implement: the VM can simply set a timer to trap back to the VM after a certain amount of time. As long as the other guarantees hold, the application will not be able to disable the timer without the VM's permission. To guard against programming errors as well as malicious attacks, we focus on the second type of approaches shown in Figure \ref{fig-safe-compilation-process}, where the node does not rely on a trusted host to guarantee safety, but can do so independent of the code it receives.
@@ -24,16 +24,16 @@ While in CapeVM, the programme eventually also runs as native code on the physic
 Table \ref{tbl-safety-checks} contains the list of checks done by CapeVM to guarantee safety. To show these are sufficient to satisfy the high level guarantees listed before, we first express them as concrete constraints specific to CapeVM:
 
 \begin{itemize}
-    \item \emph{control flow safety}: after starting the application, the VM is always executing either
+    \item \emph{Control flow safety}: after starting the application, the VM is always executing either
         \begin{itemize}
             \item a translated bytecode instruction in the current method \emph{from the start}, or
-            \item code in the VM itself, as a result of either a call to a VM function from a translated bytecode instruction, or returning from a method
+            \item code in the VM itself, as a result of either a call to a VM function from a translated bytecode instruction, or returning from a method.
         \end{itemize}
-    \item \emph{memory safety}: any write to memory done by the application is to a legal location: either
+    \item \emph{Memory safety}: any write to memory done by the application is to a legal location: either
         \begin{itemize}
             \item memory reserved for the operand stack, or
             \item a valid local or static variable slot, or
-            \item the area of the heap assigned to the application
+            \item the area of the heap assigned to the application.
         \end{itemize}
 \end{itemize}
 

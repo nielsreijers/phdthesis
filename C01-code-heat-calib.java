@@ -6,8 +6,7 @@ public class HeatCalib {
     public static short z_min, z_max;
 
     @Lightweight
-    public static native void get_heat_sensor_data(short[] frame_buffer,
-                                                   short frame_number);
+    public static native void get_sensor_data(short[] frame_buffer, short frame_number);
 
     public static void benchmark_main() {
         short[] frame_buffer = new short[64];

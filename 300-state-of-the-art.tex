@@ -47,9 +47,9 @@ For a node's hardware components, the node creates WuObjects to represent them a
 
 An WuClass is defined by:
 \begin{itemize}
-    \item Its list of properties
-    \item A \mycode{setup()} function, called once when an object is created
-    \item A \mycode{update()} function, called (i) periodically, for example to sample a sensor, or (ii) when one of the input properties changes value, to compute a new output value or drive an actuator
+    \item Its list of properties.
+    \item A \mycode{setup()} function, called once when an object is created.
+    \item A \mycode{update()} function, called (i) periodically, for example to sample a sensor, or (ii) when one of the input properties changes value, to compute a new output value or drive an actuator.
 \end{itemize}
 
 The \mycode{setup()} and \mycode{update()} functions can be written in either C or Java. A node may have native C implementations built in for a number of commonly used classes from the WuKong standard library, which it will advertise during the discovery phase. If the master cannot find a native implementation of a required class, it may use a Java version instead, which is slower, but more flexible since it can be deployed as part of the application. To support this, the WuKong middleware contains a version of the Darjeeling JVM \cite{Brouwers:2009cj}.

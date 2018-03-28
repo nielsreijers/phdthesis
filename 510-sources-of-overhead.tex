@@ -53,8 +53,8 @@ CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-
 
 \begin{enumerate}
   \small
-  \item Flush the stack cache so parameters are in memory and clear value tags (see sections \ref{sec-optimisations-simple-stack-caching} and \ref{sec-optimisations-popped-value-caching})
-  \item Save the integer and reference stack pointers (SP and X)
+  \item Flush the stack cache so parameters are in memory and clear value tags (see sections \ref{sec-optimisations-simple-stack-caching} and \ref{sec-optimisations-popped-value-caching}).
+  \item Save the integer and reference stack pointers (SP and X).
   \item Call the VM's \mycode{callMethod} function, which will:
   \begin{enumerate}
     \item allocate memory for the callee's frame
@@ -66,8 +66,8 @@ CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-
     \item reactivate the old frame: set the VM's active frame pointer back to the caller
     \item return to the caller's AOT compiled code the return value (if any) in R22 and higher
   \end{enumerate}
-  \item Restore stack pointer and X register
-  \item Push the return value onto the stack (using stack caching this will be free)
+  \item Restore stack pointer and X register.
+  \item Push the return value onto the stack (using stack caching this will be free).
 \end{enumerate}
 
 Even after considerable effort optimising this process, this requires roughly 540 cycles for the simplest case: a call to a static method without any parameters or return value. For a virtual method the cost is higher because we need to look up the right implementation. While we may be able to save some more cycles with an even more rigorous refactoring, it is clear that the number of steps involved will always take considerably more time than a native function call.

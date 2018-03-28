@@ -200,9 +200,9 @@ At the same time, sensor node code can be quite complex. While programming in a 
 
 To guard against both buggy code and malicious attacks, a desirable property would be the ability to execute code in a sand boxed manner to isolate untrusted application code from the VM itself. Specifically, we would like to guarantee that malicious code cannot:
 \begin{enumerate}
-    \item Write to memory outside the range assigned by the VM
-    \item Perform actions it does not have permission for
-    \item Retain control of the CPU indefinitely
+    \item Write to memory outside the range assigned by the VM.
+    \item Perform actions it does not have permission for.
+    \item Retain control of the CPU indefinitely.
 \end{enumerate}
 
 Note that these guarantees do assure the correctness of the application itself: buggy code may still corrupt its own state. More fine-grained checks can be useful to reduce the risk of bugs and speed up the development process by detecting them earlier. Safe TinyOS \cite{Cooprider:2007ub} adds run-time checks to detect illegal writes, and can do so efficiently by analysing the source code before it is compiled. However, this does not protect against malicious code being sent to the device and depends on the correctness of the host.

@@ -43,12 +43,7 @@ public class HeatDetect {
     private static final short zscore_threshold_recal = 1000;
 
 
-    public static void benchmark_main(short[] frame_buffer,
-                                      byte[] color,
-                                      byte[] rColor,
-                                      int[] largestSubset,
-                                      int[] testset,
-                                      int[] result) {
+    public static void benchmark_main(short[] frame_buffer, byte[] color, byte[] rColor, int[] largestSubset, int[] testset, int[] result) {
         HeatCalib.zscoreCalculation(frame_buffer);
 
         ShortWrapper maxSubsetLen = new ShortWrapper();
@@ -71,10 +66,7 @@ public class HeatDetect {
         }
     }
 
-    private static void get_largest_subset(int[] largestSubset,
-                                           ShortWrapper maxSubsetLen,
-                                           int[] testset,
-                                           int[] result) {
+    private static void get_largest_subset(int[] largestSubset, ShortWrapper maxSubsetLen, int[] testset, int[] result) {
         int pixelCount=0;
         for(short i=0; i<64; i++){
             testset[i]=0;
@@ -107,11 +99,7 @@ public class HeatDetect {
         }
     }
 
-    private static void find_largestSubset(int[] testset,
-                                           int testsetLen,
-                                           ShortWrapper maxSubsetLen,
-                                           int[] largestSubset,
-                                           int[] result){
+    private static void find_largestSubset(int[] testset, int testsetLen, ShortWrapper maxSubsetLen, int[] largestSubset, int[] result){
         for(short i=0; i<64;i++){result[i]=WAITTOCHECK;}
         int subsetNumber = 0;
         ShortWrapper startIndex = new ShortWrapper();
@@ -125,12 +113,7 @@ public class HeatDetect {
                               subsetNumber, maxSubsetLen, largestSubset);
     }
 
-    private static void select_largest_subset(int[] testset,
-                                              int testsetLen,
-                                              int[] result,
-                                              int subsetNumber,
-                                              ShortWrapper maxSubsetLen,
-                                              int[] largestSubset){
+    private static void select_largest_subset(int[] testset, int testsetLen, int[] result, int subsetNumber, ShortWrapper maxSubsetLen, int[] largestSubset){
         int maxSubsetNumber = 0;
         for(short i=0; i<subsetNumber; i++){
             short lengthCount = 0;
@@ -288,10 +271,7 @@ public class HeatDetect {
         }
     }
 
-    private static boolean get_startIndex(int[] testset,
-                                          int testsetLen,
-                                          int[] result,
-                                          ShortWrapper startIndex) {
+    private static boolean get_startIndex(int[] testset, int testsetLen, int[] result, ShortWrapper startIndex) {
         boolean rv = false; // done this way to avoid values on the stack at a brtarget
         for(short i=0; i<testsetLen; i++){
             if(result[testset[i]] == WAITTOCHECK){
@@ -303,10 +283,7 @@ public class HeatDetect {
         return rv;
     }
 
-    private static void label_subset(int[] testset,
-                                     int testsetLen,
-                                     int[] result,
-                                     int subsetNumber) {
+    private static void label_subset(int[] testset, int testsetLen, int[] result, int subsetNumber) {
         while(label_neighbor(result, subsetNumber)){
             for(short i=0; i< testsetLen; i++){
                 if(result[testset[i]] == NEIGHBOR){
