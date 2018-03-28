@@ -5,7 +5,7 @@ To come back to the research questions stated in Section \ref{sec-introduction-r
 
 \begin{enumerate}
 	\item[a.]
-	After identifying the sources of overhead in previous work on ahead-of-time compilers for sensor nodes, we introduced a number of optimisations to reduce the performance overhead by over 79\%, and the code size overhead by 60\%, resulting in an average performance overhead of 70\%, and the code size overhead of 79\% compared to native C.
+	After identifying the sources of overhead in previous work on ahead-of-time compilers for sensor nodes, we introduced a number of optimisations to reduce the performance overhead by over 79\%, and the code size overhead by 61\%, resulting in an average performance overhead of 67\%, and the code size overhead of 77\% compared to native C.
 
 	The optimisations introduced by CapeVM do increase the size of the VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node.
 
@@ -14,7 +14,7 @@ To come back to the research questions stated in Section \ref{sec-introduction-r
 	\item[b.]
 	CapeVM's second contribution is providing a safe execution environment. Compared to native binary code, the higher level of abstraction of CapeVM's bytecode allowed us to develop a relatively simple set of safety checks.
 	
-	This results in a modest overhead in terms of VM size, and because most checks are performed at translation time, the overhead for providing safety is limited to a slowdown of 22\% and a 2\% increase in code size, compared to the unsafe version.
+	This results in a modest overhead in terms of VM size, and because most checks are performed at translation time, the overhead for providing safety is limited to a slowdown of 23\% and a 2\% increase in code size, compared to the unsafe version.
 	
 	Since to the best of our knowledge only two native code approaches exist that provide safety independent of the host, we cannot exclude the possibility that these could be further optimised. Currently however, CapeVM is on-par with or faster than existing systems, and provides platform independence at the same time.
 

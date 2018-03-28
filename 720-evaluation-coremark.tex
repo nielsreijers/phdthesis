@@ -57,13 +57,13 @@ After translating the C code to Java, we do some manual optimisations to produce
 
 \input{720-tbl-evaluation-coremark}
 
-Table \ref{tbl-coremark-manual-optimisation} shows the slowdown over the native C version, broken down into \mybench{CoreMark}'s three main components. The baseline version, using the original Java code and without any optimisations, is 811\% slower than native C. Even after applying all our other optimisations, the best we can achieve with the original code is a 327\% slowdown.
+Table \ref{tbl-coremark-manual-optimisation} shows the slowdown over the native C version, broken down into \mybench{CoreMark}'s three main components. The baseline version, using the original Java code and without any optimisations, is 810\% slower than native C. Even after applying all our other optimisations, the best we can achieve with the original code is a 327\% slowdown.
 
 Next we manually optimise to the Java source code, starting with the optimisations as described in Section \ref{sec-optimisations-manual-java-source-optimisation} and add a small extra optimisation to \mycode{crcu8} which can be easily reorganised to reduce branch overhead. These are all optimisations that a future optimising infuser could do automatically.
 
-The effect depends greatly on the characteristics of the code. The matrix part of the benchmark benefits most from using short array indexes, the state machine frequently calls a small method and benefits greatly from inlining it, etc. Combined these optimisations reduce the overhead for the whole benchmark from 327\% to 98\%, proving the importance of a better optimising infuser.
+The effect depends greatly on the characteristics of the code. The matrix part of the benchmark benefits most from using short array indexes, the state machine frequently calls a small method and benefits greatly from inlining it, etc. Combined these optimisations reduce the overhead for the whole benchmark from 327\% to 97\%, proving the importance of a better optimising infuser.
 
-We also applied all these optimisations to the native C version to ensure a fair comparison, but the difference in performance was negligible. In the rest of the evaluation, all results presented are for the manually optimised code.
+We also applied all these optimisations to the native C version to ensure a fair comparison, but the difference in performance was negligible.
 
 \subsection{Non-automatic optimisations}
 \label{sec-evaluation-coremark-non-automatic-optimisations}
@@ -81,8 +81,8 @@ The virtual call to the comparer objects in the list benchmark is the most natur
 % one ListData           :  4 bytes
 % 4*5byte heap header    : 20 bytes
 
-Combined, this improves the performance of \mybench{CoreMark} to only 60\% overhead over native C, right in the middle of the spectrum of the other benchmarks.
+Combined, this improves the performance of \mybench{CoreMark} to only 59\% overhead over native C, right in the middle of the spectrum of the other benchmarks.
 
 Similar to \mybench{MoteTrack} in the previous section, these results point at some weaknesses of Java when used as an embedded VM. The lack of cheap function pointers, or a way of allocating small local objects or arrays in a method's stack frame means there will be a significant overhead in situations where the optimisations used here cannot be applied. We discuss some options to reduce the cost of such temporary objects in future VMs in Section \ref{sec-no-gc}.
 
-In the rest of the evaluation the optimised version of \mybench{CoreMark} is used. The optimisation to avoid repeatly creating temporary objects was also applied to the \mybench{LEC} and \mybench{MoteTrack} benchmarks.
+In the rest of the evaluation, all results presented are for the manually optimised code. For \mybench{CoreMark} this includes the two non-automatic optimisations. The optimisation to avoid repeatly creating temporary objects was also applied to the \mybench{LEC} and \mybench{MoteTrack} benchmarks.

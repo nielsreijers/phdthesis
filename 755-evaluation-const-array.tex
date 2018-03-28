@@ -4,11 +4,11 @@
 
 Four benchmarks contain arrays of constant data, which were stored in flash memory by placing them in classes with the \mycode{@ConstArray} annotation. To evaluate the effect of this optimisation, we compare them to versions without this annotation. The results are shown in Table \ref{tbl-const-array}. There are three advantages to this optimisation: a small improvement in performance, reduced code size, and reduced memory usage.
 
-When using constant arrays, the id of the array to read from is a bytecode parameter in the \mycode{GETCONSTARRAY} instruction. No reference to the array needs to be loaded on the stack, and the calculation to find the address of the target element is slightly easier, which results in a modest reduction in performance overhead of 1.8\% for the \mybench{LEC} benchmark and 0.1\% for \mybench{FFT}.
+When using constant arrays, the id of the array to read from is a bytecode parameter in the \mycode{GETCONSTARRAY} instruction. No reference to the array needs to be loaded on the stack, and the calculation to find the address of the target element is slightly easier, which results in a modest reduction in performance overhead of 1.8\% for the \mybench{LEC} benchmark.
 
 The real advantage however, is the reduction in code size and memory usage. Without this optimisation, an array of constant data is transformed into normal bytecode in the class initialiser that will create an array object on the heap and fill each element individually, as shown in Listing \ref{lst-constant-array-initialisation}.
 
-The class initialiser uses four bytecode instructions per element to fill each element of the array. For an array of bytes, this can take up to 7 bytes of bytecode for each byte of data, which increases even further after AOT compilation. In the \mybench{LEC} benchmark this results in a class initialiser of 928 bytes, over \emph{18 times} the size of the original data. 
+The class initialiser uses four bytecode instructions per element to fill each element of the array. For an array of bytes, this can take up to 7 bytes of bytecode for each byte of data, which increases even further after AOT compilation. In the \mybench{LEC} benchmark this results in a class initialiser of 930 bytes, over \emph{18 times} the size of the original data. 
 
 For such a small array this might still be acceptable, but the 26 KB needed to store \mybench{FFT}'s 2 KB of data is a significant overhead, and while \mybench{MoteTrack}'s 20 KB of data could fit in flash memory, the resulting class initialiser cannot. When using the constant array optimisation, the array is stored as raw data in the constant pool, resulting in just 4 bytes of overhead per array.
 

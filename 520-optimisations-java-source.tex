@@ -1,6 +1,6 @@
 \section{Manually optimising the Java source code}
 \label{sec-optimisations-manual-java-source-optimisation}
-As shown in Section \ref{sec-compilation-process}, our current implementation uses three steps to translate Java source code to CapeVM bytecode: the standard Java compiler, the ProGuard optimiser, and the modified Darjeeling infuser. None of these do any complex optimisations. 
+As shown in Figure \ref{fig-translation-process}, our current implementation uses three steps to translate Java source code to CapeVM bytecode: the standard Java compiler, the ProGuard optimiser, and the modified Darjeeling infuser. None of these do any complex optimisations. 
 
 In a future version, these three steps should be merged into an 'optimising infuser' which uses all the normal, well-known optimisation techniques to produce better quality bytecode, but at the moment we do not have the resources to build such an optimising infuser.
 
