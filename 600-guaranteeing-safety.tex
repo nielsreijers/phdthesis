@@ -17,9 +17,9 @@ As discussed in Chapter 3, most generic sensor nodes VMs do not consider safety,
 
 Both the machine model and the instruction set of the virtual machine are more structured than a real CPU. This restricts what a bytecode instruction can do, which in turn allows the VM to verify safety for many instructions at translation time.
 
-As an example, memory on the physical CPU is a flat address space, and the ATmega's store instructions can write to \emph{any} address in memory. In the VM, memory for local variables, static variables, and for objects and arrays, are separated and the VM has separate instructions to target each of them as an offset within their respective regions. Similarly, the ATmega's branch instructions target some offset or address within flash memory, while the VM's branches target the id of a branch target within the current method.
+As an example, memory on the physical CPU is a flat address space, and the ATmega's store instructions can write to \emph{any} address in memory. In the VM, memory for local variables, static variables, and for objects and arrays, are separated and the VM has separate instructions to target each of them as an offset within their respective regions. Similarly, native code can branch to any address within flash memory, while the VM's branches target the id of a branch target within the current method.
 
-In CapeVM, the programme eventually runs as native code on the physical CPU, but the VM is in complete control of the native code that is generated and the context in which this code runs. As shown in the next sections, this make it easy to determine at translation time that stores to local and static variables will write to space reserved for a local or static variable, and that branches will branch to a legal instruction within the method.
+While in CapeVM, the programme eventually also runs as native code on the physical CPU, the VM is in complete control of how this code is generated and the context in which it runs. As shown in the next sections, this make it easy to determine at translation time that stores to local and static variables will write to space reserved for a local or static variable, and that branches will branch to a legal instruction within the method.
 
 Table \ref{tbl-safety-checks} contains the list of checks done by CapeVM to guarantee safety. To show these are sufficient to satisfy the high level guarantees listed before, we first express them as concrete constraints specific to CapeVM:
 
@@ -37,9 +37,9 @@ Table \ref{tbl-safety-checks} contains the list of checks done by CapeVM to guar
         \end{itemize}
 \end{itemize}
 
-The control flow guarantees make sure code cannot jump to a point half-way a generated instruction to skip run-time checks, or to anywhere in the VM except through the proper entry points defined by the VM. As in normal Java, the bytecode instructions in CapeVM can only modify state within the virtual machine. There are no special instructions to access sensors and actuators as in for example Maté. Thus, access to external resources is assumed to happen through calls to natively implemented library functions, which returns control to VM and allows it at that point whether the application has permission to do so.
+The control flow guarantees make sure code cannot jump to a point half-way a generated instruction to skip run-time checks, or to anywhere in the VM except through the proper entry points defined by the VM. As in normal Java, the bytecode instructions in CapeVM can only modify state within the virtual machine. There are no special instructions to access sensors and actuators as in for example Maté. Thus, access to external resources is assumed to happen through calls to natively implemented library functions, which returns control to VM and allows it to check whether the application has permission to do so.
 
-We will show the checks in Table \ref{tbl-safety-checks} are sufficient to ensure these two constraints by first noting the VM will be in a legal state at the start of a method: the VM will jump to the begining of the method's first instruction and no writes will have occured yet. Then, we will consider how each bytecode instruction affects control flow and the memory writes it will do, and list the checks necessary to ensure the VM is still in a legal state after executing it. Both guarantees depend on each other: memory safety is assumed when discussing control flow safety and vice versa.
+Clearly, the VM will be in a legal state when a programme starts: the VM will jump to the begining of the first instruction and no writes will have occured yet. We will show the checks in Table \ref{tbl-safety-checks} are sufficient to ensure these two constraints, by examining how each bytecode instruction can affect control flow and write to memory, and list the checks necessary to ensure the VM is still in a legal state after executing it. Both guarantees depend on each other: memory safety is assumed when discussing control flow safety and vice versa.
 
 Each method in CapeVM has a small \emph{method header} defining properties such as the maximum stack size, number of local variables, return type, etc. The VM uses this header to create the stack frame, and to determine the effects of call to that method on the caller's operand stack, Therefore, many of the checks are to ensure the implementation of the method follows the contract established in the method header. When the node receives new code, it first receives the headers for all methods, followed by their implementations, so the contracts for all methods are known when the bytecode is translated.
 
@@ -251,7 +251,7 @@ This does not break the safety guarantees since these heap headers are not used 
 \begin{table}
 \caption{Comparison of CapeVM's safety guarantees to source code approaches}
 \label{tbl-safety-comparison-source-code-approaches}
-    \begin{tabular}{p{.30\textwidth}p{.30\textwidth}p{.30\textwidth}} % NO SIMULATION DATA
+    \begin{tabular}{p{.35\textwidth}p{.28\textwidth}p{.27\textwidth}} % NO SIMULATION DATA
     \toprule
                                                 & CapeVM and                                  & Source code approaches \\
                                                 & native code approaches                      & \\
@@ -260,7 +260,8 @@ This does not break the safety guarantees since these heap headers are not used 
     Safety checks added/verified at             & The node                                    & The host \\
     Protects                                    & The VM                                      & The VM and application \\
     Protects against malicious code             & Yes                                         & No \\
-    Detects certain programming errors          & Could be added at significant cost          & Yes \\
+    Detects certain programming errors          & No, but could be added                      & Yes \\
+                                                & ~~~ at significant cost                     & \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -271,18 +272,19 @@ For example, CapeVM allows out of bounds array indexes. While incorrect, these d
 
 Section \ref{sec-state-of-the-art-source-code-safety} introduced a number of systems such as Safe TinyOS \cite{Cooprider:2007ub} that work on the source code level. While seemingly similar, they are actually the reverse in the sense that their more fine-grained checks do prevent certain programming errors from corrupting the application's state, but since the node assumes the necessary checks to be in place, they cannot guard against malicious code sent to the device. Because in these systems the safety checks are added by the host, more complex analysis can be done on the source code to prove certain operations to be safe at compile time, which reduces the number of necessary safety checks and thus the run-time overhead.
 
-The checks in the JVM's specification both protect against malicious code and detect certain programming errors. On the desktop, JVMs, like the host in Safe TinyOS, have ample resources to do the analysis necessary to reduce the overhead of fine-grained checks. On a sensor node we argue the two goals require two separate solutions.
+The checks in the JVM's specification both protect against malicious code and detect certain programming errors. Desktop JVMs, like the host in Safe TinyOS, have ample resources to do the analysis necessary to reduce the overhead of fine-grained checks. On a sensor node we argue the two goals require two separate solutions.
 
-While CapeVM's checks could be extended to provide the same level of safety as Safe TinyOS, to do so would require extending the existing checks to include the size of the object or array that is being accessed, which would make them considerably more expensive. Since CapeVM adds the safety checks on the node, it lacks the resources necessary to do the analysis that allows Safe TinyOS to eliminate many checks, and it must conservatively check each access.
+While CapeVM's checks could be extended to provide the same level of safety as Safe TinyOS, to do so would require extending the existing checks to include the size of the object or array that is being accessed, which would make them considerably more expensive. Since CapeVM adds the safety checks on the node, it lacks the resources necessary to do the analysis that allows Safe TinyOS to eliminate many checks. Instead, CapeVM must conservatively check each access.
 
-If the goal is to protect the application against a certain class of programming errors, this implies the code is trusted, and an approach similar to that of Safe TinyOS will be more efficient. Safe TinyOS works on native nesC code, but a similar system could be developed for Java where the checks inserted by the host are implemented as a new bytecode instruction to mark array or object accesses than need run-time checking.
+% TODO this sentence could be better....
+If the goal is to protect the application from programming errors that could corrupting its own state, this implies control over the code, and an approach similar to that of Safe TinyOS will be more efficient. Safe TinyOS works on native nesC code, but a similar system could be developed for Java where the checks inserted by the host are implemented as a new bytecode instruction to mark array or object accesses than need run-time checking.
 
-The difference between both approaches is summarised in Table \ref{tbl-safety-comparison-source-code-approaches}. Which approach is appropriate depends on the scenario and for some both may be useful. For example, if the Amulet smart watch system would use a VM, CapeVM's safety checks are useful to isolate untrusted applications from the VM. At the same time, it may also want to provide more fine-grained checks to detect buggy applications. In this case, doing by adding checks on the host, similar to Safe TinyOS, will lead to less overhead compared to extending the added by the node.
+The difference between both approaches is summarised in Table \ref{tbl-safety-comparison-source-code-approaches}. For some applications both may be useful. For example, in a system like the Amulet smart watch, CapeVM's safety checks are useful to isolate an untrusted application from the VM. At the same time, more fine-grained checks may be added to detect buggy applications. In this case, adding these checks on the host, similar to Safe TinyOS, will lead to less overhead compared to extending those added by the node.
 
 
 
 
-\subsection{\emph{SensorScheme}}
+\subsection{SensorScheme}
 Next, we will compare the approach taken by CapeVM to three existing systems that provide safety on the node. First, SensorScheme is the only sensor node VM to explicitly mention safety, although it does not describe many the details.
 
 SensorScheme is a LISP dialect, so both code and data are stored as lists. In SensorScheme memory is organised as a collection of fixed-sized \emph{cells} that make up these lists. Since the cells are managed by the VM this inherently gives it a level of safety, and run-time checks are added to check the datatypes and length for each operation. Since it is an interpreter, it has a large run-time overhead, which makes the added overhead of these checks insignificant.
@@ -296,9 +298,9 @@ In addition to safety, \emph{t-kernel} \cite{Gu:2005un, Gu:2006ww} also provides
 \paragraph{OS control and control flow safety}
 OS control is defined as the ability of the OS to take control of the CPU. The authors note that “Traditionally, the CPU control is guaranteed by privilege support and clock interrupts. However, many microcontrollers used by sensor nodes do not have privilege support. The application can disable interrupts and occupy the CPU for an arbitrarily long time.”
 
-To implement its virtual memory features and safety guarantees, \emph{t-kernel} extensively rewrites, or \emph{naturalizes}, the application's binary code at run time, on demand, one 256-byte page at a time. As a result, addresses in the original binary (called VPCs, virtual program counters), do not match the physical addresses in the naturalized pages. This is solved by converting all branching instructions, including calls, returns, etc, with calls back to the kernel, which then looks up the corresponding physical address.
+To implement its virtual memory features and safety guarantees, \emph{t-kernel} extensively rewrites, or \emph{naturalizes}, the application's binary code at run time, on demand, one 256-byte page at a time. As a result, addresses in the original binary, do not match the physical addresses in the naturalized pages. This is solved by replacing all branching instructions, including calls, returns, etc, with calls back to the kernel, which then looks up the corresponding physical address.
 
-This causes a slowdown of up to 30x. To reduce this overhead, the kernel replaces the call back to the kernel for forward branches with a direct jump after the first transition occurs. Backward branches are replaced with code that first increment an 8-bit counter, and calls back to the kernel when this reaches zero. This guarantees the kernel gets back control at least once for every 256 backward branches, without depending on a timer, but at the cost of a slight overhead. Control flow safety is not explicitly discussed, but is guaranteed by the same mechanism. Since each branch targets a virtual address, which is translated to a physical address by the kernel, the kernel can make sure the physical address is correct.
+This causes a slowdown of up to 30x. To reduce this overhead, for forward branches these calls back to the kernel are replaced with a direct jump after the first transition occurs. Backward branches are replaced with code that first increment an 8-bit counter, and calls back to the kernel when this reaches zero. This guarantees the kernel gets back control at least once for every 256 backward branches, without depending on a timer, but at the cost of a slight overhead. Control flow safety is not explicitly discussed, but is guaranteed by the same mechanism. Since each branch targets a virtual address, which is translated to a physical address by the kernel, the kernel can ensure the physical address is correct.
 
 Compared to \emph{t-kernel}, it is easier for CapeVM to guarantee it can regain control of the CPU. Since the VM offers no functions for the application to turn of interrupts or modify timers, it \emph{can} simply use a clock interrupt to ensure it periodically regains control of the CPU.
 
@@ -309,7 +311,7 @@ Memory in \emph{t-kernel} is split into three regions: (i) physical addresses th
 
 \emph{t-kernel}'s virtual memory provides the application with a 60 KB heap. This is divided in 16 byte pages, some of which are kept in buffers in RAM. Each buffered page has a header indicating its virtual memory starting address. When the application accesses the heap, \emph{t-kernel} searches the pages in RAM, starting with the one used for the most recent access. If the required page is not in RAM, it is swapped in from flash. Besides providing virtual memory, this also guarantees safety since a heap write always writes to a buffered page, and the entire virtual heap is assigned to the application.
 
-Access to the heap is both considerably slower than stack access, and highly variable. The paper lists a benchmark which does repeated heap writes without swapping. This takes 16 cycles per write, compared to 2 for a normal memory write. The paper does not mention whether the benchmarks targets different pages, but the low overhead would suggest it may be targeting the same address for every write, which means the first page the kernel examines is the correct one. If the required page is not found in RAM, it is swapped in from flash, which takes over 180,000 cycles.
+Access to the heap is both considerably slower than stack access, and highly variable. The paper lists a benchmark which does repeated heap accesses without swapping. This takes 16 cycles, compared to 2 for a normal memory access. The paper does not mention whether the benchmarks targets different pages, but the low overhead would suggest it may be targeting the same address for every write, which means the first page the kernel examines is the correct one. If the required page is not found in RAM, it is swapped in from flash, which takes over 180,000 cycles.
 
 The best case access of 16 cycles is comparable to CapeVM's 22 cycle overhead for heap access, but will rise if multiple pages need to be searched by the kernel, or if pages need to be swapped in from flash. Unfortunately the paper does not mention how many pages are buffered in RAM, but it is clear applications with more data, the ones that would benefit from having a larger virtual memory, will incur a higher overhead, either from having to scan more buffered pages, or from having to do more swapping.
 
@@ -318,7 +320,7 @@ In conclusion, \emph{t-kernel}'s performance overhead should be slightly higher 
 
 
 
-\subsection{\emph{Harbor}}
+\subsection{Harbor}
 Harbor guarantees safety by adding checks on the host. A verifier on the node then verifies all checks are in place before executing the programme.
 
 \paragraph{Control flow safety}
@@ -329,7 +331,7 @@ Function returns could also be used to jump to an arbitrary location if the retu
 \paragraph{Memory safety}
 Memory safety in Harbor differs significantly from CapeVM. The entire address space is split into fixed sized blocks, each of which can be assigned to a module. A memory map keeps track of the ownership of each block.
 
-Harbor supports multiple modules, and both the block size and the maximum number of modules are parameters that can be changed. The overhead for storing the memory map is 256 bytes for an 8-byte block size and maximum of 8 modules, which are the defaults used in the paper. Using only 2 modules, for the OS and the application, this is reduced to 128 bytes. Increasing the block size will also reduce the size of the memory map, but at the cost of greater fragmentation.
+Harbor supports multiple modules, and both the block size and the maximum number of modules are parameters that can be changed. The overhead for storing the memory map is 256 bytes for an 8-byte block size and maximum of 8 modules, which are the defaults used in the paper. Using only 2 modules, which is sufficient to isolate the OS and the application, this is reduced to 128 bytes. Increasing the block size will also reduce the size of the memory map, but at the cost of greater fragmentation.
 
 All memory writes are preceded by a call to the \mycode{write_access_check} function, which checks the current module has permission to write to the target address. This imposes a run-time overhead of 65 cycles per write.
 
@@ -338,5 +340,5 @@ CapeVM only needs a run-time check for writes to the heap, while Harbor checks \
 \paragraph{Verifier}
 Although Harbor's safety checks are added on the host, the correctness of the system only depends on the verifier running on the node. This verifier is a relatively small and simple component.
 
-Malicious attacks often exploit bugs in the system they are trying to corrupt. An advantage of Harbor is that the simplicity and small size of its verifier reduces the chance of bug, compared to more complex systems like \emph{t-kernel} and CapeVM, but this comes at the cost of an increased run-time overhead.
+This is a significant advangage of Harbor's approach. Malicious attacks often exploit bugs in the system they are trying to corrupt. Compared to more complex systems like \emph{t-kernel} and CapeVM, the simplicity and small size of Harbor's verifier reduces the chance of exploitable bugs, but this comes at the cost of an increased run-time overhead.
 
