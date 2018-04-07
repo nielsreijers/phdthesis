@@ -30,7 +30,7 @@ The \mybench{MoteTrack} benchmark is by far the slowest of our benchmarks, at a 
 Since the layout of the complete C structure is known at compile time, the C function to load a reference signature from its database can simply use \mycode{memcpy_P} to copy a block of 80 bytes from flash memory to RAM. For Java, the method to read from flash memory must follow multiple pointers to follow several indirections to find the locations to put each value. As a result, reading a single signature takes 1455 cycles in Java, and only 735 cycles in C.
 % 68.5% overhead from reading refSignatures from flash. 68.5 / 1695 * 735 = 29.7
 
-Additionally, the fixed offsets in the C structure means that accessing the reference signatures is also more efficient than in Java, which must follow a number of references to reach the data. We discuss this in more detail in Section \ref{sec-nested-data}.
+Additionally, the fixed offsets in the C structure means that accessing the reference signatures is also more efficient in C than in Java, which must follow a number of references to reach the data. We discuss this in more detail in Section \ref{sec-nested-data}.
 
 \subsubsection{LEC}
 In Section \ref{sec-introduction-performance} we calculated that the LEC compression algorithm reduced the energy spent to transmit our sample ECG data by 650 μJ, at the expense of 246 μJ spent on CPU cycles compressing the data, when implemented in C and using the ATmega128 CPU and CC2420 radio.
@@ -55,9 +55,9 @@ After we apply our optimisations, the overhead is reduced to 84.6\%, resulting i
 \label{fig-performance-pinnedregs-per-benchmark}
 \end{figure}
 
-The \mybench{XXTEA} has the highest average stack depth of all benchmarks. As a result, popped value caching does not have much effect: most registers are used for real stack values, leaving few chances to reuse a value that was previously popped from the stack. 
+The \mybench{XXTEA} benchmark has the highest average stack depth of all benchmarks. As a result, popped value caching does not have much effect: most registers are used for real stack values, leaving few chances to reuse a value that was previously popped from the stack. 
 
-When we apply the mark loops optimisation, performance actually degrades by 5\%! Here we have an interesting tradeoff: if we use a register to pin a variable, accessing that variable will be cheaper, but this register will no longer be available for stack caching, so more stack values may have to be spilled to memory.
+When we apply the mark loops optimisation, performance actually degrades by 5\%! Here we have an interesting trade-off: if we use a register to pin a variable, accessing that variable will be cheaper, but this register will no longer be available for stack caching, so more stack values may have to be spilled to memory.
 
 For most benchmarks, using the maximum of 7 register pairs to pin variables was also the best option. At a lower average stack depth, the fewer number of registers available for stack caching is easily compensated for by cheaper variable access. For \mybench{XXTEA} however, the cost of spilling more stack values to memory outweighs the gains of pinning more variables when too many variables are pinned. Figure \ref{fig-performance-pinnedregs-xxtea-per-opcode-category} shows the overhead for \mybench{XXTEA} from the different instruction categories. When we increase the number of register pairs used to pin variables from 1 to 7, the load/store overhead steadily decreases, but the push/pop and move overhead increase. For \mybench{XXTEA}, the optimum is at 5 pinned register pairs, at which the total overhead is only 43\%, instead of 58\% at 7 pinned register pairs.
 

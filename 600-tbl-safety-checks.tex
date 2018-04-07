@@ -37,7 +37,7 @@
         & After popping the return value, the stack is empty. \\
 
     \tcheck{chk-sufficient-stack-space-at-invokelight}
-        & At the point of an \mycodetbl{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee, for both integer and reference stacks. \\
+        & At each \mycodetbl{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee, for both integer and reference stacks. \\
 
     \tcheck{chk-no-operandstack-underflow}
         & Before each instruction, the stack depth >= the number of elements to be consumed by the instruction. \\
@@ -49,7 +49,7 @@
         & The stack is empty at branches and branch targets. \\
 
     \tcheck{chk-sufficient-locals-at-invokelight}
-        & For each \mycodetbl{INVOKELIGHT}, the total number of slots - the number of own variable slots for the caller >= the total variable slots for the callee. \\
+        & For each \mycodetbl{INVOKELIGHT}, the total number of variable slots - the number of own variable slots for the caller >= the total variable slots for the callee. \\
 
     \tcheck{chk-local-variable-slot-exists}
         & The index of the local variable < the number of own variable slots for the current method. \\
@@ -67,7 +67,7 @@
         & The target implementation for an \mycodetbl{INVOKEVIRTUAL}/\mycodetbl{INVOKEINTERFACE} is found. \\
 
     \rcheck{chk-no-nativestack-overflow}
-        & Whenever a new stack frame is allocated the frame+max stack depth+some safety margin > the end of the heap. \\
+        & Whenever a new stack frame is allocated, the frame+max stack depth+some safety margin > the end of the heap. \\
 
     \rcheck{chk-invokevirtual-stack-effects-match}
         & The target implementation for an \mycodetbl{INVOKEVIRTUAL}/\mycodetbl{INVOKEINTERFACE} matches the stack effects used to verify the caller's stack at translation time. \\

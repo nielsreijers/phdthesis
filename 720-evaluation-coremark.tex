@@ -44,11 +44,11 @@ public static final class ListHead {
 
 Since \mybench{CoreMark} is the largest benchmark, we will use it to discuss some of the challenges when translating its C code to Java.
 
-The biggest complication is that \mybench{CoreMark} makes extensive use of pointers, which do not exist in Java. In cases where a pointer to a simple variable is passed to a function, we simply wrap it in a wrapper object. A more complicated case is the \mycode{core_list_mergesort} function, which takes a function pointer parameter \mycode{cmp} used to compare list elements. Two different implementations exists, \mycode{cmp_idx} and \mycode{cmp_complex}. Here we choose the most canonical way to do this in Java, which is to define an interface and pass an object with the right to implementation to \mycode{core_list_mergesort}.
+The biggest complication is that \mybench{CoreMark} makes extensive use of pointers, which do not exist in Java. In cases where a pointer to a simple variable is passed to a function, we simply wrap it in a wrapper object. A more complicated case is the \mycode{core_list_mergesort} function, which takes a function pointer parameter \mycode{cmp} used to compare list elements. Two different implementations exists, \mycode{cmp_idx} and \mycode{cmp_complex}. Here we initially choose the most canonical way to do this in Java, which is to define an interface and pass an object with the right to implementation to \mycode{core_list_mergesort}.
 
 The C version of the linked list benchmark takes a block of memory and constructs a linked list inside it by and treating it as a collection of \mycode{list_head} and \mycode{list_data} structs, shown in Listing \ref{lst-coremark-list-data-structures}. One way to mimic this as closely as possible is to use an array of shorts of equal size to the memory block used in the C version, and use indexes into this array instead of C pointers. However this leads to quite messy code.
 
-Instead we choose the more natural Java approach and define two classes to match the structs in C and create instances of these to initialise the list. This is also the faster option because accessing fields is faster than array access. The trade-off is memory consumption, since each object has its own heap header.
+Instead we choose the more natural Java approach and define two classes to match the structs in C and create instances of these to build the list. This is also the faster option because accessing object fields is faster than array access. The trade-off is memory consumption, since each object has its own heap header.
 
 
 \subsection{Manual optimisations}
@@ -83,6 +83,6 @@ The virtual call to the comparer objects in the list benchmark is the most natur
 
 Combined, this improves the performance of \mybench{CoreMark} to only 59\% overhead over native C, right in the middle of the spectrum of the other benchmarks.
 
-Similar to \mybench{MoteTrack} in the previous section, these results point at some weaknesses of Java when used as an embedded VM. The lack of cheap function pointers, or a way of allocating small local objects or arrays in a method's stack frame means there will be a significant overhead in situations where the optimisations used here cannot be applied. We discuss some options to reduce the cost of such temporary objects in future VMs in Section \ref{sec-no-gc}.
+Similar to \mybench{MoteTrack} in the previous section, these results point at some weaknesses of Java when used as an embedded VM. The lack of cheap function pointers, or a way of allocating small local objects or arrays in a method's stack frame means there will be a significant overhead in situations where the optimisations used here cannot be applied. We discuss a way to reduce the cost of such temporary objects in future VMs in Section \ref{sec-no-gc}.
 
 In the rest of the evaluation, all results presented are for the manually optimised code. For \mybench{CoreMark} this includes the two non-automatic optimisations. The optimisation to avoid repeatly creating temporary objects was also applied to the \mybench{LEC} and \mybench{MoteTrack} benchmarks.

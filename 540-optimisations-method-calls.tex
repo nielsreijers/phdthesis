@@ -1,13 +1,13 @@
 \section{Method calls}
 \label{sec-optimisations-method-calls}
 
-Finally, we will look at the overhead caused by method calls. In native code, the smallest possible function call only has 8 cycles of overhead for a \mycode{CALL} and a \mycode{RET}, and some \mycode{MOV}s may be needed to move the parameters to the right registers. More complicated functions may spend up to 76 cycles saving and restoring call-saved registers. As seen in Section \ref{sec-overhead-method-call}, in Java a considerable amount of state needs to be initialised. For the simplest method call this takes about 540 cycles, and this increases further for large methods with many parameters.
+Finally, we will look at the overhead caused by method calls. In native code, the smallest possible function call only has 8 cycles of overhead for a \mycode{CALL} and a \mycode{RET} instruction. More complicated functions may spend up to 76 cycles saving and restoring call-saved registers. As seen in Section \ref{sec-overhead-method-call}, in Java a considerable amount of state needs to be initialised. For the simplest method call this takes about 540 cycles, and this increases further for large methods with many parameters.
 
 Methods in a programme typically form a spectrum from a limited number of large methods at the base of the call tree that take a long time to complete and are only called a few times, to small (near-)leaf methods that are fast and frequently called. Figure \ref{fig-coremark-method-calls-vs-duration} shows this spectrum for the \mybench{CoreMark} benchmark.
 
 For the slow methods at the base, the overhead of the method call is insignificant compared to the total execution time. However, as we get closer to the leaf methods, the number of calls increases, as does the impact on the overall performance.
 
-At the very end of this spectrum are tiny helper functions that may be inlined, but this is only possible for very small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee_isdigit} was small enough to inline. When larger methods are inlined, the tradeoff is an increase in code size. There is a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
+At the very end of this spectrum are tiny helper functions that may be inlined, but this is only possible for very small methods, or methods called from a single place. In \mybench{CoreMark}'s case, \mycode{ee_isdigit} was small enough to inline. When larger methods are inlined, the trade-off is an increase in code size. There is a problem in the middle of the spectrum: methods that are too large to inline, but called often enough for the method call overhead to have a significant impact the overall performance.
 
 \subsection{Lightweight methods}
 For these cases we introduce a new type of method call: lightweight methods. These methods differ from normal methods in two ways:
@@ -66,7 +66,7 @@ SRETURN         ()
 \label{lst-lightweight-stack-only}
 \end{listing}
 
-The normal implementation has a single local variable. It expects the parameter to be stored there and the stack to be empty when we enter the method. In contrast, the lightweight method does not have any local variables and expects the parameter to be on the stack at the start of the method.
+The normal implementation has a single local variable. It expects the parameter to be stored in the local variable and the stack to be empty when we enter the method. In contrast, the lightweight method does not have any local variables and expects the parameter to be on the stack at the start of the method.
 
 We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. Listing \ref{lst-comparison-lightweight-and-normal-invocation} shows how \mycode{INVOKELIGHT} and \mycode{INVOKESTATIC} are translated to native code. Both first flush the stack cache to memory. After that, the lightweight method can directly call the implementation of \mycode{isOdd}, while the native version first saves the stack pointers, and then enters an expensive call into the VM to setup a stack frame for \mycode{isOdd}, which in turn will call the actual method.
 
@@ -123,7 +123,7 @@ For lightweight methods that will call another lightweight method, the return va
 This difference in method prologue and epilogue is the only difference in the way the VM generates code for a lightweight method, all bytecode instructions can then be translated the same way as for a normal method.
 
 \subsubsection{Stack frame layout}
-A normal method that invokes a possible string of lightweight methods, needs to save space for this in its stack frame. How much space it needs to reserve can be determined by the infuser at compile time, and this information is added to the method descriptor.
+A normal method that invokes a possible string of lightweight methods, needs to save space for this in its stack frame. How much space it needs to reserve can be determined by the infuser at compile time, and this information is added to the method header used to create the stack frame.
 
 % For each method the number of locals is known by the infuser. If it is a lightweight method that will call another lightweight, one extra slot is reserved for the return address. In addition, each method needs to reserve the maximum number of extra slots required for of any lightweight method it may call. Since we can only call one at a time, they can all use the same space reserved in the caller's stack frame. A similar calculation is done to determine any extra reference stack space needed to accommodate the lightweight methods that may be called.
 
@@ -138,10 +138,10 @@ An example is shown in Figure \ref{fig-stack-frame-lightweight-method}, which sh
 
 The stack frame for \mycode{f} contains space for its own locals, and for the locals of the lightweight method it calls: \mycode{g_lw}. In turn, \mycode{g_lw}'s locals contain space for \mycode{h_lw}'s locals, as well as a slot to store the return address back to \mycode{f}. Since \mycode{h_lw} does not call any other methods, it just keeps its return address in registers.
 
-When a method calls a lightweight method with local variables, it will move the Y register to point at that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g_lw}'s locals. Since \mycode{g_lw} may call \mycode{h_lw}, \mycode{g_lw}'s prologue will first store the return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
+When a method calls a lightweight method with local variables, it will move the Y register to point to that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g_lw}'s locals. Since \mycode{g_lw} may call \mycode{h_lw}, \mycode{g_lw}'s prologue will first store the return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
 
 \subsubsection{Mark loop}
-Lightweight methods may use any register and do not save call-saved registers like normal methods. When a lightweight method is called inside a \mycode{MARKLOOP}, it may corrupt some of the variables pinned to registers. In this case the caller saves those variables back to memory before calling the lightweight method and loads them again after the call returns. Since lightweight methods always come before their invocation in the infusion, the VM already knows which registers it uses, and will only save and restore pinned variables if there is a conflict. Because registers for mark loop are allocated low to high, and for normal stack caching from high to low, in many cases the two may not collide.
+Lightweight methods may use any register and do not save call-saved registers like normal methods. When a lightweight method is called inside a \mycode{MARKLOOP} block, it may corrupt some of the variables pinned to registers. In this case the caller saves those variables back to memory before calling the lightweight method and loads them again after the call returns. Since lightweight methods always come before their invocation in the infusion, the VM already knows which registers it uses, and will only save and restore pinned variables if there is a conflict. Because registers for \mycode{MARKLOOP} are allocated low to high, and for normal stack caching from high to low, in many cases the two may not collide.
 
 \subsubsection{Example call}
 An example of the most complex case for a lightweight call is shown in Listing \ref{lst-full-lighweight-method-call}, which shows how method \mycode{f} from Figure \ref{fig-stack-frame-lightweight-method} would call \mycode{g_lw}, assuming \mycode{f} is in a \mycode{MARKLOOP} block at the time which pinned a variable R14:R15, and these registers are also used by \mycode{g_lw}.
@@ -164,6 +164,18 @@ INVOKELIGHT g_lw
     std Y+23, r15
     adiw Y, 26      // Move Y to g_lw's
     call &g_lw                 // locals
+
+
+
+
+
+
+
+
+
+
+
+
     sbiw Y, 26      // Restore Y
     ldd r14, Y+22   // Reload pinned value
     ldd r15, Y+23
@@ -173,6 +185,13 @@ INVOKELIGHT g_lw
 \centering
 \begin{minted}[linenos=false]{java}
 // IMPLEMENTATION OF g_lw
+
+
+
+
+
+
+
     pop r18     // Pop the return address
     pop r19
     st Y+, r18  // Save in 1st local,
@@ -185,6 +204,9 @@ INVOKELIGHT g_lw
     push r19    // Push return address
     push r18    //  onto the stack
     ret
+
+
+
 \end{minted}
 \end{minipage}
 \caption{Full lightweight method call}
@@ -200,7 +222,7 @@ We currently support two ways to create lightweight methods:
 \end{itemize}
 
 \subsubsection{Handwritten bytecode}
-For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in bytecode, which the infuser will simply add to the infusion, and then process it in the same way it processes a normal method, with one added step:
+For the first option we declare the methods \mycode{native} in the Java source code, so the code calling it will compile as usual. We provide the infuser with a handwritten implementation in bytecode, which the infuser will simply add to the infusion, and then process it in the same way it processes a normal method, with one additional step:
 
 For lightweight methods, the parameters will be on the stack at the start of the method, but the infuser expects to start with an empty stack. To allow the infuser to process them like other methods, we add a dummy \mycode{LW_PARAMETER} instruction for each parameter. This instruction is skipped when writing the binary infusion, but it tricks the infuser into thinking the parameters are being put on the stack.
 
@@ -258,14 +280,14 @@ SRETURN         ()
 \end{listing}
 
 \subsubsection{Replacing \mycode{INVOKE}s}
-The infuser does a few more transformations to the bytecode. Every method is scanned for \mycode{INVOKESTATIC} instructions that invoke a lightweight method. These are simply replaced by an \mycode{INVOKELIGHT}, and the number of extra slots for the reference stack and local variables of the current method is increased if necessary. Finally, methods are sorted so a lightweight method will be defined before it is invoked, to make sure the VM can always generate the \mycode{CALL} directly.
+The infuser does a few more transformations to the bytecode. Every method is scanned for \mycode{INVOKESTATIC} instructions that invoke a lightweight method. These are simply replaced by an \mycode{INVOKELIGHT} instruction, and the number of extra slots for the reference stack and local variables of the current method is increased if necessary. Finally, methods are sorted so a lightweight method will be defined before it is invoked, to make sure the VM can always generate the \mycode{CALL} directly.
 
 \subsection{Overhead comparison}
 We now compare the overhead for the various ways we can call a method in Table \ref{tbl-method-invoke-overhead-comparison}.
 
 Manually inlining code yields the best performance, but at the cost of increasing code size if larger methods are inlined. ProGuard inlining is slightly more expensive because it always saves parameters in local variables.
 
-Both lightweight methods options cause some overhead, although this is very little compared to a full method call. First, we need to flush the stack cache to memory to make sure the parameters are on the real stack. This this takes two \mycode{push} and eventually two corresponding \mycode{pop} instructions per word, costing 8 cycles per word. In addition, we need to clear the value tags from the stack cache, which means we may not be able to skip as many \mycode{LOAD} instructions after the lightweight call, but this is hard to quantify.
+Both lightweight methods options cause some overhead, although this is very little compared to a full method call. First, we need to flush the stack cache to memory to make sure the parameters are on the real stack. This this takes two \mycode{push} and eventually two corresponding \mycode{pop} instructions per word, costing 8 cycles per word. In addition, we need to clear the value tags from the stack cache, which means we may not be able to skip as many \mycode{LOAD} instructions after the lightweight call, but the effect of this is hard to quantify.
 
 Next the cost of translating the \mycode{INVOKE} instruction varies depending on the situation. In the simplest case it is simply a \mycode{CALL} to the lightweight method, which together with the corresponding \mycode{RET} costs 8 cycles. The worst case is 68 cycles when the lightweight method has local variables, uses all registers, and the caller used the maximum of 7 pairs to pin variables in a \mycode{MARKLOOP} block.
 
@@ -324,9 +346,10 @@ For a normal method call the cost is much higher, and less dependent on the comp
 \end{table}
 
 
-\subsection{Limitations and tradeoffs}
+\subsection{Limitations and trade-offs}
 There are a few limitations to the use of lightweight methods:
-\paragraph{No recursion} Since we need to be able to determine how much space to reserve in the caller's stack frame for a lightweight method's reference stack and local variables, recursion is not supported, although lightweight calls can be nested. The limited amount of memory on a sensor node makes recursion means recursion would be a bad choice in most cases.
+
+\paragraph{No recursion} Since we need to be able to determine how much space to reserve in the caller's stack frame for a lightweight method's reference stack and local variables, recursion is not supported, although lightweight calls can be nested. The limited amount of memory on a sensor node means recursion is a bad choice in most cases.
 
 \paragraph{No garbage collection}
 Lightweight methods reuse the caller's stack frame. This is a problem for the garbage collector, which works by inspecting each stack frame and finding the references on the stack and in local variables. If the garbage collector would be triggered while a lightweight method is being executed, it would not know where to find the lightweight method's references, since the stack frame only has information for the method that owns it. Thus, lightweight methods cannot perform any action that may trigger the garbage collector.
@@ -334,7 +357,7 @@ Lightweight methods reuse the caller's stack frame. This is a problem for the ga
 While it may be possible to relax this constraint with some effort, in most cases this is only a minor restriction. Lightweight methods are most useful for fast and frequently called methods, and operations that may trigger the garbage collector are usually expensive, so there is less to be gained from using a lightweight method in these situations.
 
 \paragraph{Static only}
-Lightweight virtual methods are not supported, since the overhead of resolving the target of the invoke is large compared to the rest of the invoke overhead, but this is something that could be considered in future work.
+Lightweight virtual methods are not supported, but this is something that could be considered in future work.
 
 \paragraph{Stack frame usage}
 Finally, we should remember that a method calling a lightweight method always reserves space for it in its locals. This space is reserved, regardless of whether the method is currently executing or not, and the more nested lightweight calls are made, the more space we need to reserve.

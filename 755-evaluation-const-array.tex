@@ -6,7 +6,7 @@ Four benchmarks contain arrays of constant data, which were stored in flash memo
 
 When using constant arrays, the id of the array to read from is a bytecode parameter in the \mycode{GETCONSTARRAY} instruction. No reference to the array needs to be loaded on the stack, and the calculation to find the address of the target element is slightly easier, which results in a modest reduction in performance overhead of 1.8\% for the \mybench{LEC} benchmark.
 
-The real advantage however, is the reduction in code size and memory usage. Without this optimisation, an array of constant data is transformed into normal bytecode in the class initialiser that will create an array object on the heap and fill each element individually, as shown in Listing \ref{lst-constant-array-initialisation}.
+The real advantage however, is the reduction in code size and memory usage. Without this optimisation, an array of constant data is transformed into normal bytecode that will create an array object on the heap and fill each element individually, as shown in Listing \ref{lst-constant-array-initialisation}.
 
 The class initialiser uses four bytecode instructions per element to fill each element of the array. For an array of bytes, this can take up to 7 bytes of bytecode for each byte of data, which increases even further after AOT compilation. In the \mybench{LEC} benchmark this results in a class initialiser of 930 bytes, over \emph{18 times} the size of the original data. 
 

@@ -16,7 +16,7 @@ Another decade of miniaturisation since the start of WSN research has allowed us
 
 These devices have capabilities similar to that of desktop PCs only a few generations ago. They can run a normal operating system like Linux and all the standard protocols and tools that come with it. Compared to the traditional resource-constrained sensor nodes, they can perform much more complex tasks, but the smallest devices in this class are still significantly larger than sensor nodes, more expensive, and most importantly, consume significantly more power.
 
-Tung et al. \cite{Tung:2017tn} report measurements on the Intel Edison, one of the most low-power devices in its class, showing an active power consumption of up to 130 mA and sleep power consumption of 1.8 mA, at 3.7 V. Additionally, the wake-up response time was measured around 380 ms, while the resource-constrained CPUs described below can wake up in only a few ms, depending on their configuration.
+Tung et al. \cite{Tung:2017tn} report measurements on the Intel Edison, one of the most low-power devices in its class, showing an active power consumption of up to 130 mA and sleep power consumption of 1.8 mA, at 3.7 V. Additionally, the wake-up response time was measured around 380 ms, while the resource-constrained CPUs described below can wake up in only a few cycles or ms, depending on their configuration.
 
 Since devices in this class are capable of running normal, well established VMs, we do not consider them in this dissertation, but instead focus on the second class of devices: sensor nodes.
 
@@ -69,7 +69,7 @@ A number of sensor node virtual machines have been developed that allow the appl
 \section{The Java virtual machine}
 Next, we will briefly introduce the Java virtual machine, and describe some details relevant to this work.
 
-The first public release of Java was in 1995. It consists of two separate but related parts: the Java programming language, and the Java virtual machine (JVM): an abstract machine specification, running programmes written in JVM bytecode. Since the release of Java, several other languages have been developed that compile to JVM bytecode and can run on the same virtual machine.
+The first public release of Java was in 1995. It consists of two separate but closely related parts: the Java programming language, and the Java virtual machine (JVM): an abstract machine specification, running programmes written in JVM bytecode. Since the release of Java, several other languages have been developed that compile to JVM bytecode and can run on the same virtual machine.
 
 It was quickly adopted by web browsers to run interactive \emph{applets}. Two key properties of Java contributed to this success:
 \begin{itemize}
@@ -80,16 +80,16 @@ It was quickly adopted by web browsers to run interactive \emph{applets}. Two ke
 For stand alone desktop applications Java also became popular because it was an easy to learn, object oriented, garbage-collected language that allowed for a higher level of programming than C or C++, all of which boosted developer productivity.
 
 \subsection{JVM bytecode}
-Compared to other widespread desktop virtual machines such as Lua, Python and .Net, Java's bytecode is very simple. Java is a \emph{stack-based} virtual machine, as opposed to a \emph{register-based} virtual machine: almost all operations take their operands from an operand stack, and push their results back onto it. For example, Listing \ref{lst-basic-jvm-bytecode-example} shows how the statement \mycode{a=b+c;} may be translated into JVM bytecode. First, \mycode{a} and \mycode{b} are loaded onto the stack, the \mycode{IADD} instruction then pops these operands from the operand stack and pushes the sum back onto it, and finally \mycode{ISTORE} stores the result back into a local variable.
+Compared to other widespread desktop virtual machines such as Lua, Python and .Net, Java's bytecode is very simple. Java is a \emph{stack-based} virtual machine, as opposed to a \emph{register-based} virtual machine: almost all operations take their operands from an operand stack, and push their results back onto it. For example, Listing \ref{lst-basic-jvm-bytecode-example} shows how the statement \mycode{a=b+c;} may be translated into JVM bytecode. First, \mycode{b} and \mycode{c} are loaded onto the stack, the \mycode{IADD} instruction then pops these operands from the operand stack and pushes the sum back onto it, and finally \mycode{ISTORE} stores the result back into a local variable.
 
 \begin{listing}
     \centering
     \begin{minted}{java}
     //JVM instruction     // JVM stack
 
-    ILOAD_1               a
-    ILOAD_2               a   ,   b
-    IADD                  a+b
+    ILOAD_1               b
+    ILOAD_2               b   ,   c
+    IADD                  b+c
     ISTORE_0
     \end{minted}
 \caption{JVM bytecode for \mycode{a=b+c;}}
@@ -116,7 +116,7 @@ The JVM stores information in three different places:
 \label{fig-jvm-memory}
 \end{figure}
 
-The JVM is a 32-bit machine. All the places where data may be stored, objects on the heap, operand stacks and local variable slots, and a class' static variables, are blocks of 32-bit wide slots. 64-bit \mycode{long} and \mycode{double} types occupy two slots, while the shorter \mycode{byte}, and \mycode{short} types are sign-extended and stored as a 32-bit value.
+The JVM is a 32-bit machine. All the places where data may be stored, objects on the heap, operand stacks, local variables, and a class' static variables, are blocks of 32-bit wide slots. 64-bit \mycode{long} and \mycode{double} types occupy two slots, while the shorter \mycode{byte}, and \mycode{short} types are sign-extended and stored as a 32-bit value.
   
 Figure \ref{fig-jvm-memory} shows a graphical representation of this. An important difference with languages such as C, Pascal or C\# is that in JVM the only value types are the various integer types, and references. There are no compound types like a C \mycode[c]{struct} or Pascal \mycode[pascal]{record}. Object live in heap, and only there, and the operand stack, and local, static or instance variables only contain references to objects.
 
@@ -125,7 +125,7 @@ A sandbox is a security mechanism for isolating a process from the environment i
 
 In the JVM's case, programmes are written to run on the abstract JVM machine model. Besides providing platform independence, this also means JVM programmes have no knowledge of the hardware platform they are running on. All communication with the outside world happens through the Java standard library classes implemented by the JVM in native code, which gives the virtual machine firm control over the resources an application may access.
 
-In addition, the JVM will verify the bytecode at load time to make sure it is well formed and adheres to the JVM standard \cite{Lindholm:2017vu}. It performs many checks, for example that branches are within the bounds of the method, and branch to the beginning of an instruction, that execution cannot fall off the end of the code, that no instruction can access or modify a local variable at an index greater than or equal to the number of local variables that its method indicates it allocates, that the exact operand stack depth and the type of values on the stack is known at any point and does not over- or underflow, etc.
+In addition, the JVM will verify the bytecode at load time to make sure it is well formed and adheres to the JVM standard \cite{Lindholm:2017vu}. It performs many checks, for example that branches are within the bounds of the method, and branch to the beginning of an instruction, that execution cannot fall off the end of a method, that no instruction can access or modify a local variable at an index greater than or equal to the number of local variables that its method indicates it allocates, that the exact operand stack depth and the type of values on the stack is known at any point and does not over- or underflow, etc.
 
 \subsection{WAT, AOT, and JIT compilation}
 While the popularity of Java rose quickly after its introduction, it also very quickly got a reputation for being slow. As Tyma put it in 1998 "The plain truth is: Java is slow. Java isn't just slow, it's \emph{really} slow, \emph{surprisingly} slow. It is 'you get to watch the buttons being drawn on your toolbar' slow." \cite{Tyma:1998vj}.

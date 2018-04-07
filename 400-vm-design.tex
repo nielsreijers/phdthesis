@@ -4,20 +4,20 @@ This chapter we introduce the global design of CapeVM, which is a modified versi
 \begin{itemize}
     \item AOT compilation: Darjeeling is originally an interpreter. To improve performance, this interpreter is replaced with an Ahead-of-Time compiler: instead of interpreting the bytecode, CapeVM translates it to native code at load time, before the application is started. While JIT compilation is possible on some devices \cite{Ellul:2012thesis}, it depends on the ability to execute code from RAM, which many embedded CPUs, including the ATmega, cannot do.
     \item Bytecode format: To support the AOT compilation process and further improve performance, CapeVM modifies Darjeeling's bytecode format, and adds several new bytecode instructions.
-    \item Safety: To provide a safe, sandboxed execution environment, CapeVM adds a number of translation-time and run-time safety checks.
+    \item Safety: CapeVM adds a number of translation-time and run-time safety checks to provide a safe, sandboxed execution environment.
 \end{itemize}
 
 \section{Goals}
 \label{sec-CapeVM-goals}
-Working on resource-constrained devices means we have to make some compromises. Our main goal is to build an AOT compiling VM that will produce safe code, performs well, and reduces the code size overhead seen in previous work. In addition, we want our VM to fit as many scenarios as possible, for example scenarios were multiple applications may be running on a single device. When new code is being loaded, the impact on other applications should be as small as possible.
+Working on resource-constrained devices means we have to make some compromises. Our main goal is to build an AOT compiling VM that generates safe code, performs well, reduces the code size overhead seen in previous work, and fits as many IoT scenarios as possible. This includes scenarios like Amulet or WuKong, where multiple applications may be running on a single device. When new code is being loaded, the impact on other applications should be as small as possible.
 
 WuKong, discussed in Section \ref{sec-state-of-the-art-wukong} is a good motivating example. Parts of WuKong applications may be written in Java. A node may be part of more than one application, and the WuKong master may dynamically decide to move an WuObject from one node to another. This means new Java code may have to be loaded onto a device, while parts of the same or another application are already running.
 
 To support scenarios like this, the translation process should be very light weight. Specifically, it should use as little memory as possible, since this is a scarce resource and any memory used by the AOT compiler cannot be used for other concurrently running tasks. This means we cannot do any analysis on the bytecode that would require us to hold large data structures in memory.
 
-Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to do more complex optimisations to achieve even better performance through more complex optimisations, but, as we will see, much can be achieved even with very limited resources.
+Our goal is to limit memory use to around 100 bytes, which rules out most traditional AOT and JIT compiler techniques. It may be possible to achieve even better performance through more complex optimisations, but, as we will see, much can be achieved even with very limited resources.
 
-The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load-time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is already larger than JVM bytecode, and our safe, AOT compiled code is on average 77\% larger than its optimised C equivalent. This is the price we pay for increased performance and safety, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous techniques.
+The two metrics we compromise on are load time and code size. Compiling to native code takes longer than simply storing bytecode and starting the interpreter, but we feel this load-time delay will be acceptable in many cases, and will be quickly compensated for by improved run-time performance. Native code is already larger than JVM bytecode, and our safe, AOT compiled code is on average 82\% larger than its optimised C equivalent. This is the price we pay for increased performance and safety, but the optimisations we propose do significantly reduce this code size overhead compared to previous work, thus reducing an important drawback of previous techniques.
 
 We summarise our goals and constraints below:
 \begin{itemize}
@@ -33,7 +33,7 @@ The one to two orders of magnitude slowdown seen in interpreting VMs will be a p
 
 The optimisations presented in this dissertation reduce the slowdown to 1.7x, and the size of generated code by 40\%. This further expands the range of scenarios for which a VM is a viable option.
 
-Additional optimisations may improve performance even more, but on resource-constrained devices where CPU cycles, energy, RAM, and flash memory are all restricted, there is always a tradeoff. At a slowdown of 1.7x, the tradition argument that this is acceptable because the CPU has enough time and other factors are more important in energy consumption, will hold for most applications. Adding more complex optimisations may rule out the use of a VM in scenarios that cannot afford the increase in VM size or the additional state that needs to be kept in RAM, while the improvement in performance is unlikely to enable many applications and has only limited impact on the total energy consumption. Thus, we believe CapeVM to be at a sensible point in this tradeoff and Section \ref{sec-code-size-break-even} will show how selectively including optimisations gives it some flexibility to adjust to specific devices and scenarios.
+Additional optimisations may improve performance even more, but on resource-constrained devices where CPU cycles, energy, RAM, and flash memory are all restricted, there is always a trade-off. At a slowdown of 1.7x, the tradition argument that this is acceptable because the CPU will still be in sleep mode for most of the time and other factors are more important in energy consumption, will hold for many more applications compared to a 9x or 100x slowdown. Adding more complex optimisations may rule out the use of a VM in scenarios that cannot afford the increase in VM size or the additional state that needs to be kept in RAM, while the improvement in performance is unlikely to enable many applications and has only limited impact on the total energy consumption. Thus, we believe CapeVM to be at a sensible point in this trade-off and Section \ref{sec-code-size-break-even} will show how selectively including optimisations gives it some flexibility to adjust to specific devices and scenarios.
 
 
 \section{Compilation process}
@@ -101,7 +101,7 @@ The example has been slightly simplified for readability. Since the AVR is an 8-
     \end{threeparttable}
 \end{table}
 
-Since the baseline should be as close as possible to Ellul's MSP430 implementation, a similar set of peephole optimisations were implemented. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations in CapeVM is shown in Table \ref{tbl-CapeVM-peephole}.
+Since the baseline should be as close as possible to Ellul's implementation, a similar set of peephole optimisations were implemented. However, differences between the ATmega and MSP430 instruction sets means they are not completely identical. The complete set of peephole optimisations in CapeVM is shown in Table \ref{tbl-CapeVM-peephole}.
 
 A \mycode{push} directly followed by a \mycode{pop} are both either eliminated or replaced by a \mycode{mov}. A push or pop may be either a real \mycode{push} or \mycode{pop} instruction for the integer stack, or implemented using a \mycode[c-objdump]{st X+} or \mycode[c-objdump]{ld -X} instruction for the reference stack. Both cases are optimised in the same way. We also similarly optimise blocks of pushes followed by blocks of pops, which are very common on the 8-bit ATmega. 
 
@@ -111,7 +111,7 @@ When the push and pop instructions target different registers, this results in m
 \subsection{Branches}
 Forward branches pose a problem for this direct translation approach since the target address is not yet known. A second problem is that on the ATmega, a branch may take 1 to 3 words, depending on the distance to the target, so it is also not known how much space should be reserved for a branch.
 
-To solve this the infuser modifies the bytecode by inserting a new instruction, \mycode{BRTARGET}, in front of any instruction that is the target of a branch. The branch instructions themselves are modified to target the id of a \mycode{BRTARGET}, which are implicitly numbered, instead of a bytecode offset. When the VM encounters a \mycode{BRTARGET} during translation, no code is emitted, but the address where the next instruction will be emitted is recorded in a separate part of flash memory. Branch instruction initially emit a temporary 3-word 'branch tag', containing the branch target id and the branch condition. After code generation is finished and all target addresses are known, the VM scans the generated code a second time, and replaces each branch tag with the real branch instruction.
+To solve this, the infuser modifies the bytecode by inserting a new instruction, \mycode{BRTARGET}, in front of any instruction that is the target of a branch. The branch instructions themselves are modified to target the id of a \mycode{BRTARGET}, which are implicitly numbered, instead of a bytecode offset. When the VM encounters a \mycode{BRTARGET} during translation, no code is emitted, but the address where the next instruction will be emitted is recorded in a separate part of flash memory. Branch instruction initially emit a temporary 3-word 'branch tag', containing the branch target id and the branch condition. After code generation is finished and all target addresses are known, the VM scans the generated code a second time, and replaces each branch tag with the real branch instruction.
 
 There is still the matter of the different sizes a branch may take. The VM could simply add \mycode{NOP} instructions to smaller branches to keep the size of each branch at 3 words, but this causes both a code size penalty and a performance penalty on small, non-taken branches. Instead, the VM does another scan of the code, before replacing the branch tags, to update the branch target addresses by compensating for cases where a smaller branch will be used. This second scan adds about 500 bytes to the VM, but improves performance, especially on benchmarks where branches are common.
 
@@ -128,12 +128,12 @@ Most of these checks are performed at translation time, and the VM will reject t
 
 \subsection{Bytecode modification}
 \label{sec-vm-design-bytecode-modifications}
-We made several modifications to the infuser and introduced new bytecode instructions to support our AOT compiler and improve performance. These changes will be introduced in more detail in the following sections, but for completeness we also list them here:
+We made several modifications to the infuser and introduced new bytecode instructions to support our AOT compiler and improve performance. These changes will be introduced in more detail in the following chapters, but for completeness we also list them here:
 
 \begin{itemize}
     \item The \mycode{BRTARGET} opcode marks targets of branch instructions. All branch instructions are modified to target a \mycode{BRTARGET} id instead of a bytecode offset.
     \item The \mycode{MARKLOOP} opcode marks inner loops and the variables they use.
-    \item \mycode{PUTFIELD_A_FIXED} and \mycode{GETFIELD_A_FIXED} are used to access an object's reference fields when the offset is known at compile time. The offset ia always known at compile time for integer fields.
+    \item \mycode{PUTFIELD_A_FIXED} and \mycode{GETFIELD_A_FIXED} are used to access an object's reference fields when the offset is known at compile time. The offset is always known at compile time for integer fields.
     \item The \mycode{SIMUL} opcode does 16x16-bit to 32-bit multiplication.
     \item New \mycode{_CONST} versions of the (variable) bit shift opcodes support shifting by a constant number of bits.
     \item The \mycode{INVOKELIGHT} opcode supports an optimised 'lightweight' way of calling methods.
@@ -145,7 +145,7 @@ We made several modifications to the infuser and introduced new bytecode instruc
 \subsection{Separation of integers and references}
 \label{sec-darjeeling-split-architecure}
 
-An important feature of Darjeeling, which we have maintained in CapeVM, it its separation of integers and references. When the garbage collector runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This is then iteratively expanded to also cover all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left of the heap are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be freed by the garbage collector.
+An important feature of Darjeeling, which we have maintained in CapeVM, is its separation of integers and references. When the garbage collector runs, it needs to mark the \emph{root set}: the set of all live, directly reachable objects. This set is then iteratively expanded to include all indirectly reachable objects. For example in Figure \ref{fig-jvm-memory}, only the two objects on the left of the heap are in the root set, two others are also reachable but not in the root set, while the fifth is not reachable and will be freed by the garbage collector.
 
 To mark the root set, the garbage collector needs to determine which local variables, static variables, object fields, and values on the operand stack are references. To do this efficiently, references and integers are separated throughout the VM: the operand stack, instance variables on the heap, class static variables, and local variables in a method's stack frame are all split in a block for integers and one for references, as shown in Figure \ref{fig-object-and-stack-frame-layout}.
 
@@ -160,7 +160,7 @@ In CapeVM's AOT compiler we use the native stack for the VM's integer operand st
 
 
 \section{Limitations}
-Since CapeVM is based on Darjeeling, we share its limitations, most notably a lack of floating point support and reflection. In addition, we do not support threads or exceptions because after compilation to native code, we lose the interpreter loop as a convenient place to switch between threads or unwind the stack to jump to an exception handler. Threads and exceptions have been implemented in Ellul's AOT compiler \cite{Ellul:2012thesis}, proving it is possible to add support for both, but we feel the added complexity in an environment where code space is at a premium makes other, more lightweight models for concurrency and error handling more appropriate. This also allows us to allocate the VM's stack frames on the native stack, which considerably improves performance compared to Darjeeling's approach of allocating stack frames as a linked list on the heap.
+Since CapeVM is based on Darjeeling, we share its limitations, most notably a lack of floating point support and reflection. In addition, we do not support threads or exceptions because after compilation to native code, we lose the interpreter loop as a convenient place to switch between threads or unwind the stack to jump to an exception handler. Threads and exceptions have been implemented in Ellul's AOT compiler \cite{Ellul:2012thesis}, proving it is possible to add support for both, but we feel the added complexity in an environment where code space is at a premium makes other, more lightweight models for concurrency and error handling more appropriate. Dropping support for threads also allows us to allocate the VM's stack frames on the native stack, which considerably improves performance compared to Darjeeling's approach of allocating stack frames as a linked list on the heap.
 
 We will discuss the cost of using our VM more in more detail in Chapter \ref{sec-evaluation}, and alternatives to some traditional JVM features in Chapter \ref{sec-lessons-from-jvm}.
 
