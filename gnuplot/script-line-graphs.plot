@@ -38,6 +38,32 @@ plot "performance-per-opcode-category.dat" using 2 title 'total'      with lines
 
 
 
+set key width -2.8
+set output "../performance-per-benchmark2.eps"
+plot "performance-per-benchmark2.dat" using 2 title 'Bubble sort'   with linespoints dashtype 1 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 3 title 'Heap sort'     with linespoints dashtype 2 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 4 title 'Binary search' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 5 title 'XXTEA'         with linespoints dashtype 4 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 6 title 'MD5'           with linespoints dashtype 5 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 7 title 'RC5'           with linespoints dashtype 6 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 8 title 'FFT'           with linespoints dashtype 7 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 9 title 'Outlier'       with linespoints dashtype 8 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 10 title 'LEC'           with linespoints dashtype 9 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 11 title 'CoreMark'      with linespoints dashtype 10 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 12 title 'MoteTrack'     with linespoints dashtype 11 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 13 title 'HeatCalib'     with linespoints dashtype 12 lw 3 ps 1.5, \
+     "performance-per-benchmark2.dat" using 14 title 'HeatDetect'    with linespoints dashtype 13 lw 3 ps 1.5
+
+set key width 0
+set output "../performance-per-opcode-category2.eps"
+plot "performance-per-opcode-category2.dat" using 2 title 'total'      with linespoints dashtype 1 lw 3 ps 1.5, \
+     "performance-per-opcode-category2.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
+     "performance-per-opcode-category2.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
+     "performance-per-opcode-category2.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
+     "performance-per-opcode-category2.dat" using 6 title 'invoke'     with linespoints dashtype 5 lw 3 ps 1.5, \
+     "performance-per-opcode-category2.dat" using 7 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5
+
+
 
 set ylabel "Overhead (% of native C size)"
 set xtics ("simple \n peeph." 0, "impr. \n peeph." 1, "stack \n caching" 2, "pop.val. \n caching" 3, "mark \n loops" 4, "const \n shift" 5, "16-bit \n index" 6, "SIMUL" 7)
