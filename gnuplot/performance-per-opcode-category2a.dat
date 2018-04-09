@@ -1,0 +1,12 @@
+# UPDATED 20180409
+
+#X                  ,  total    ,  push/pop ,   load/store ,     mov(w) ,        vm ,  other
+   Optimised source ,     377.3 ,     137.8 ,        109.3 ,        7.4 ,      50.1 ,   72.7
+Lightweight methods ,     325.2 ,     138.7 ,        110.5 ,        7.2 ,       1.5 ,   67.2
+     Impr. peephole ,     236.1 ,      38.5 ,        110.5 ,       18.7 ,       1.5 ,   66.8
+        Stack cache ,     187.4 ,       3.3 ,        110.5 ,        5.3 ,       1.5 ,   66.7
+      Pop.val.cache ,     147.5 ,       2.5 ,         72.5 ,          5 ,       1.5 ,     66
+           Markloop ,     104.6 ,       7.3 ,         20.2 ,       10.7 ,       1.5 ,   64.9
+       Const. shift ,      90.9 ,       6.9 ,         20.1 ,       10.8 ,       1.5 ,   51.4
+ 16-bit array index ,        72 ,       6.1 ,         18.9 ,          7 ,       1.5 ,   38.4
+              SIMUL ,        67 ,       4.3 ,         18.9 ,        6.9 ,       1.5 ,   35.4
