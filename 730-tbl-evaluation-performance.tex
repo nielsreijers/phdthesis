@@ -3,9 +3,9 @@
 \thispagestyle{empty}
 \begin{landscape}
 \begin{table}[t!]
-\caption{Performance data per benchmark}
+\caption{\\ Performance data per benchmark}
 \label{tbl-performance-per-benchmark}
-    \begin{tabular}{lrrrrrrrrrrrrrrr} % UPDATED 20180327
+    \begin{tabular}{lrrrrrrrrrrrrrrr} % UPDATED 20180410
     \toprule
                                         & B.sort     &  H.sort    & Bin.Search & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
     \midrule
@@ -29,20 +29,22 @@
     \midrule
     % Take this from performance-table.xlsx 
     \multicolumn{10}{l}{PERFORMANCE OVERHEAD BEFORE OPTIMISATIONS (\% of native C)} \\
-    \xxt Total                          &      663.9 &      496.3 &      475.8 &      250.4 &      226.4 &      124.3 &      122.8 &      492.5 &      272.6 &      312.2 &      403.5 &      181.7 &      205.2 &                   &     325.2 \\
-      \xxxt push/pop                    & \xt  266.9 & \xt  203.6 & \xt  202.2 & \xt  166.4 & \xt  105.3 & \xt   61.9 & \xt   57.2 & \xt  205.5 & \xt  105.6 & \xt  124.5 & \xt  145.5 & \xt   81.3 & \xt   77.5 & \xt               & \xt 138.7 \\
-      \xxxt load/store                  & \xt  240.3 & \xt  183.0 & \xt  191.0 & \xt   42.5 & \xt   43.9 & \xt   28.5 & \xt   25.2 & \xt  190.4 & \xt  111.7 & \xt   91.2 & \xt  173.2 & \xt   68.5 & \xt   47.6 & \xt               & \xt 110.5 \\
-      \xxxt mov(w)                      & \xt   23.3 & \xt   14.1 & \xt    4.5 & \xt    3.9 & \xt    2.6 & \xt   -1.2 & \xt    4.2 & \xt    8.0 & \xt    5.1 & \xt    5.0 & \xt   16.3 & \xt   -3.1 & \xt   10.9 & \xt               & \xt   7.2 \\
-      \xxxt other                       & \xt  133.5 & \xt   95.5 & \xt   78.1 & \xt   37.7 & \xt   74.6 & \xt   35.1 & \xt   36.2 & \xt   88.8 & \xt   49.0 & \xt   90.6 & \xt   55.0 & \xt   35.0 & \xt   64.8 & \xt               & \xt  67.2 \\
-      \xxxt vm                          & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt    0.0 & \xt   -0.1 & \xt    1.1 & \xt    0.8 & \xt   13.4 & \xt    0.0 & \xt    4.4 & \xt               & \xt   1.5 \\
+    \xxt Total                          &     1277.1 &     1927.2 &     1319.4 &      714.5 &      470.6 &      409.9 &      437.8 &      549.0 &      885.3 &      809.7 &     1018.7 &      210.2 &      203.9 &                   &     787.2 \\
+      \xxxt push/pop                    & \xt  640.1 & \xt  356.7 & \xt  233.7 & \xt  197.2 & \xt  115.7 & \xt   70.1 & \xt   66.6 & \xt  207.2 & \xt  106.6 & \xt  220.4 & \xt  166.5 & \xt   80.9 & \xt   78.8 & \xt               & \xt 195.4 \\
+      \xxxt load/store                  & \xt  360.1 & \xt  197.4 & \xt  175.3 & \xt   67.0 & \xt   46.7 & \xt   33.2 & \xt   29.3 & \xt  190.3 & \xt  110.7 & \xt  136.8 & \xt  218.2 & \xt   67.6 & \xt   43.8 & \xt               & \xt 129.0 \\
+      \xxxt mov(w)                      & \xt   10.0 & \xt   41.1 & \xt    8.4 & \xt    6.6 & \xt    3.6 & \xt    0.1 & \xt    5.2 & \xt   21.5 & \xt    5.1 & \xt    5.5 & \xt   38.6 & \xt   -3.0 & \xt    9.5 & \xt               & \xt  11.7 \\
+      \xxxt other                       & \xt  266.9 & \xt  331.4 & \xt  902.1 & \xt   82.8 & \xt  104.0 & \xt   67.8 & \xt   76.8 & \xt  130.1 & \xt  370.6 & \xt  234.2 & \xt  220.0 & \xt   37.4 & \xt   65.6 & \xt               & \xt 222.3 \\
+      \xxxt vm                          & \xt    0.0 & \xt 1000.6 & \xt    0.0 & \xt  361.1 & \xt  200.4 & \xt  238.7 & \xt  260.0 & \xt   -0.1 & \xt  292.2 & \xt  212.9 & \xt  375.4 & \xt   27.3 & \xt    6.2 & \xt               & \xt 228.8 \\
     \multicolumn{10}{l}{PERFORMANCE OVERHEAD REDUCTION PER OPTIMISATION (\% of native C)} \\
-    \xxt Impr. peephole                 &     -233.5 &     -157.7 &     -149.4 &      -60.3 &      -48.2 &      -23.1 &      -36.5 &     -186.9 &      -54.2 &      -58.3 &      -61.1 &      -35.2 &      -54.4 &                   &     -89.1 \\
-    \xxt Stack caching                  &      -40.0 &      -56.0 &      -57.3 &      -98.4 &      -58.0 &      -39.8 &      -16.2 &      -27.8 &      -67.7 &      -42.9 &      -62.5 &      -42.2 &      -24.3 &                   &     -48.7 \\
-    \xxt Pop. val. caching              &     -133.1 &      -93.3 &      -67.4 &       -6.8 &      -12.9 &       -8.8 &      -10.7 &      -51.0 &      -28.8 &      -26.1 &      -48.3 &      -15.5 &      -15.4 &                   &     -39.9 \\
-    \xxt Mark loops                     &     -102.9 &      -51.5 &      -85.4 &       +5.0 &      -10.9 &       -8.0 &       -7.9 &     -114.9 &      -18.0 &      -40.1 &      -55.6 &      -39.4 &      -28.7 &                   &     -42.9 \\
-    \xxt Const shift                    &        0.0 &      -14.5 &      -35.4 &      -18.4 &      -45.2 &      -20.9 &       -3.8 &        0.0 &       -9.6 &      -10.0 &        0.0 &      -17.2 &       -3.2 &                   &     -13.7 \\
-    \xxt 16-bit array index             &      -53.2 &      -34.8 &      -15.7 &      -13.9 &       -5.5 &       -4.2 &       -2.8 &      -36.2 &       -9.7 &      -39.3 &      -19.7 &       -1.7 &       -9.0 &                   &     -18.9 \\
-    \xxt SIMUL                          &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &      -27.2 &        0.0 &        0.0 &      -36.6 &        0.0 &        0.0 &        0.0 &                   &      -5.0 \\
+    \xxt Source optimisation            &     -613.2 &    -1234.0 &     -843.6 &     -464.1 &     -244.2 &     -285.6 &     -315.0 &      -56.5 &     -612.7 &     -433.7 &     -227.9 &        0.0 &        1.7 &                   &    -409.9 \\
+    \xxt Impr. peephole                 &     -233.5 &     -157.7 &     -149.4 &      -60.3 &      -48.2 &      -23.1 &      -36.5 &     -186.9 &      -54.2 &      -58.8 &      -60.2 &      -35.2 &      -54.5 &                   &     -89.1 \\
+    \xxt Stack caching                  &      -40.0 &      -56.0 &      -57.3 &      -98.4 &      -58.0 &      -39.8 &      -16.2 &      -27.8 &      -67.7 &      -40.7 &      -63.1 &      -41.4 &      -24.2 &                   &     -48.6 \\
+    \xxt Pop. val. caching              &     -133.1 &      -84.9 &      -67.4 &       -6.8 &      -12.9 &       -8.8 &      -10.7 &      -51.0 &      -28.8 &      -24.5 &      -41.5 &      -15.4 &      -15.5 &                   &     -38.5 \\
+    \xxt Mark loops                     &     -102.9 &      -46.8 &      -85.4 &       +5.0 &      -10.9 &       -8.0 &       -7.9 &     -114.9 &      -18.0 &      -40.0 &      -54.3 &      -38.2 &      -28.6 &                   &     -42.4 \\
+    \xxt Const shift                    &        0.0 &      -17.1 &      -35.4 &      -18.4 &      -45.2 &      -20.9 &       -3.8 &        0.0 &       -9.6 &      -10.1 &        0.0 &      -17.2 &       -3.3 &                   &     -13.9 \\
+    \xxt 16-bit array index             &      -53.2 &      -34.9 &      -15.7 &      -13.9 &       -5.5 &       -4.2 &       -2.8 &      -36.2 &       -9.7 &      -38.9 &      -19.7 &       -1.7 &       -9.0 &                   &     -18.9 \\
+    \xxt SIMUL                          &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &      -27.2 &        0.0 &        0.0 &      -36.6 &        0.0 &        0.0 &        0.0 &                   &      -4.9 \\
+    \xxt Lightw. methods                &        0.0 &     -207.3 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &      -67.5 &     -395.7 &      -30.6 &       -0.3 &                   &     -54.0 \\
     \multicolumn{10}{l}{PERFORMANCE OVERHEAD AFTER OPTIMISATIONS (\% of native C)} \\
     \xxt Total                          &      101.2 &       88.5 &       65.2 &       57.6 &       45.7 &       19.5 &       17.7 &       75.7 &       84.6 &       58.9 &      156.3 &       30.5 &       70.2 &                   &      67.0 \\
       \xxxt push/pop                    & \xt    0.0 & \xt   -2.8 & \xt    0.0 & \xt   37.4 & \xt    0.1 & \xt    2.9 & \xt    2.0 & \xt   -0.2 & \xt  -13.7 & \xt    2.5 & \xt   20.4 & \xt    5.6 & \xt    1.7 & \xt               & \xt   4.3 \\

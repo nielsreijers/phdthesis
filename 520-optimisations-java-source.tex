@@ -12,7 +12,7 @@ The most common optimisations we performed are:
 \begin{itemize}
 	\item Store the result of expressions calculated in a loop in a temporary variable, if it is known the result will be the same for each iteration.
 	\item Since array and object field access is relatively expensive and not cached by the mark loop optimisation discussed in Section \ref{sec-optimisation-markloops}, prefer to minimise array and object access by using a temporary local variable, if the value may be used again soon.
-	\item Manually inline small methods.
+	\item Manually inline \texttt{\#define}s and functions inlined by \mycode{avr-gcc}.
 	\item Prefer to use 16-bit variables for array indexes where possible.
 	\item Use bit shifts for multiplications by a power of two.
 \end{itemize}

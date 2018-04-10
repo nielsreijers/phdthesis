@@ -60,7 +60,7 @@ plot "performance-per-opcode-category2a.dat" using 2 title 'total'      with lin
      "performance-per-opcode-category2a.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
      "performance-per-opcode-category2a.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
      "performance-per-opcode-category2a.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
-     "performance-per-opcode-category2a.dat" using 6 title 'invoke'     with linespoints dashtype 5 lw 3 ps 1.5, \
+     "performance-per-opcode-category2a.dat" using 6 title 'vm'         with linespoints dashtype 5 lw 3 ps 1.5, \
      "performance-per-opcode-category2a.dat" using 7 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5 
 
 set xtics ("baseline" 0, "optimised \n source" 1, "lightw. \n methods" 2, "impr. \n peeph." 3, "stack \n caching" 4, "pop.val. \n caching" 5, "mark \n loops" 6, "const \n shift" 7, "16-bit \n index" 8, "SIMUL" 9)
@@ -114,7 +114,7 @@ plot "performance-per-opcode-category3a.dat" using 2 title 'total'      with lin
      "performance-per-opcode-category3a.dat" using 3 title 'push/pop'   with linespoints dashtype 2 lw 3 ps 1.5, \
      "performance-per-opcode-category3a.dat" using 4 title 'load/store' with linespoints dashtype 3 lw 3 ps 1.5, \
      "performance-per-opcode-category3a.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
-     "performance-per-opcode-category3a.dat" using 6 title 'invoke'     with linespoints dashtype 5 lw 3 ps 1.5, \
+     "performance-per-opcode-category3a.dat" using 6 title 'vm'         with linespoints dashtype 5 lw 3 ps 1.5, \
      "performance-per-opcode-category3a.dat" using 7 title 'other'      with linespoints dashtype 5 lw 3 ps 1.5 
 
 set xtics ("baseline" 0, "optimised \n source" 1, "impr. \n peeph." 2, "stack \n caching" 3, "pop.val. \n caching" 4, "mark \n loops" 5, "const \n shift" 6, "16-bit \n index" 7, "SIMUL" 8, "lightw. \n methods" 9)
@@ -226,7 +226,7 @@ plot "codesizeoverhead-per-opcode-category2b.dat" using 2 title 'total'      wit
      "codesizeoverhead-per-opcode-category2b.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category2b.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
 
-set xtics ("optimised \n source" 0, "lightw. \n methods" 1, "impr. \n peeph." 2, "stack \n caching" 3, "pop.val. \n caching" 4, "mark \n loops" 5, "const \n shift" 6, "16-bit \n index" 7, "SIMUL" 8)
+set xtics ("optimised \n source" 0, "impr. \n peeph." 1, "stack \n caching" 2, "pop.val. \n caching" 3, "mark \n loops" 4, "const \n shift" 5, "16-bit \n index" 6, "SIMUL" 7, "lightw. \n methods" 8)
 
 set key width -2.8
 set output "../codesizeoverhead-per-benchmark3a.eps"
@@ -252,7 +252,7 @@ plot "codesizeoverhead-per-opcode-category3a.dat" using 2 title 'total'      wit
      "codesizeoverhead-per-opcode-category3a.dat" using 5 title 'mov(w)'     with linespoints dashtype 4 lw 3 ps 1.5, \
      "codesizeoverhead-per-opcode-category3a.dat" using 6 title 'vm+other'   with linespoints dashtype 5 lw 3 ps 1.5
 
-set xtics ("baseline" 0, "optimised \n source" 1, "lightw. \n methods" 2, "impr. \n peeph." 3, "stack \n caching" 4, "pop.val. \n caching" 5, "mark \n loops" 6, "const \n shift" 7, "16-bit \n index" 8, "SIMUL" 9)
+set xtics ("baseline" 0, "optimised \n source" 1, "impr. \n peeph." 2, "stack \n caching" 3, "pop.val. \n caching" 4, "mark \n loops" 5, "const \n shift" 6, "16-bit \n index" 7, "SIMUL" 8, "lightw. \n methods" 9)
 
 set key width -2.8
 set output "../codesizeoverhead-per-benchmark3b.eps"
