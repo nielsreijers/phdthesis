@@ -10,23 +10,22 @@
                                         & B.sort     & H.sort     & Bin.Search & XXTEA      & MD5        & RC5        & FFT        & Outlier    & LEC        & CoreMark   & MoteTrack  & HeatCalib  & HeatDetect & \makebox[0.2mm]{} &   average \\
     \midrule
     \midrule
-    \multicolumn{10}{l}{CODE SIZE (BYTES)} \\
-    % Take JVM, Native C and AOT original from results_0BASE_R___P__C0_A0_S0_G1 (Java interpeter for JVM)
-    \xxt Bytecode                       &         74 &        134 &         83 &        379 &       2983 &        453 &        441 &        287 &        334 &       2788 &       2552 &        310 &       2661 &                   &           \\
-    \xxt Native C                       &        118 &        298 &        146 &       1442 &       9458 &        910 &       1292 &        380 &        560 &       6128 &       3906 &       1944 &       5294 &                   &           \\
-    \xxt AOT original                   &        418 &       1012 &        412 &       3792 &      29502 &       4090 &       2576 &       1402 &       1628 &      13982 &      12784 &       2454 &      17248 &                   &           \\
-    % Take AOT optimised from results_4MARK_R11_P7_C1_A1_S1_G1
-    \xxt AOT optimised                  &        258 &        596 &        310 &       2236 &      14654 &       2018 &       1324 &        800 &       1056 &       8990 &       8478 &       1610 &      10346 &                   &           \\
-    \midrule
-    \multicolumn{10}{l}{CODE SIZE OVERHEAD BEFORE OPTIMISATIONS (\% of native C)} \\
-    % Take this from code-size-table.xlsx 
+    \multicolumn{10}{l}{CODE SIZE OVERHEAD USING ORIGINAL SOURCE (\% of native C)} \\
     \xxt Total                          &      449.2 &      298.0 &      208.2 &      287.2 &      166.0 &      239.3 &       94.9 &      316.3 &      186.4 &      159.4 &      255.0 &       26.2 &      238.5 &                    &    225.0 \\
       \xxxt push/pop                    & \xt  159.3 & \xt   99.3 & \xt   71.2 & \xt  140.6 & \xt  110.7 & \xt  108.6 & \xt   47.7 &  \xt  92.6 & \xt   60.7 & \xt   69.6 & \xt   78.1 & \xt   31.7 & \xt   93.9 & \xt                & \xt 89.5 \\
       \xxxt load/store                  & \xt  128.8 & \xt   65.8 & \xt   76.7 & \xt   68.9 & \xt   40.8 & \xt   56.5 & \xt   20.3 &  \xt 103.2 & \xt   71.4 & \xt   51.6 & \xt   75.9 & \xt   22.6 & \xt   56.4 & \xt                & \xt 64.5 \\
       \xxxt mov(w)                      & \xt    1.7 & \xt   17.4 & \xt    9.6 & \xt   10.1 & \xt   -3.6 & \xt    0.0 & \xt    2.5 &  \xt  14.7 & \xt    5.7 & \xt   -3.1 & \xt   24.1 & \xt  -14.3 & \xt   15.1 & \xt                & \xt  6.1 \\
       \xxxt other                       & \xt  159.3 & \xt  115.4 & \xt   50.7 & \xt   67.6 & \xt   18.0 & \xt   74.3 & \xt   24.5 &  \xt 105.8 & \xt   48.6 & \xt   41.2 & \xt   76.9 & \xt  -13.8 & \xt   73.1 & \xt                & \xt 64.7 \\
-    \multicolumn{10}{l}{CODE SIZE OVERHEAD REDUCTION PER OPTIMISATION (\% of native C)} \\
+    \multicolumn{10}{l}{OVERHEAD REDUCTION FROM SOURCE CODE OPTIMISATION (\% of native C)} \\
     \xxt Source optimisation            &     -195.0 &      -58.4 &      -26.0 &     -124.2 &      +45.9 &     +110.2 &       +4.5 &      -47.4 &       +4.3 &      -31.2 &      -27.7 &        0.0 &      -12.7 &                    &    -27.5 \\
+    \multicolumn{10}{l}{CODE SIZE OVERHEAD BEFORE COMPILER OPTIMISATIONS (\% of native C)} \\
+    % Take this from code-size-table.xlsx 
+    \xxt Total                          &      254.2 &      239.6 &      182.2 &      163.0 &      211.9 &      349.5 &       99.4 &      268.9 &      190.7 &      128.2 &      227.3 &       26.2 &      225.8 &                    &    197.5 \\
+      \xxxt push/pop                    & \xt   71.2 & \xt   80.5 & \xt   60.3 & \xt  103.7 & \xt  133.3 & \xt  165.3 & \xt   52.6 & \xt   86.3 & \xt   63.6 & \xt   55.2 & \xt   72.8 & \xt   31.7 & \xt   83.3 & \xt                & \xt 81.5 \\
+      \xxxt load/store                  & \xt   88.1 & \xt   73.8 & \xt   74.0 & \xt   28.4 & \xt   56.7 & \xt   67.9 & \xt   19.7 & \xt  101.1 & \xt   72.9 & \xt   45.8 & \xt   68.2 & \xt   22.6 & \xt   60.1 & \xt                & \xt 59.9 \\
+      \xxxt mov(w)                      & \xt   10.2 & \xt    9.4 & \xt    4.1 & \xt    2.6 & \xt   -1.0 & \xt    2.2 & \xt    4.3 & \xt    4.7 & \xt    5.7 & \xt   -3.4 & \xt   19.6 & \xt  -14.3 & \xt   16.2 & \xt                & \xt  4.6 \\
+      \xxxt other                       & \xt   84.7 & \xt   75.8 & \xt   43.8 & \xt   28.2 & \xt   22.9 & \xt  114.1 & \xt   22.8 & \xt   76.8 & \xt   48.6 & \xt   30.5 & \xt   66.7 & \xt  -13.8 & \xt   66.2 & \xt                & \xt 51.3 \\
+    \multicolumn{10}{l}{OVERHEAD REDUCTION PER COMPILER OPTIMISATION (\% of native C)} \\
     \xxt Impr. peephole                 &      -67.8 &      -53.0 &      -45.2 &      -38.3 &      -49.4 &      -62.5 &      -32.2 &      -77.8 &      -33.9 &      -24.7 &      -27.4 &      -13.6 &      -49.8 &                    &    -44.3 \\
     \xxt Stack caching                  &      -25.4 &      -26.2 &      -24.7 &      -59.4 &      -85.4 &     -111.2 &      -20.9 &      -30.6 &      -39.7 &      -27.6 &      -26.7 &      -12.6 &      -38.3 &                    &    -40.7 \\
     \xxt Pop. val. caching              &      -16.9 &      -29.5 &       -6.8 &       -6.2 &      -18.7 &      -18.7 &      -13.5 &       -5.2 &      -18.5 &       -9.9 &      -26.7 &       -8.1 &      -20.7 &                    &    -15.3 \\
@@ -35,7 +34,7 @@
     \xxt 16-bit array index             &      -27.2 &      -22.8 &       -8.2 &      -11.6 &       -5.1 &      -16.7 &      -11.6 &      -25.8 &      -10.7 &       -7.4 &      -16.9 &       -2.2 &      -10.7 &                    &    -13.6 \\
     \xxt SIMUL                          &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &       -9.9 &        0.0 &        0.0 &       -3.4 &        0.0 &        0.0 &        0.0 &                    &     -1.1 \\
     \xxt Lightw. methods                &        0.0 &       -2.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &        0.0 &       -5.5 &       -3.8 &       -3.9 &       +0.6 &                    &     -1.1 \\
-    \multicolumn{10}{l}{CODE SIZE OVERHEAD AFTER OPTIMISATIONS (\% of native C)} \\
+    \multicolumn{10}{l}{CODE SIZE OVERHEAD AFTER COMPILER OPTIMISATIONS (\% of native C)} \\
     \xxt Total                          &      118.6 &      100.0 &      112.3 &       55.1 &       54.9 &      121.8 &        2.5 &      110.5 &       88.6 &       46.7 &      117.1 &      -17.2 &       95.4 &                    &     77.4 \\
       \xxxt push/pop                    & \xt   23.7 & \xt   16.1 & \xt   27.4 & \xt   13.3 & \xt    0.0 & \xt    6.2 & \xt    1.9 &  \xt  -2.1 & \xt   -5.0 & \xt    1.7 & \xt   16.3 & \xt    3.9 & \xt   -3.1 & \xt                & \xt  7.7 \\
       \xxxt load/store                  & \xt   33.9 & \xt   41.6 & \xt   49.3 & \xt   14.8 & \xt   37.2 & \xt   25.3 & \xt   -2.6 &  \xt  57.9 & \xt   45.0 & \xt   30.1 & \xt   40.9 & \xt    8.0 & \xt   37.6 & \xt                & \xt 32.2 \\
