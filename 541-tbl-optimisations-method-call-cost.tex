@@ -1,0 +1,43 @@
+%INVOKE COST FOR LIGHTWEIGHT METHOD:
+%  8            CALL/RET
+%  4            move Y
+%  8 per word   saving markloop pinned registers used by lw method
+%  0            pre/post invoke
+%  0            setup callMethod parameters
+%  
+%  minimum: 8
+%  maximum: 8 + 4 + 8*7 = 68
+%  
+%INVOKE COST FOR NORMAL METHOD:
+%  8            CALL/RET
+%  0            move Y
+%  0            saving markloop pinned registers used by lw method
+%  32+34        pre/post invoke
+%  8            setup callMethod parameters
+%  
+%  total: 8+ = 82
+\begin{table}
+\caption{Approximate cycles of overhead caused by different ways of invoking a method}
+\label{tbl-method-invoke-overhead-comparison}
+	\centerline{
+    \begin{tabular}{lccccc} % NO SIMULATION DATA
+    \toprule
+                                                              & Manual          & ProGuard                & Stack-only                  & Converted Java              & Normal                                              \\
+                                                              & inlining        & inlining                & lightweight                 & lightweight                 & method call                                         \\
+    \midrule
+    \midrule
+    flush the stack cache
+                                                              &                 &                         & 8 per word                  & 8 per word                  & 8 per word                                          \\
+    \mintinline[fontsize=\footnotesize]{java}{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 80                                  \\
+% was (20180303)    \mycode{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 82                                  \\
+    create stack frame                                        &                 &                         &                             &                             & \textasciitilde 450                                 \\
+    method pro-/epilogue                                      &                 &                         & 8 or 16                     & 8 or 16                     & 10 to 71                                            \\
+    store and load parameters                                 &                 & 4 or 8 per word         &                             & 4 or 8 per word             & 4 or 8 per word                                     \\
+    \\
+% was (20180303)    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 542 to \textasciitilde 603 +} \\
+    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 540 to \textasciitilde 601 +} \\
+                                                              &                 &                         & \emph{8 per word}           & \emph{12 or 16 per word}    & \emph{12 or 16 per word}                            \\
+    \bottomrule
+    \end{tabular}
+    }
+\end{table}

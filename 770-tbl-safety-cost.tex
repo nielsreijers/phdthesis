@@ -13,6 +13,7 @@
     \multicolumn{10}{l}{EXECUTED BYTECODE INSTRUCTIONS (\% of total executed bytecode instructions after optimisation)} \\
     Array element/object field STORES   &       18.0 &        7.8 &        0.0 &        2.9 &        4.5 &        1.5 &        6.1 &        5.8 &        3.7 &        2.6 &       10.0 &        1.4 &        4.7 &                   &       5.3 \\
     Array element/object field LOADS    &       18.0 &       15.9 &        7.1 &        8.6 &        6.2 &        6.4 &        7.0 &       10.7 &        7.9 &       11.7 &       21.4 &        4.1 &        8.8 &                   &      10.3 \\
+    \midrule
     \multicolumn{10}{l}{PERFORMANCE OVERHEAD VS NATIVE C (\% of native C)} \\
     unsafe                              &      101.2 &       88.5 &       65.2 &       57.6 &       45.7 &       19.5 &       17.7 &       75.7 &       84.6 &       58.9 &      156.3 &       30.5 &       70.2 &                   &      67.0 \\
     safe writes                         &      247.5 &      153.9 &       65.2 &       68.2 &       60.3 &       22.2 &       30.3 &      128.4 &      118.4 &       76.7 &      266.1 &       33.9 &       88.2 &                   &     104.6 \\
@@ -20,6 +21,7 @@
     \multicolumn{10}{l}{PERFORMANCE OVERHEAD VS UNSAFE VM (\% of unsafe AOT)} \\
     safe writes                         &       72.7 &       34.7 &        0.0 &        6.7 &       10.0 &        2.3 &       10.7 &       30.0 &       18.3 &       11.2 &       42.8 &        2.6 &       10.6 &                   &      22.5 \\
     safe reads and writes               &      145.5 &      105.7 &       52.4 &       26.9 &       23.7 &       11.6 &       21.5 &       85.9 &       51.6 &       60.5 &      112.7 &       10.3 &       29.7 &                   &      64.0 \\
+    \midrule
     \multicolumn{10}{l}{CODE SIZE OVERHEAD VS NATIVE C (\% of native C)} \\
     unsafe                              &      118.6 &      100.0 &      112.3 &       55.1 &       54.9 &      121.8 &        2.5 &      110.5 &       88.6 &       46.7 &      117.1 &      -17.2 &       95.4 &                   &      77.4 \\
     safe writes                         &      125.4 &      105.4 &      112.3 &       56.2 &       55.7 &      125.3 &        5.0 &      118.9 &       94.3 &       50.5 &      125.4 &      -16.4 &      102.6 &                   &      81.6 \\

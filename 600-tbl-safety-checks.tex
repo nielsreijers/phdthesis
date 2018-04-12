@@ -11,6 +11,7 @@
 \begin{table}
 \caption{List of safety checks}
 \label{tbl-safety-checks}
+    \begin{threeparttable}
     \begin{tabular}{lp{0.9\linewidth}} % NO SIMULATION DATA
     \toprule
      & Translation-time checks \\
@@ -33,19 +34,19 @@
     \tcheck{chk-invokestatic-target-header-found}
         & The target method header for an \mycodetbl{INVOKESTATIC}/\mycodetbl{INVOKESPECIAL} exists. \\
 
-    \tcheck{chk-stack-is-empty-after-return}
+    \tcheck{chk-stack-is-empty-after-return} \tnote{a}
         & After popping the return value, the stack is empty. \\
 
-    \tcheck{chk-sufficient-stack-space-at-invokelight}
-        & At each \mycodetbl{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee, for both integer and reference stacks. \\
+    \tcheck{chk-sufficient-stack-space-at-invokelight} \tnote{a}
+        & At each \mycodetbl{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee. \\
 
-    \tcheck{chk-no-operandstack-underflow}
+    \tcheck{chk-no-operandstack-underflow} \tnote{a}
         & Before each instruction, the stack depth >= the number of elements to be consumed by the instruction. \\
 
-    \tcheck{chk-no-operandstack-overflow}
+    \tcheck{chk-no-operandstack-overflow} \tnote{a}
         & After each instruction, the stack depth <= the max stack depth announced in the header. \\
 
-    \tcheck{chk-stack-is-empty-at-branches}
+    \tcheck{chk-stack-is-empty-at-branches} \tnote{a}
         & The stack is empty at branches and branch targets. \\
 
     \tcheck{chk-sufficient-locals-at-invokelight}
@@ -55,7 +56,7 @@
         & The index of the local variable < the number of own variable slots for the current method. \\
 
     \tcheck{chk-static-variable-infusion-exists}
-        & The target infusion of a static variable exists. \\
+        & The target infusion of a static variable access exists. \\
 
     \tcheck{chk-static-variable-slot-exists}
         & The index of the static variable < the number of static variable slots for the target infusion. \\
@@ -67,7 +68,7 @@
         & The target implementation for an \mycodetbl{INVOKEVIRTUAL}/\mycodetbl{INVOKEINTERFACE} is found. \\
 
     \rcheck{chk-no-nativestack-overflow}
-        & Whenever a new stack frame is allocated, the frame+max stack depth+some safety margin > the end of the heap. \\
+        & Whenever a new stack frame is allocated, the frame address - max integer stack space - some safety margin > the end of the heap. \\
 
     \rcheck{chk-invokevirtual-stack-effects-match}
         & The target implementation for an \mycodetbl{INVOKEVIRTUAL}/\mycodetbl{INVOKEINTERFACE} matches the stack effects used to verify the caller's stack at translation time. \\
@@ -80,4 +81,8 @@
 
     \bottomrule
     \end{tabular}
+    \begin{tablenotes}
+        \item[a] for both the integer and reference stack
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}

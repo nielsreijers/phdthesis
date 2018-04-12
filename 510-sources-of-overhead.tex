@@ -45,9 +45,9 @@ A second example is arrays of constant data. Since the JVM has no concept of con
 \subsection{Method call overhead}
 \label{sec-overhead-method-call}
 The final source of overhead comes from method calls. In the JVM, each method has a stack frame (or 'activation frame') which the language specification describes as
-\begin{quotation}
+\begin{displayquote}
 "containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked and any other bookkeeping information that may be required by the implementation (stack pointer, programme counter, reference to previous activation frame, and the like)" \cite{Gosling:2014}
-\end{quotation}
+\end{displayquote}
 
 CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps CapeVM goes through to invoke a Java method:
 
@@ -64,7 +64,7 @@ CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-
     \item lookup the address of the AOT compiled code
     \item do the actual \mycode{CALL}, which will return any return value in registers R22 and higher
     \item reactivate the old frame: set the VM's active frame pointer back to the caller
-    \item return to the caller's AOT compiled code the return value (if any) in R22 and higher
+    \item return to the caller with the return value (if any) in R22 and higher
   \end{enumerate}
   \item Restore stack pointer and X register.
   \item Push the return value onto the stack (using stack caching this will be free).

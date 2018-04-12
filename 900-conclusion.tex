@@ -30,7 +30,7 @@ Finally, we conclude by comparing CapeVM to existing work on improving sensor no
 
 Taking unsafe and platform specific native C as a baseline, we first note that existing interpreting sensor node VM's are typically not safe, and suffer from a 1 to 2 orders of magnitude slowdown. The performance overhead was reduced drastically by Ellul's work on Ahead-of-Time compilation, but still a significant overhead remains and this approach increases code size, reducing the size of programmes we can load onto a device.
 
-On the safety side, Safe TinyOS achieves safety with relatively little overhead, but this depends on a trusted host. Harbor and \emph{T-kernel} provide safety independent of the host, but at the cost of a significant performance overhead, or increase in code size respectively. Non of these approaches provide platform independence.
+On the safety side, Safe TinyOS achieves safety with relatively little overhead, but this depends on a trusted host. Harbor and \emph{T-kernel} provide safety independent of the host, but at the cost of a significant performance overhead, or increase in code size respectively. None of these approaches provide platform independence.
 
 Finally, we see CapeVM provides both platform independence and safety, at a cost in terms of code size and performance that is lower than or comparable to previous work.
 

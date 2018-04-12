@@ -1,7 +1,7 @@
 %!PS-Adobe-3.0 EPSF-3.0
 %%Title: stack-frame-lightweight-method.fig
 %%Creator: fig2dev Version 3.2 Patchlevel 5e
-%%CreationDate: Sat Apr  7 20:50:09 2018
+%%CreationDate: Fri Apr 13 10:40:06 2018
 %%For: nielsreijers@Nielss-MacBook-Pro.local (Niels Reijers)
 %%BoundingBox: 0 0 774 412
 %Magnification: 1.0000
@@ -102,8 +102,8 @@ pageheader
 % 
 % here starts figure with depth 50
 /Times-Roman ff 200.00 scf sf
-6300 750 m
-gs 1 -1 sc (optional extra space for lw methods) col0 sh gr
+6300 6975 m
+gs 1 -1 sc (Stack frame layout for method f,) col0 sh gr
 % Polyline
 0 slj
 0 slc
@@ -251,14 +251,8 @@ gs 1 -1 sc (return address to from g_lw to f) col0 sh gr
 11025 4050 m
 gs 1 -1 sc (Y when calling g_lw) col0 sh gr
 /Times-Roman ff 200.00 scf sf
-375 6975 m
-gs 1 -1 sc (Normal stack frame layout) col0 sh gr
-/Times-Roman ff 200.00 scf sf
-6300 6975 m
-gs 1 -1 sc (Layout for method f, which calls) col0 sh gr
-/Times-Roman ff 200.00 scf sf
 6300 7230 m
-gs 1 -1 sc (lightweight method g_lw) col0 sh gr
+gs 1 -1 sc (which calls lightweight method g_lw) col0 sh gr
 /Times-Roman ff 200.00 scf sf
 1275 4725 m
 gs 1 -1 sc (local variables) col0 sh gr
@@ -268,6 +262,15 @@ gs 1 -1 sc (reference stack) col0 sh gr
 /Times-Roman ff 200.00 scf sf
 7125 1425 m
 gs 1 -1 sc (reference stack) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+6300 750 m
+gs 1 -1 sc (optional extra space for lw methods) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+300 6975 m
+gs 1 -1 sc (Stack frame layout for methods) col0 sh gr
+/Times-Roman ff 200.00 scf sf
+300 7200 m
+gs 1 -1 sc (without lightweight method calls) col0 sh gr
 % Polyline
 n 225 5175 m
  3450 5175 l gs col0 s gr 

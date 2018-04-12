@@ -9,11 +9,11 @@
     \midrule
     \midrule
     Native code       & No          & No                 & 1x                    & 1x                         \\
-    Interpreters      & Yes         & Mostly no          & 300-55400\% slower    & ~50\% smaller \tnote{b}    \\ 
+    Interpreters      & Yes         & Mostly no          & 300\tnote{a}~~-55400\% slower    & ~50\% smaller \tnote{b}    \\ 
     % Most interpreters & Yes         & No                 & 1300-22900\% slower   & ~50\% smaller \tnote{b}    \\
     % SensorScheme      & Yes         & Yes                & 300-10400\% slower    & unknown \tnote{b}          \\
     Ellul's AOT       & Yes         & No                 & 204-1927\% slower     & 26-449\% larger \tnote{b}  \\
-    Safe TinyOS       & No          & Yes \tnote{a}      & 17\% slower           & 27\% larger                \\
+    Safe TinyOS       & No          & Yes \tnote{c}      & 17\% slower           & 27\% larger                \\
     Harbor            & No          & Yes                & 380 to 1230\% slower  & 30 to 65\% larger          \\
     \emph{t-kernel}   & No          & Yes                & 50 to 200\% slower    & 500 to 750\% larger        \\
     CapeVM (unsafe)   & Yes         & No                 & 67\% slower           & 77\% larger                \\ % avg
@@ -21,8 +21,9 @@
     \bottomrule
     \end{tabular}
     \begin{tablenotes}
-        \item[a] requires a trusted host
-        \item[b] no support for constant data
+        \item[a] In SensorScheme for a single call to a natively implemented random number generator. \\ The next fastest benchmark is 1070\% slower than native code.
+        \item[b] No support for constant data.
+        \item[c] Requires a trusted host.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}

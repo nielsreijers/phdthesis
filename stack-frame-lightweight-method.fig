@@ -71,10 +71,11 @@ Single
 4 0 0 50 -1 0 12 0.0000 4 195 1830 7050 3150 g_lw's local variables\001
 4 0 0 50 -1 0 12 0.0000 4 195 2685 6600 3825 return address to from g_lw to f\001
 4 0 0 50 -1 0 12 0.0000 4 195 1725 11025 4050 Y when calling g_lw\001
-4 0 0 50 -1 0 12 0.0000 4 195 2295 375 6975 Normal stack frame layout\001
-4 0 0 50 -1 0 12 0.0000 4 195 2760 6300 6975 Layout for method f, which calls\001
-4 0 0 50 -1 0 12 0.0000 4 195 2100 6300 7230 lightweight method g_lw\001
+4 0 0 50 -1 0 12 0.0000 4 195 3105 6300 7230 which calls lightweight method g_lw\001
 4 0 0 50 -1 0 12 0.0000 4 150 1230 1275 4725 local variables\001
 4 0 0 50 -1 0 12 0.0000 4 150 1350 1200 3525 reference stack\001
 4 0 0 50 -1 0 12 0.0000 4 150 1350 7125 1425 reference stack\001
 4 0 0 50 -1 0 12 0.0000 4 195 3045 6300 750 optional extra space for lw methods\001
+4 0 0 50 -1 0 12 0.0000 4 195 2685 300 6975 Stack frame layout for methods\001
+4 0 0 50 -1 0 12 0.0000 4 195 2760 300 7200 without lightweight method calls\001
+4 0 0 50 -1 0 12 0.0000 4 195 2760 6300 6975 Stack frame layout for method f,\001

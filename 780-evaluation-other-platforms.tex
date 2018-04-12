@@ -1,6 +1,6 @@
 \section{Expected perfomance on other platforms}
 \label{sec-evaluation-other-platforms}
-Platform independence is one of the main advantages of using a VM. The ATmega family of CPUs is widely used in low power embedded systems, and we implemented our VM for the popular ATmega128 CPU. However, our approach does not depend on any ATmega specific properties and the approach described in this dissertation can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers for stack caching.
+Platform independence is one of the main advantages of using a VM. The ATmega family of CPUs is widely used in low power embedded systems, and we implemented our VM for the popular ATmega128 CPU. However, the approach described in this dissertation does not depend on any ATmega specific properties and can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers for stack caching.
 
 While it is impossible to determine exactly what the resulting performance would be on different platforms without porting the VM, we present some results here that indicate it is likely to be slightly worse than the results we see on the ATmega.
 
@@ -37,9 +37,9 @@ Two important parameters that influence performance are the number of available 
 
 The ATmega has 32 8-bit registers available, which are managed as 16 pairs since the VM stores data in 16-bit slots. Looking at the MSP430, it only has 12 registers, but they are 16-bit. 5 register pairs are reserved on the ATmega, leaving 11 pairs available for stack caching. Assuming the same can be achieved by reserving 5 16-bit registers on the MSP430, 7 registers will be available to the stack cache.
 
-To evaluate the effect of a smaller number of registers on the stack cache, all benchmarks were run while restricting the number of registers the cache manage may use. Since the VM needs a minimum of 4 pairs to implement all instructions, we vary the number of register from 4 to 11.
+To evaluate the effect of a smaller number of registers on the stack cache, all benchmarks were run while restricting the number of registers the cache manage may use. Since the VM needs a minimum of 4 pairs to implement all instructions, we vary the number of register pairs from 4 to 11.
 
-The results are shown in Figure \ref{fig-performance-per-opcode-category-per-cachesize} and Table \ref{tbl-performance-per-opcode-category-per-cachesize}. As is common with caching techniques, the first few registers have the most impact, with half of the overhead reduction already realised when adding the first two additional registers. Ignoring all other difference for the moment, the effect of reducing the number of register pairs from 11 to 7 is an increase in overhead by 21.4\%, to 88.4\%.
+The results are shown in Figure \ref{fig-performance-per-opcode-category-per-cachesize} and Table \ref{tbl-performance-per-opcode-category-per-cachesize}. As is common with caching techniques, the first few registers have the most impact, with half of the overhead reduction already realised when adding the first two additional register pairs. Ignoring all other difference for the moment, the effect of reducing the number of register pairs from 11 to 7 is an increase in overhead by 21.4\%, to 88.4\%.
 
 The Cortex M0 has one general purpose register more than the MSP430, and at 8 register pairs the overhead drops to 80.1\%. In addition, the M0's registers are 32-bit, which means in cases where mostly 32-bit values are used, the cache size is effectively doubled since values can be stored in a single register instead of two pairs of 8-bit registers.
 

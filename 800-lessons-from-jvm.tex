@@ -6,11 +6,9 @@
 
 In Section \ref{sec-introduction-research-questions} we defined two of our main research questions as how close an AOT compiling sensor node VM can come to native performance, and whether a VM is an efficient way to provide a safe execution environment. These questions are not specific to Java, and the main motivation to base CapeVM on Java was the availability of a rich set of tools and infrastructure to build on, including a solid VM to start from in the form of Darjeeling. In this chapter we consider the third question: whether Java is a suitable language for a sensor node VM, and how it may be improved.
 
-One aspect of the JVM that makes it an attractive choice for sensor nodes is its simplicity, allowing a useful subset of it to be implement in as little as 8 KB \cite{Harbaum}. However, it also lacks some important features that make it a less good fit for typical sensor node code. These range from minor annoyances that reduce code readability, to the lack of support for constant data and high memory consumption for nested data structures. The last two issues make some applications that can run on a sensor node when written in C, impossible to implement in standard Java.
+One aspect of the JVM that makes it an attractive choice for sensor nodes is its simplicity, allowing a useful subset of it to be implemented in as little as 8 KB \cite{Harbaum}. However, it also lacks some important features that make it a less good fit for typical sensor node code. These range from minor annoyances that reduce code readability, to the lack of support for constant data and high memory consumption for nested data structures. The last two issues make some applications that can run on a sensor node when written in C, impossible to implement in standard Java.
 
-In this chapter we discuss the most pressing issues we encountered, summarised in Table \ref{tbl-issues}, and suggest ways they could be improved in future VMs. Where possible, the impact of these issues is quantified in Table \ref{tbl-quantitative-results}.
-
-Although more study is required to turn these suggestions into working solutions, many of the points raised here could be improved with minor changes to Java, leading to a 'sensor node Java', much like nesC \cite{Gay:2003up} is a sensor node version of C, but some require more drastic changes.
+In this chapter we discuss the most pressing issues we encountered, summarised in Table \ref{tbl-issues}, and suggest ways they could be improved in future VMs. Where possible, the impact of these issues is quantified in Table \ref{tbl-quantitative-results}. Although more study is required to turn these suggestions into working solutions, many of the points raised here could be improved with minor changes to Java, leading to a 'sensor node Java', much like nesC \cite{Gay:2003up} is a sensor node version of C, but some require more drastic changes.
 
 
 
@@ -20,24 +18,24 @@ Although more study is required to turn these suggestions into working solutions
 
 A minimum Java API for resource-constrained devices, the Connected Limited Device Configuration (CLDC) specification, was proposed by Sun Microsystems \cite{CLDC}. The CLDC was primarily intended for devices larger than typical sensor nodes, and not tailored to the characteristics of typical sensor node code. Providing support for the full CLDC specification would require a substantial amount of memory and programme space for features that are rarely required by sensor node applications. Table \ref{tab-vm-size} shows the code size of library support as implemented in the original Darjeeling VM.
 
-The largest mismatch comes from the CLDC's string support, which takes up over 8 KB. While string support is one of the most basic features one would expect to find in the standard library of any general purpose language, it is rarely required within sensor node applications that usually do not have a UI and only communicate with the outside world through radio messages.
+The largest mismatch comes from the CLDC's string support, which takes up over 10 KB. While string support is one of the most basic features one would expect to find in the standard library of any general purpose language, it is rarely required within sensor node applications that usually do not have a UI and only communicate with the outside world through radio messages.
 
 On the other hand, the standard library should include abstractions for typical sensor node operations that are missing from the CLDC. The CLDC \mycode{Stream} abstraction is intended to facilitate file, network and memory operations. The abstraction is not well suited for communication protocols required by WSN applications, such as I$^{2}$C and SPI. In CLDC, connections between devices can be initiated by specifying URI-like strings. However, processing these is relatively expensive, and WSN nodes often identify other nodes using a 16 or 32-bit identifier.
 
-Aslam \cite{Aslam:2011thesis} discusses a method for dead code removal that could be used to remove unused code from a library. The remaining library code becomes part of the application that is uploaded to a device as a whole. While this can be useful to allow developers to use a large library of seldom used functions that will only be included when needed, this is much less efficient compared to a natively implemented standard library, and not possible for library functions to access the hardware.
+\input{803-tbl-vm-size} 
 
-Therefore we argue a minimal tailored library is necessary that may be efficiently implemented in native code and present on all devices, and that this library should be designed from the ground-up specifically for sensor node applications. Such a library would include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
+Aslam \cite{Aslam:2011thesis} discusses a method for dead code removal that could be used to remove unused code from a library. The remaining library code becomes part of the application that is uploaded to a device as a whole. While this can be useful to allow developers to use a large library of seldomly used functions that will only be included when needed, this is much less efficient compared to a natively implemented standard library, and not possible for library functions to access the hardware.
 
+Therefore we argue a minimal tailored library is necessary that may be efficiently implemented in native code and present on all devices, and that this library should be designed from the ground-up specifically for sensor node applications. Such a library should include functionality for: (i) basic math; (ii) array operations; (iii) a communication API that encapsulates the low-level protocols typically used (e.g. I$^{2}$C); and (iv) a higher-level generic radio and sensor API abstraction.
 
 
 \input{802-tbl-quantitative-results}
-
 
 \section{Support for constant arrays}
 \label{sec-const-data}
 Constant data is relatively common in sensor node code. In our benchmarks, they appear as the key schedule in the \mybench{RC5} cipher, a table of precomputed sine wave values for the \mybench{FFT} benchmark, a dictionary of codes in the \mybench{LEC} benchmark, and a database of RSSI signatures in \mybench{MoteTrack}.
 
-Sensor node CPUs differ from desktop systems in the fact that memory is split in a small amount of RAM for volatile data, and a relatively large amount of flash memory for code and constant data. Because Java was not designed for such systems, it has no way to distinguish between the two, so both constant and variable data are always placed in RAM.
+Sensor node CPUs differ from desktop systems in the fact that memory is split in a small amount of RAM for volatile data, and a relatively large amount of flash memory for code and constant data. Because Java was not designed for such systems, it has no way to distinguish between the two, and both constant and variable data are always placed in RAM.
 
 There are two problems with Java's approach: (i) an array of constant data will take up RAM, which is a scarce resource, and (ii) the data is not stored as raw data, but as a sequence of bytecode instructions that initialise each element of an array individually. In the worst case, an array of bytes, this means 7 byte of bytecode are needed for each byte of data, which increases even further after AOT compilation.
 
@@ -45,7 +43,6 @@ An extension that allows developers to place arrays of constant data in flash me
 
 
 
-\input{803-tbl-vm-size} 
 
 \section{Support for nested data structures}
 \label{sec-nested-data}
@@ -100,9 +97,9 @@ There are two problems with this. First, since the location of these Java object
 
 The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes. In addition, the 18 byte arrays have a 3 byte header, the signal array a 4 byte header, and the whole structure contains a total of 39 references, which each take up 2 bytes. In total, the collection of Java objects use $80 + 40*5 + 18*3 + 4 + 39*2 = 416$ bytes.
 
-Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variables stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 236 bytes, and reading a RSSI value still takes two lookups instead of one.
+Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variables stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 236 bytes, and reading an RSSI value still takes two lookups instead of one.
 
-Table \ref{tbl-quantitative-results} shows the size of the main data structures used by each benchmark. For most benchmarks that operate on a handful of objects and arrays, the overhead is limited to at most tens of bytes. Beside's \emph{MoteTrack}, the \emph{CoreMark} benchmark also has a significant overhead but here the cause is the linked list of \mycode{ListHead} and \mycode{ListData} objects, each of which has a 5 byte header.
+Table \ref{tbl-quantitative-results} shows the size of the main data structures used by each benchmark. For most benchmarks that operate on a handful of objects and arrays, the overhead is limited to at most tens of bytes. Beside's \emph{MoteTrack}, the \emph{CoreMark} benchmark also has a significant overhead. Here the cause is the linked list of \mycode{ListHead} and \mycode{ListData} objects, each of which has a 5 byte header.
 
 Generally, large arrays of primitive types do not suffer from this problem and can be stored with low relative overhead, but for programmes containing large numbers of small objects the overhead is significant. In some cases we can work around the problem by flattening the structure. Section \ref{sec-evaluation-coremark} described an alternative for \mybench{CoreMark} to replace the linked list with a single array, and in \mybench{MoteTrack}'s case we could replace the array of \mycode{RFSignal} objects with three separate arrays for \mycode{sourceID}s, \mycode{rssi_0} and \mycode{rssi_1}. In both cases the reduced memory overhead comes at a significant cost in readability.
 
@@ -123,7 +120,7 @@ Passing literal integer values to a method call treats them as ints, even if the
 
 \mycode{f((byte)1);}
 
-While seemingly a small annoyance, in more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read. Table \ref{tbl-quantitative-results} shows that over 25 casts per 100 lines of code can appear in some benchmarks.
+While seemingly a small annoyance, in more complex code that frequently uses of shorts and bytes, these casts can make the code much harder to read. Table \ref{tbl-quantitative-results} shows that over 25 casts per 100 lines of code appear in some benchmarks.
 
 \paragraph{Possible solutions}
 %If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.
@@ -154,7 +151,7 @@ Java method calls are inherently more expensive than C functions. On the desktop
                  ^ ((sum^y) + (key[(p&3)^e] ^ z)))
 \end{minted}
 
-This macro is called in four places, and implementing it as a lightweight method slows down the benchmark by 57\%. Tools like Proguard \cite{proguard} can be used to inline small methods or methods that are only called from a single location. But in this case, \mycode{MX} is larger than Proguard's size threshold. This leaves developers with two unattractive options: either leaving it as a method and accepting the performance penalty, or manually copy-pasting the code, which is error-prone and leads to code that is harder to maintain.
+This macro is called in four places, and implementing it as a lightweight method still slows down the benchmark by 57\%. Tools like Proguard \cite{proguard} can be used to inline small methods or methods that are only called from a single location, but \mycode{MX} is called from multiple places and is larger than Proguard's size threshold. This leaves developers with two unattractive options: either leaving it as a method and accepting the performance penalty, or manually copy-pasting the code, which is error-prone and leads to code that is harder to maintain.
 
 Inlining larger methods called from multiple locations does run the risk of increasing code size. However, the data in Table \ref{tbl-quantitative-results} shows the increase in code size is often modest. In two cases the inlined version is actually smaller. The code generated by the AOT compiler for a lightweight method call is still larger than for most other bytecode instructions, and in \emph{CoreMark}'s case the inlining the \mycode{ee_isdigit} method means the code directly branches on the result of the inlined expression, instead of having to perform an additional branch on the returned boolean value.
 
@@ -179,7 +176,7 @@ In Java anything larger than a primitive value has to be allocated on the heap. 
 
 In our benchmarks we encountered a number of situations where a temporary object was needed. For example, the \mycode{encode} function in the \mybench{LEC} benchmark needs to return two values: \emph{bsi} and the number of bits in \emph{bsi}. In C this is done by passing two pointers to \mycode{encode}. In Java we can wrap both values in a class and either create and return an object from \mycode{encode}, or let the caller create it and pass it as a parameter for \mycode{encode} to fill in.
 
-In code that frequently needs short-lived objects the overhead for allocating them can be significant, and unpredictable garbage collector runs are a problem for code with specific timing constraints. Besides \mybench{LEC}, we saw similar situations in the \mybench{CoreMark}, \mybench{MoteTrack} benchmarks. The problem is especially serious on a sensor node, where the limited amount of memory means the garbage collector is triggered frequently even if relatively few temporary objects are created.
+In code that frequently needs short-lived objects the overhead for allocating them can be significant, and unpredictable garbage collector runs are a problem for code with specific timing constraints. Besides \mybench{LEC}, we saw similar situations in the \mybench{CoreMark} and \mybench{MoteTrack} benchmarks. The problem is especially serious on a sensor node, where the limited amount of memory means the garbage collector is triggered frequently even if relatively few temporary objects are created.
 
 \begin{listing}
 \begin{minted}{java}

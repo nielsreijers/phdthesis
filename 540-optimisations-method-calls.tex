@@ -68,7 +68,7 @@ SRETURN         ()
 
 The normal implementation has a single local variable. It expects the parameter to be stored in the local variable and the stack to be empty when we enter the method. In contrast, the lightweight method does not have any local variables and expects the parameter to be on the stack at the start of the method.
 
-We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. Listing \ref{lst-comparison-lightweight-and-normal-invocation} shows how \mycode{INVOKELIGHT} and \mycode{INVOKESTATIC} are translated to native code. Both first flush the stack cache to memory. After that, the lightweight method can directly call the implementation of \mycode{isOdd}, while the native version first saves the stack pointers, and then enters an expensive call into the VM to setup a stack frame for \mycode{isOdd}, which in turn will call the actual method.
+We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. Listing \ref{lst-comparison-lightweight-and-normal-invocation} shows how \mycode{INVOKELIGHT} and \mycode{INVOKESTATIC} are translated to native code. Both first flush the stack cache to memory. After that, the lightweight invocation can directly call the implementation of \mycode{isOdd}, while the normal version first saves the stack pointers, and then enters an expensive call to the \mycode{callMethod} function in the VM, which will set up a stack frame for \mycode{isOdd}, and then call the actual method.
 
 \begin{listing}
 \centering
@@ -109,12 +109,12 @@ We added a new instruction, \mycode{INVOKELIGHT}, to call lightweight methods. L
 \subsubsection{Local variables}
 The lightweight implementation of the \mycode{isOdd} example only needs to process the values that are on the stack, but this is only possible for the smallest methods. If a lightweight method has local variables, space is reserved for them in the caller's stack frame, equal to the maximum number of slots needed by all the lightweight methods it may call.
 
-CapeVM uses the ATmega's Y register to point the start of a method's local variables. To call a lightweight method with local variables, the caller only needs to shift Y up to the region reserved for lightweight method variables before doing the \mycode{CALL}. The lightweight method can then access its locals as if it were a normal method. After the lightweight method returns, the caller lowers Y, so it points to the caller's own variables again.
+CapeVM uses the ATmega's Y register to point to the start of a method's local variables. To call a lightweight method with local variables, the caller only needs to shift Y up to the region reserved for lightweight method variables before doing the \mycode{CALL}. The lightweight method can then access its locals as if it were a normal method. After the lightweight method returns, the caller lowers Y, so it points to the caller's own variables again.
 
 \subsubsection{Nested calls}
 A final extension is to allow for nested calls. While frequently called leaf methods benefit the most from lightweight methods, there are many cases where it is useful for one lightweight methods to call another. A good example from the \mybench{CoreMark} benchmark is the 32-bit \mycode{crcu32} function, which is implemented as two calls to \mycode{crcu16}. For the best performance, both methods should be lightweight.
 
-So far we have not discussed how to handle the return address in a lightweight method. Our AOT compiler uses the native stack to store VM's integer stack value, which means the operands to a lightweight method will be on the native stack. But after a \mycode{CALL}, the return address is put on the stack, covering the method parameters.
+So far we have not discussed how to handle the return address in a lightweight method. The AOT compiler uses the native stack to store VM's integer stack value, which means the operands to a lightweight method will be on the native stack. But after a native \mycode{CALL} instruction, the return address is put on the stack, covering the method parameters.
 
 For leaf methods, the lightweight method will first pop the return address into two fixed registers, and avoid using these register for stack caching. When the method returns, the return address is pushed back onto the stack just before the \mycode{RET} instruction.
 
@@ -140,7 +140,7 @@ The stack frame for \mycode{f} contains space for its own locals, and for the lo
 
 When a method calls a lightweight method with local variables, it will move the Y register to point to that method's locals. From Figure \ref{fig-stack-frame-lightweight-method} it is clear it only needs to increment Y by the size of its own locals. For \mycode{f}, this will place the Y register at the beginning of \mycode{g_lw}'s locals. Since \mycode{g_lw} may call \mycode{h_lw}, \mycode{g_lw}'s prologue will first store the return address in the first local slot, moving Y forward in the process so that Y points to the first free slot.
 
-\subsubsection{Mark loop}
+\subsubsection{Mark loops}
 Lightweight methods may use any register and do not save call-saved registers like normal methods. When a lightweight method is called inside a \mycode{MARKLOOP} block, it may corrupt some of the variables pinned to registers. In this case the caller saves those variables back to memory before calling the lightweight method and loads them again after the call returns. Since lightweight methods always come before their invocation in the infusion, the VM already knows which registers it uses, and will only save and restore pinned variables if there is a conflict. Because registers for \mycode{MARKLOOP} are allocated low to high, and for normal stack caching from high to low, in many cases the two may not collide.
 
 \subsubsection{Example call}
@@ -194,7 +194,7 @@ INVOKELIGHT g_lw
 
     pop r18     // Pop the return address
     pop r19
-    st Y+, r18  // Save in 1st local,
+    st Y+, r18  // Save in 1st local slot,
     st Y+, r19  //  and increment Y
 
       .. // g_lw's body
@@ -290,6 +290,7 @@ Manually inlining code yields the best performance, but at the cost of increasin
 Both lightweight methods options cause some overhead, although this is very little compared to a full method call. First, we need to flush the stack cache to memory to make sure the parameters are on the real stack. This this takes two \mycode{push} and eventually two corresponding \mycode{pop} instructions per word, costing 8 cycles per word. In addition, we need to clear the value tags from the stack cache, which means we may not be able to skip as many \mycode{LOAD} instructions after the lightweight call, but the effect of this is hard to quantify.
 
 Next the cost of translating the \mycode{INVOKE} instruction varies depending on the situation. In the simplest case it is simply a \mycode{CALL} to the lightweight method, which together with the corresponding \mycode{RET} costs 8 cycles. The worst case is 68 cycles when the lightweight method has local variables, uses all registers, and the caller used the maximum of 7 pairs to pin variables in a \mycode{MARKLOOP} block.
+\input{541-tbl-optimisations-method-call-cost}
 
 After calling the method, the method prologue for lightweight methods is very simple. It saves the return address and restores it in the epilogue, which takes 8 cycles if left in a register, or 16 if it needs to be stored in a local variable slot.
 
@@ -301,55 +302,13 @@ The number of cycles in Table \ref{tbl-method-invoke-overhead-comparison} is jus
 
 For a normal method call the cost is much higher, and less dependent on the complexity of the method that is called. The overhead from setting up the stack frame, and the more expensive translation of the \mycode{INVOKE} instruction (see Listing \ref{lst-lightweight-stack-only}) are fixed, meaning a call will cost at least around 540 cycles, increasing to over 700 cycles for more complex methods taking many parameters.
 
-%INVOKE COST FOR LIGHTWEIGHT METHOD:
-%  8            CALL/RET
-%  4            move Y
-%  8 per word   saving markloop pinned registers used by lw method
-%  0            pre/post invoke
-%  0            setup callMethod parameters
-%  
-%  minimum: 8
-%  maximum: 8 + 4 + 8*7 = 68
-%  
-%INVOKE COST FOR NORMAL METHOD:
-%  8            CALL/RET
-%  0            move Y
-%  0            saving markloop pinned registers used by lw method
-%  32+34        pre/post invoke
-%  8            setup callMethod parameters
-%  
-%  total: 8+ = 82
-\begin{table}
-\caption{Approximate cycles of overhead caused by different ways of invoking a method}
-\label{tbl-method-invoke-overhead-comparison}
-	\centerline{
-    \begin{tabular}{lccccc} % NO SIMULATION DATA
-    \toprule
-                                                              & Manual          & ProGuard                & Stack-only                  & Converted Java              & Normal                                              \\
-                                                              & inlining        & inlining                & lightweight                 & lightweight                 & method call                                         \\
-    \midrule
-    \midrule
-    flush the stack cache \footnote{excluding effect on future popped value cache performance because of cleared value tags}
-                                                              &                 &                         & 8 per word                  & 8 per word                  & 8 per word                                          \\
-    \mintinline[fontsize=\footnotesize]{java}{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 80                                  \\
-% was (20180303)    \mycode{INVOKE}                                           &                 &                         & 8 to 68                     & 8 to 68                     & \textasciitilde 82                                  \\
-    create stack frame                                        &                 &                         &                             &                             & \textasciitilde 450                                 \\
-    method pro-/epilogue                                      &                 &                         & 8 or 16                     & 8 or 16                     & 10 to 71                                            \\
-    store and load parameters                                 &                 & 4 or 8 per word         &                             & 4 or 8 per word             & 4 or 8 per word                                     \\
-    \\
-% was (20180303)    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 542 to \textasciitilde 603 +} \\
-    \emph{total}                                              &                 & \emph{4 or 8 per word}  & \emph{16 to 84 +}           & \emph{16 to 84 +}           & \emph{\textasciitilde 540 to \textasciitilde 601 +} \\
-                                                              &                 &                         & \emph{8 per word}           & \emph{12 or 16 per word}    & \emph{12 or 16 per word}                            \\
-    \bottomrule
-    \end{tabular}
-    }
-\end{table}
+
 
 
 \subsection{Limitations and trade-offs}
 There are a few limitations to the use of lightweight methods:
 
-\paragraph{No recursion} Since we need to be able to determine how much space to reserve in the caller's stack frame for a lightweight method's reference stack and local variables, recursion is not supported, although lightweight calls can be nested. The limited amount of memory on a sensor node means recursion is a bad choice in most cases.
+\paragraph{No recursion} Since the infuser needs to be able to determine how much space to reserve in the caller's stack frame for a lightweight method's reference stack and local variables, recursion is not supported, although lightweight calls can be nested. While this is clearly a limitation, recursive code is not common on sensor nodes because of the limited amount of memory available.
 
 \paragraph{No garbage collection}
 Lightweight methods reuse the caller's stack frame. This is a problem for the garbage collector, which works by inspecting each stack frame and finding the references on the stack and in local variables. If the garbage collector would be triggered while a lightweight method is being executed, it would not know where to find the lightweight method's references, since the stack frame only has information for the method that owns it. Thus, lightweight methods cannot perform any action that may trigger the garbage collector.
@@ -357,10 +316,11 @@ Lightweight methods reuse the caller's stack frame. This is a problem for the ga
 While it may be possible to relax this constraint with some effort, in most cases this is only a minor restriction. Lightweight methods are most useful for fast and frequently called methods, and operations that may trigger the garbage collector are usually expensive, so there is less to be gained from using a lightweight method in these situations.
 
 \paragraph{Static only}
-Lightweight virtual methods are not supported, but this is something that could be considered in future work.
+Lightweight virtual methods are not supported, but this is something that could be considered in future work. However, in all our benchmarks, virtual methods were only used in a single case that could easily be transformed into code using static methods (see Section \ref{sec-evaluation-coremark-non-automatic-optimisations}
+).
 
 \paragraph{Stack frame usage}
 Finally, we should remember that a method calling a lightweight method always reserves space for it in its locals. This space is reserved, regardless of whether the method is currently executing or not, and the more nested lightweight calls are made, the more space we need to reserve.
 
-As an example, consider a method \mycode{f1} which may call a lightweight method with a large number of local variables, \mycode{big_lw}, but is currently calling normal method \mycode{f2}, which may also call \mycode{big_lw}. In this case space for \mycode{big_lw} will be reserved twice, both in \mycode{f1}'s and in \mycode{f2}'s frame.
+As an example, consider a method \mycode{f1} which may call a lightweight method with a large number of local variables, \mycode{big_lw}, but is currently calling normal method \mycode{f2}, which may also call \mycode{big_lw}. In this case space for \mycode{big_lw} will be reserved twice, both in \mycode{f1}'s and in \mycode{f2}'s frame. Thus, some restraint should be used when making larger methods at the top of the call tree lightweight.
 
