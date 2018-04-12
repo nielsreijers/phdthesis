@@ -1,10 +1,9 @@
-\input{710-tbl-evaluation-benchmarks}
 \section{Benchmarks and experimental setup}
 \label{sec-evaluation-benchmarks}
 
 This section describes our experimental setup, the benchmarks used and how the source code for each benchmark was obtained, and any relevant details in their implementation.
 
-A set of twelve different benchmarks, shown in Table \ref{tbl-benchmarks}, is used to measure the effect of the optimisations and the overhead of safety checks. This mix of benchmarks was chosen for several reasons. A number of benchmarks, \mybench{bubble sort}, \mybench{binary search}, \mybench{MD5}, \mybench{FFT}, and \mybench{Outlier detection} were chosen because they are used in various related work, allowing a comparison of CapeVM to these results.
+A set of twelve different benchmarks, shown in Table \ref{tbl-benchmarks}, is used to measure the effect of the optimisations and the overhead of safety checks. Table \ref{tbl-evaluation-benchmark-characteristics} shows some key characteristics of these benchmarks: their code size, stack depth, and mix of executed instructions. This mix of benchmarks was chosen for several reasons. A number of benchmarks, \mybench{bubble sort}, \mybench{binary search}, \mybench{MD5}, \mybench{FFT}, and \mybench{Outlier detection} were chosen because they are used in various related work, allowing a comparison of CapeVM to these results.
 
 A number of benchmarks are small benchmarks that process arrays of data. While the actual processing done may not be typical for sensor networks (although the \mybench{MoteTrack} application does do a bubble sort), the small size of these benchmarks make them useful to highlights specific behaviours that would be lost in the averages of a larger benchmark.
 
@@ -13,6 +12,9 @@ The \mybench{CoreMark} benchmark is an industry standard benchmark to measure CP
 Finally, \mybench{Outlier detection}, \mybench{LEC}, \mybench{MoteTrack} and \mybench{heat detection} are all code that was specifically developed for sensor nodes, and \mybench{FFT} is a typical signal processing operation, which is a common and potentially expensive task for sensor nodes.
 
 Sensor nodes spend their time and energy on three main tasks: accessing sensor and actuators, communication, and data processing. The first two require interaction with the hardware, so they must be implemented in native code in the VM's standard library. Since native code is not influenced by the performance of the VM, the benchmarks used in this evaluation focus on data processing.
+
+\input{710-tbl-evaluation-benchmarks}
+\input{711-tbl-evaluation-benchmark-characteristics}
 
 As noted before, to what extent an application is affected by the VM's slowdown is highly application dependent. The Amulet smart watch system discussed in Chapter \ref{sec-introduction} notes that energy consumed when the CPU is in active mode is significant, and their breakdown of the CPU active time shows most is spent in application code rather than the OS. Similarly, the Mercury motion analysis platform show the energy spent on feature extraction or FFT becomes significant or dominant in the total energy consumption when multiplied by the typical slowdown seen in interpreting VMs.
 
@@ -23,18 +25,16 @@ Finally, we note that compared to benchmarks on more complex high performance CP
 \subsection{Implementation details}
 To ensure the results can be reproduced, we describe the implementation of our benchmarks in this section. For most benchmarks a C version is available in the sources mentioned in Table \ref{tbl-benchmarks}. The sources for \mybench{heat detection}, \mybench{LEC} and \mybench{outlier detection} are not available online, but are listed in the appendices.
 
-The \mybench{bubble sort}, \mybench{heap sort}, \mybench{FFT}, \mybench{binary search}, and \mybench{outlier detection} benchmarks could all be implemented for different data sizes. In this evaluations 16-bit data is used. 8-bit data is too small for many tasks, for example the ATmega's has 10-bit ADCs, and the memory constraints of sensor nodes mean developers will often be reluctant to use 32-bit variables where 16 bits are sufficient. Therefore, the middle option is used for the main evaluation, and the effect on the performance of 8-bit or 32-bit data is discussed in Section \ref{sec-evaluation-other-platforms}.
+The \mybench{bubble sort}, \mybench{heap sort}, \mybench{FFT}, \mybench{binary search}, and \mybench{outlier detection} benchmarks could all be implemented for different data sizes. In this evaluation 16-bit data is used. 8-bit data is too small for many tasks, for example the ATmega's has 10-bit ADCs, and the memory constraints of sensor nodes mean developers will often be reluctant to use 32-bit variables where 16 bits are sufficient. Therefore, the middle option is used for the main evaluation, and the effect on the performance of 8-bit or 32-bit data is discussed in Section \ref{sec-evaluation-other-platforms}.
 
 The C versions of these benchmarks were first translated directly to Java, keeping both implementations as close as possible. The result was then manually optimised as described in Section \ref{sec-optimisations-manual-java-source-optimisation}. These optimisations did not affect the performance of the C version significantly, indicating \mycode{avr-gcc} already does similar transformations on the original code.
 
-There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when developing a Java implementation directly. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-non-automatic-optimisations}, including two changes that lead to better performance. The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat detection} benchmarks, since these could not be directly translated.
+The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat calibration} benchmarks, since these could not be directly translated. There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when developing a Java implementation directly. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-non-automatic-optimisations}, including two extra optimisations that could not be done automatically by the compiler, but do lead to better performance.
 
 The benchmarks exposed some limitations of using a VM instead of native code, which are common to most sensor nodes VMs. Specifically, the lack of support for constant data, high memory overhead for code containing many small objects, and high performance overhead for allocating temporary objects. These are discussed in more detail in Chapter \ref{sec-lessons-from-jvm}, where we also suggest options to solve some of these limitations.
 
 \subsubsection{FFT}
-Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}.
-
-Both versions contain a table of precalculated sine wave values, which are stored in flash using the constant array optimisation introduced in Section \ref{sec-opt-constant-arrays}.
+Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}. Both versions contain a table of precalculated sine wave values, which are stored in flash using the constant array optimisation introduced in Section \ref{sec-opt-constant-arrays}.
 
 \subsubsection{Outlier detection}
 We implemented the outlier detection algorithm as described in \cite{Kumar:2007ge}:
@@ -43,7 +43,7 @@ We implemented the outlier detection algorithm as described in \cite{Kumar:2007g
 "The outlier detector samples a set of sensor values and stores them in a buffer. Once the buffer is filled, it computes the distance between all pairs of samples in the buffer and stores the result in a matrix. Using a distance threshold, the algorithm marks the distance measurements in the matrix that are greater than the threshold. If the majority of the distance measurements for a sensor readings are marked, then the sensor reading is classified as an outlier."
 \end{displayquote}
 
-Note that there is no reason to store the distances in a matrix, and having to allocate this matrix limits us to only small arrays of input data. The same result can be calculated directly, without the distance matrix, by examining the samples one at a time, and counting the number of other samples with a distance higher than the threshold.
+Note that there is no reason to store the distances in a matrix, and having to allocate this matrix limits us to small arrays of input data. The same result can be calculated directly, without the distance matrix, by examining the samples one at a time, and counting the number of other samples with a distance higher than the threshold.
 
 Because this benchmark will be used to compare CapeVM's safety cost to Harbor's, we implemented it as described in the paper.
 
@@ -54,7 +54,7 @@ The LEC algorithm is described in detailed pseudo code in \cite{Marcelloni:2009j
 \label{sec-evaluation-benchmark-implementation-motetrack}
 The \mybench{MoteTrack} application uses received signal strength (RSSI) measurements from a number of beacon nodes to do indoor localisation. It contains a database in flash memory of reference RSSI signatures, stored in a complex structure of many small structs and arrays in C.
 
-The memory overhead when translating this directly to Java was too high to run the application, forcing us to make two modifications. First, the original source has the option to list RSSI signatures at different transmission powers, but the authors note this may not always improve results. The original C code only uses a single transmission power setting, which results in arrays of a single element that get optimised away at compile time. In the Java version these were replaced with simple variables. Second, a two element array with RSSI values for different channels was flattened into two separated variables to eliminate the overhead from allocating too many small arrays.
+The memory overhead when translating this directly to Java was too high to run the application, forcing us to make two modifications. First, MoteTrack has the option to store RSSI signatures at different transmission powers, but the authors note this may not always improve results. The original C code only uses a single transmission power setting, which results in arrays of a single element that get optimised away at compile time. In the Java version these were replaced with simple variables. Second, a two element array with RSSI values for different channels was flattened into two separated variables to eliminate the overhead from allocating too many small arrays.
 
 Again, the constant array optimisation was used to place the data in flash memory. Since this only allows arrays of integer types, the single array of C nested structs was split into 7 arrays for the individual fields. Without this optimisation, it would be impossible to implement this application in Java because the 20 KB database is too large to fit in RAM.
 

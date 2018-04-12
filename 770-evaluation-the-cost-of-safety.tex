@@ -100,4 +100,4 @@ While this shows CapeVM achieves a performance comparable to even a hypothetical
 
 CapeVM's \emph{total} overhead for the \mybench{array writes} benchmark is slightly higher than the hypothetical optimised Harbor, but the overhead due to safety checks is lower because CapeVM does not need to check writes to the index variable \mycode{i}. This advantage should be more pronounced in code with more frequent writes to local variables, which is exactly the case for the more realistic \mybench{outlier detection} and \mybench{FFT} benchmarks. 
 
-The reported overhead is 690\% and 380\%, which would result in 234\% and 129\% resp., when using the faster memory access check. For these benchmarks, CapeVM is significantly faster at only 128.5\% and 30.3\% overhead.
+The reported overhead is 690\% and 380\%, which would result in 234\% and 129\% resp., when using the faster memory access check. For these benchmarks, CapeVM is significantly faster at only 128.4\% and 30.3\% overhead.

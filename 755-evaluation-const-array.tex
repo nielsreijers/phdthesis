@@ -4,7 +4,7 @@
 
 Four benchmarks contain arrays of constant data, which were stored in flash memory by placing them in classes with the \mycode{@ConstArray} annotation. To evaluate the effect of this optimisation, we compare them to versions without this annotation. The results are shown in Table \ref{tbl-const-array}. There are three advantages to this optimisation: a small improvement in performance, reduced code size, and reduced memory usage.
 
-When using constant arrays, the id of the array to read from is a bytecode parameter in the \mycode{GETCONSTARRAY} instruction. No reference to the array needs to be loaded on the stack, and the calculation to find the address of the target element is slightly easier, which results in a modest reduction in performance overhead of 1.8\% for the \mybench{LEC} benchmark.
+When using constant arrays, the id of the array to read from is a bytecode parameter in the \mycode{GETCONSTARRAY} instruction. No reference to the array needs to be loaded on the stack, and the calculation to find the address of the target element is slightly easier, which results in a modest reduction in performance overhead of 1.9\% for the \mybench{LEC} benchmark.
 
 The real advantage however, is the reduction in code size and memory usage. Without this optimisation, an array of constant data is transformed into normal bytecode that will create an array object on the heap and fill each element individually, as shown in Listing \ref{lst-constant-array-initialisation}.
 
