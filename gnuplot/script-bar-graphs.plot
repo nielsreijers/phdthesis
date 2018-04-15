@@ -21,3 +21,11 @@ set output "../8_16_32_bit.eps"
 plot '8_16_32_bit.dat' using 2:xtic(1) ti col linecolor "#039f74", '' u 3 ti col linecolor "#56b5e8", '' u 4 ti col linecolor "#e7a529"
 
 
+set ylabel "Total execution time (% of native C)"
+set yrange [0:900]
+set linetype 1 lc rgb 'red'
+set linetype 2 lc rgb 'red'
+set output "../safety-cost-defence-slides.eps"
+set key at 9, 870
+plot 'safety-cost-defence-slides-a.dat' using 2:xtic(1) ti col linecolor "#039f74", '' u 3 ti col linecolor "#56b5e8", '' u 4 ti col linecolor "#e7a529", '' u 5 ti col linecolor "#bb3333", \
+     'safety-cost-defence-slides-b.dat' using 2:5:4:5:5:6 with candlesticks lw 4 linecolor "#000000" notitle whiskerbars
