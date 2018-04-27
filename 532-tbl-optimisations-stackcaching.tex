@@ -1,11 +1,11 @@
 \begin{table}
-\caption{Simple stack caching}
+\caption{Stack caching}
 \label{tbl-simplestackcaching}
     \scriptsize\centerline{
     \begin{tabular}{llll|c|c|c|c} % NO SIMULATION DATA
     \toprule
                        &                                                      &                     &        & \multicolumn{4}{c}{cache state} \\
-    Bytecode           & AOT compiler                                         & AVR                 & cycles & R1                   & R2                   & R3                   & R4                   \\
+    Bytecode           & AOT compiler                                         & native code         & cycles & R1                   & R2                   & R3                   & R4                   \\
     \midrule
     \midrule
     0: BRTARGET(0)     & \sccomment{record current address}                   &                     &        & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } & \sce{    }{   }{   } \\

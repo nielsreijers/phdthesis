@@ -1,7 +1,7 @@
 \section{Benchmarks and experimental setup}
 \label{sec-evaluation-benchmarks}
 
-This section describes our experimental setup, the benchmarks used and how the source code for each benchmark was obtained, and any relevant details in their implementation.
+This section describes the experimental setup, the benchmarks used, how the source code for each benchmark was obtained, and any relevant details in their implementation.
 
 A set of twelve different benchmarks, shown in Table \ref{tbl-benchmarks}, is used to measure the effect of the optimisations and the overhead of safety checks. Table \ref{tbl-evaluation-benchmark-characteristics} shows some key characteristics of these benchmarks: their code size, stack depth, and mix of executed instructions. This mix of benchmarks was chosen for several reasons. Some benchmarks, \mybench{bubble sort}, \mybench{binary search}, \mybench{MD5}, \mybench{FFT}, and \mybench{Outlier detection} were chosen because they are used in various related work, allowing a comparison of CapeVM to these results.
 
@@ -29,19 +29,17 @@ The \mybench{bubble sort}, \mybench{heap sort}, \mybench{FFT}, \mybench{binary s
 
 The C versions of these benchmarks were first translated directly to Java, keeping both implementations as close as possible. The result was then manually optimised as described in Section \ref{sec-optimisations-manual-java-source-optimisation}. These optimisations did not affect the performance of the C version significantly, indicating \mycode{avr-gcc} already does similar transformations on the original code.
 
-The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat calibration} benchmarks, since these could not be directly translated. There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when developing a Java implementation directly. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-non-automatic-optimisations}, including two extra optimisations that could not be done automatically by an optimising compiler, but do lead to better performance.
+The C version was followed as closely as possible to avoid bias by optimising specifically for our VM. We take a bit more liberty for the \mybench{MoteTrack} and \mybench{heat calibration} benchmarks, since these could not be directly translated. There are cases where a developer who is aware of the performance characteristics of the VM may choose a different approach than the one used in the C version when directly implementing in Java. We discuss some of the issues when translating C to Java for the \mybench{CoreMark} benchmark in Section \ref{sec-evaluation-coremark-non-automatic-optimisations}, including two extra optimisations that could not be done automatically by an optimising compiler, but do lead to better performance.
 
 The benchmarks exposed some limitations of using a VM instead of native code, which are common to most sensor nodes VMs. Specifically, the lack of support for constant data, high memory overhead for code containing many small objects, and high performance overhead for allocating temporary objects. These are discussed in more detail in Chapter \ref{sec-lessons-from-jvm}, where we also suggest options to solve some of these limitations.
 
 \subsubsection{FFT}
-Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation we use the 16-bit version taken from the Harbor source code \cite{sos-operating-system}. Both versions contain a table of precalculated sine wave values, which are stored in flash using the constant array optimisation introduced in Section \ref{sec-opt-constant-arrays}.
+Both 8-bit and 16-bit versions of the \mycode{fix_fft.c} implementation exist. In the main evaluation the 16-bit version is used, taken from the Harbor source code \cite{sos-operating-system}. Both versions contain a table of precalculated sine wave values, which are stored in flash using the constant array optimisation introduced in Section \ref{sec-opt-constant-arrays}.
 
 \subsubsection{Outlier detection}
-We implemented the outlier detection algorithm as described in \cite{Kumar:2007ge}:
+The outlier detection algorithm was implemented as described in \cite{Kumar:2007ge}:
 
-\begin{displayquote}
-"The outlier detector samples a set of sensor values and stores them in a buffer. Once the buffer is filled, it computes the distance between all pairs of samples in the buffer and stores the result in a matrix. Using a distance threshold, the algorithm marks the distance measurements in the matrix that are greater than the threshold. If the majority of the distance measurements for a sensor readings are marked, then the sensor reading is classified as an outlier."
-\end{displayquote}
+\begin{displayquote}“The outlier detector samples a set of sensor values and stores them in a buffer. Once the buffer is filled, it computes the distance between all pairs of samples in the buffer and stores the result in a matrix. Using a distance threshold, the algorithm marks the distance measurements in the matrix that are greater than the threshold. If the majority of the distance measurements for a sensor readings are marked, then the sensor reading is classified as an outlier.”\end{displayquote}
 
 Note that there is no reason to store the distances in a matrix, and having to allocate this matrix limits us to small arrays of input data. The same result can be calculated directly, without the distance matrix, by examining the samples one at a time, and counting the number of other samples with a distance higher than the threshold.
 
@@ -58,7 +56,7 @@ The memory overhead when translating this directly to Java was too high to run t
 
 Again, the constant array optimisation was used to place the data in flash memory. Without this optimisation, it would be impossible to implement this application in Java because the 20 KB database is too large to fit in RAM. Since this only allows arrays of integer types, the single array of nested C structs was split into 7 arrays for the individual fields.
 
-Thus, while our Java implementation of \mybench{MoteTrack} does execute the same algorithm as the C version, we were force to modify its implementation significantly, which clearly highlights some of the weaknesses of current sensor node VMs. These changes do not affect the results of the current version of the code, but we note that while it would be possible to use multiple transmission powers or more channels in the C version, this would require too much memory for the Java version.
+Thus, while our Java implementation of \mybench{MoteTrack} does execute the same algorithm as the C version, we were forced to modify its implementation significantly, which clearly highlights some of the weaknesses of current sensor node VMs. These changes do not affect the results of the current version of the code, but we note that while it would be possible to use multiple transmission powers or more channels in the C version, this would require too much memory for the Java version.
 
 \subsubsection{Heat detection}
 The \mybench{heat detection} application is adapted from code used by a different project in our group to track persons and fire hazards using Raspberry Pi devices equipped with an 8x8 heat sensor.

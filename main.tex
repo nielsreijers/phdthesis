@@ -33,13 +33,14 @@
 \newcommand{\xt}[0] { \scriptsize }
 \newcommand{\xxt}[0] { \makebox[2mm]{} }
 \newcommand{\xxxt}[0] { \makebox[5mm]{} \scriptsize }
-\newcommand{\tblhl}[0] {\cellcolor{yellow!45}}
+\newcommand{\tblhl}[0] {\cellcolor{yellow!55}}
 \newcommand{\mycode}[2][java]{\mintinline[fontsize=\normalsize]{#1}{#2}}
 \newcommand{\mycodetbl}[2][java]{\mintinline[fontsize=\footnotesize]{#1}{#2}}
 % \newcommand{\mycode}[2][java]{\texttt{\detokenize{#2}}}
 \newcommand{\mybench}[1]{\emph{#1}}
 \newcommand{\lcell}[1]{\multicolumn{1}{l}{#1}}
 
+\emergencystretch 3em
 
 \let\originaltable\table
 \let\endoriginaltable\endtable
@@ -97,7 +98,7 @@
 ~
 \newpage
 \vspace*{6cm}
-\centerline{\emph{Dedicated to my family: Ton, Leny and Nanda Reijers.}}
+\centerline{\emph{Dedicated to Ton, Leny and Nanda Reijers.}}
 \newpage
 
 \input{000-acknowledgements}
@@ -135,14 +136,8 @@
 \input{800-lessons-from-jvm}
 \input{900-conclusion}
 
-%TODO: check for consistent use of WSN/IoT/wireless sensor networks/sensor networks/Internet-of-Things
-%TODO: check for 'we', 'our', etc
-%TODO: check for VM and replace with virtual machine?
-%TODO: consistent use of AVR or ATmega.
-%TODO: consistent use of (sensor) node and device
-
-%TODO: discuss with prof Shih (1) include SensorScheme in conclusion table?
-
+% TODO: title chapter 8?
+% TODO: include source code in appendix?
 
 \appendix
 \input{A00-lec-source}

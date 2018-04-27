@@ -4,34 +4,34 @@
     \centerline{
     \begin{tabular}{lp{.40\textwidth}ccc} % NO SIMULATION DATA
     \toprule
-    Benchmark                   & Source and input data                                                                                              & Size             & Typical sensor & Used as a                                \\
-                                &                                                                                                                    &                  & node code      & benchmark in                             \\
+    Benchmark                   & Source and input data                                                                                               & Size             & Typical sensor & Used as a                                \\
+                                &                                                                                                                     &                  & node code      & benchmark in                             \\
     \midrule
     \midrule
-    \mybench{Bubble sort}       & Darjeeling sources \cite{darjeelingsource}                                                                         & single method    & no             & \cite{Brouwers:2009cj, Ellul:2012thesis} \\
-                                & \emph{Input:} 256 16-bit numbers sorted in reverse order, as in the original source.                               &                  &                & \\
-    \mybench{Heap sort}         & Standard heap sort taken from \cite{heapsort}                                                                      & two methods      & no             & \\
-                                & \emph{Input:} 256 16-bit numbers sorted in reverse order.                                                          &                  &                & \\
-    \mybench{Binary search}     & TakaTuka sources \cite{takatukasource}                                                                             & single method    & no             & \cite{Ellul:2012thesis}                  \\
-                                & \emph{Input:} worst case (not found) search in 100 16-bit values, as in \cite{Ellul:2012thesis}.                   &                  &                & \\
-    \mybench{XXTEA}             & Wheeler and Needham \cite{Wheeler:1998}                                                                            & single method    & no             & \\
-                                & \emph{Input:} 32 32-bit numbers. Contents do not affect performance.                                               &                  &                & \\
-    \mybench{MD5}               & Darjeeling sources \cite{darjeelingsource}                                                                         & single method    & no             & \cite{Brouwers:2009cj, Ellul:2012thesis} \\
-                                & \emph{Input:} the string 'message digest' as in the original source.                                               &                  &                & \\
-    \mybench{RC5}               & LibTomCrypt \cite{libtomcrypt}                                                                                     & single method    & no             & \\
-                                & \emph{Input:} first test case in libtomcrypt sources (64 bit)                                                      &                  &                & \\
-    \mybench{FFT}               & Fixed point FFT using the widespread \mintinline[fontsize=\footnotesize]{c}{fix_fft.c} \cite{sos-operating-system} & single method    & yes            & \cite{Kumar:2007ge}                      \\
-                                & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                                      &                  &                & \\
-    \mybench{Outlier detection} & Our implementation of the algorithm described in \cite{Kumar:2007ge}                                               & single method    & yes            & \cite{Kumar:2007ge}                      \\
-                                & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11.         &                  &                & \\
-    \mybench{LEC}               & Our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}                              & three methods    & yes            & \\
-                                & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.                     &                  &                & \\
-    \mybench{CoreMark 1.0}      & EEMBC \cite{coremark}                                                                                              & full application & no             & \\
-                                & \emph{Input:} defined in CoreMark source.                                                                          &                  &                & \\
-    \mybench{MoteTrack}         & Lorincz \cite{Lorincz:2006fc, motetrack}                                                                           & full application & yes            & \\
-                                & \emph{Input:} defined in MoteTrack source.                                                                         &                  &                & \\
-    \mybench{Heat detection}    & Adapted from code used in our group to track objects using an 8x8 pixel heat sensor                                & full application & yes            & \\
-                                & \emph{Input:} 101 frames of 8x8 16-bit values for calibration, 25 frames for detection.                            &                  &                & \\
+    \mybench{Bubble sort}       & Darjeeling sources \cite{darjeelingsource}                                                                          & single method    & no             & \cite{Brouwers:2009cj, Ellul:2012thesis} \\
+                                & \emph{Input:} 256 16-bit numbers sorted in reverse order, as in the original source.                                &                  &                & \\
+    \mybench{Heap sort}         & Standard heap sort taken from \cite{heapsort}.                                                                      & two methods      & no             & \\
+                                & \emph{Input:} 256 16-bit numbers sorted in reverse order.                                                           &                  &                & \\
+    \mybench{Binary search}     & TakaTuka sources \cite{takatukasource}                                                                              & single method    & no             & \cite{Ellul:2012thesis}                  \\
+                                & \emph{Input:} worst case (not found) search in 100 16-bit values, as in \cite{Ellul:2012thesis}.                    &                  &                & \\
+    \mybench{XXTEA}             & Wheeler and Needham \cite{Wheeler:1998}                                                                             & single method    & no             & \\
+                                & \emph{Input:} 32 32-bit numbers. Contents do not affect performance.                                                &                  &                & \\
+    \mybench{MD5}               & Darjeeling sources \cite{darjeelingsource}                                                                          & single method    & no             & \cite{Brouwers:2009cj, Ellul:2012thesis} \\
+                                & \emph{Input:} the string 'message digest' as in the original source.                                                &                  &                & \\
+    \mybench{RC5}               & LibTomCrypt \cite{libtomcrypt}                                                                                      & single method    & no             & \\
+                                & \emph{Input:} first test case in libtomcrypt sources (64 bit).                                                      &                  &                & \\
+    \mybench{FFT}               & Fixed point FFT using the widespread \mintinline[fontsize=\footnotesize]{c}{fix_fft.c} \cite{sos-operating-system}. & single method    & yes            & \cite{Kumar:2007ge}                      \\
+                                & \emph{Input:} 64 8-bit or 16-bit numbers. Contents do not affect performance.                                       &                  &                & \\
+    \mybench{Outlier detection} & Our implementation of the algorithm described in \cite{Kumar:2007ge}.                                               & single method    & yes            & \cite{Kumar:2007ge}                      \\
+                                & \emph{Input:} 20 16-bit values increasing from 0 to 19, with outliers of 1000 and -1000 at index 2 and 11.          &                  &                & \\
+    \mybench{LEC}               & Our implementation of the compression algorithm described in \cite{Marcelloni:2009ja}.                              & three methods    & yes            & \\
+                                & \emph{Input:} 256 16-bit ECG measurements downloaded from PhysioNet \cite{physionet-ecg-data}.                      &                  &                & \\
+    \mybench{CoreMark 1.0}      & EEMBC \cite{coremark}                                                                                               & full application & no             & \\
+                                & \emph{Input:} defined in CoreMark source.                                                                           &                  &                & \\
+    \mybench{MoteTrack}         & Lorincz \cite{Lorincz:2006fc, motetrack}                                                                            & full application & yes            & \\
+                                & \emph{Input:} defined in MoteTrack source.                                                                          &                  &                & \\
+    \mybench{Heat detection}    & Adapted from code used in our group to track objects using an 8x8 pixel heat sensor.                                & full application & yes            & \\
+                                & \emph{Input:} 101 frames of 8x8 16-bit values for calibration, 25 frames for detection.                             &                  &                & \\
     \bottomrule
     \end{tabular}
     }

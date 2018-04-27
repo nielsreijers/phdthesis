@@ -11,11 +11,11 @@ A safe execution environment is one that guarantees an application cannot harm t
     \item Retain control of the CPU indefinitely.
 \end{enumerate}
 
-Given the first two, the last guarantee is easy to implement: the VM can use interrupts or set a timer to trap back to the VM to regain control when needed. As long as the other guarantees hold, the application will not be able to disable these without the VM's permission.
+Given the first two, the last guarantee is easy to implement: the VM can use interrupts or set a timer to trap back to the VM and regain control when needed. As long as the other guarantees hold, the application will not be able to disable these without the VM's permission.
 
-To guard against programming errors as well as malicious attacks, we focus on the second type of approaches shown in Figure \ref{fig-safe-compilation-process}. CapeMV does not rely on a trusted host to guarantee safety, but can do so independent of the code it receives.
+To guard against programming errors as well as malicious attacks, we focus on the second type of approaches shown in Figure \ref{fig-safe-compilation-process}. CapeVM does not rely on a trusted host to guarantee safety, but can do so independent of the code it receives.
 
-As discussed in Chapter 3, most generic sensor nodes VMs do not consider safety, with the exception of SensorScheme \cite{Evers:2010ur}, but a number of native code systems have been proposed. This is unfortunate because using a VM has some distinct advantages compared to native code systems that guarantee safety.
+As discussed in Chapter 3, most generic sensor nodes VMs do not consider safety, with the exception of SensorScheme \cite{Evers:2010ur}, but a number of native code systems have been developed. This is unfortunate because using a VM has some distinct advantages compared to native code systems that guarantee safety.
 
 Both the machine model and the instruction set of the virtual machine are more structured than a real CPU. This restricts what a bytecode instruction can do, which in turn allows the VM to verify safety for many instructions at translation time.
 
@@ -39,11 +39,11 @@ Table \ref{tbl-safety-checks} contains the list of checks done by CapeVM to guar
         \end{itemize}
 \end{itemize}
 
-The control flow guarantees make sure code cannot jump to a point half-way a generated instruction to skip run-time checks, or to anywhere in the VM except through the proper entry points defined by the VM. As in normal Java, the bytecode instructions in CapeVM can only modify state within the virtual machine. There are no special instructions to access sensors and actuators as in for example Maté. Thus, access to external resources is assumed to happen through calls to natively implemented library functions, which returns control to VM and allows it to check whether the application has permission to do so.
+The control flow guarantees make sure code cannot jump to a point half-way a generated instruction to skip run-time checks, or to anywhere in the VM except through the proper entry points defined by the VM. As in normal Java, the bytecode instructions in CapeVM can only modify state within the virtual machine. There are no special instructions to access sensors and actuators as in, for example, Maté. Thus, access to external resources is assumed to happen through calls to natively implemented library functions, which returns control to VM and allows it to check whether the application has permission to do so.
 
 Clearly, the VM will be in a legal state when a programme starts: the VM will jump to the begining of the first instruction and no writes will have occured yet. We will show the checks in Table \ref{tbl-safety-checks} are sufficient to ensure these two constraints, by examining how each bytecode instruction can affect control flow and write to memory, and list the checks necessary to ensure the VM is still in a legal state after executing each instruction. Both guarantees depend on each other: memory safety is assumed when discussing control flow safety and vice versa.
 
-Each method in CapeVM has a small \emph{method header} defining properties such as the maximum stack size, number of local variables, return type, etc. The VM uses this header to create the stack frame, and to determine the effects of a call to the method on the caller's operand stack. Therefore, many of the checks are to ensure the implementation of the method follows the contract established in the method header. When the node receives new code, it first receives the headers for all methods, followed by their implementations, so the contracts for all methods are known when the bytecode is translated.
+Each method in CapeVM has a small \emph{method header} defining properties such as the maximum stack size, number of local variables, return type, etc. The VM uses this header to create the stack frame, and to determine the effects of a call to a method on the caller's operand stack. Therefore, many of the checks are to ensure the implementation of the method follows the contract established in the method header. When the node receives new code, it first receives the headers for all methods, followed by their implementations, so the contracts for all methods are known when the bytecode is translated.
 
 The first check is a basic sanity check on the data in the method headers (\ref{chk-method-header-is-sane}). Since each parameter becomes a local variable, the number of local variable slots must be at least as high as the number of parameters, and the total number of slots must be at least as high as the method's own local variable slots, while the rest may be used for lightweight methods. Finally, a method cannot be marked static and abstract at the same time.
 
@@ -71,17 +71,17 @@ The state is correct at the start of the programme, since the VM will start it b
 \subsection{Simple instructions}
 Starting with the last category: most instructions such as math operations, loads and stores, are translated to a sequence of native instructions that will be executed top to bottom. In some cases this may call to a VM or \mycode{libc} function to perform some complex operation, but these calls return to the current instruction once the operation is complete.
 
-For this category, the generated code will flow naturally into the start of the next generated instruction. This is means the control flow constraint would be broken if there \emph{is no} next instruction, which produces the second translation-time check, \ref{chk-return-or-goto-at-end-of-method}: the last instruction in a method must be a \mycode{RETURN} or \mycode{GOTO} to prevent control from flowing out of the method body.
+For this category, the generated code will naturally flow into the start of the next generated instruction. This is means the control flow constraint would be broken if there \emph{is no} next instruction, which produces the second translation-time check, \ref{chk-return-or-goto-at-end-of-method}: the last instruction in a method must be a \mycode{RETURN} or \mycode{GOTO} to prevent control from flowing out of the method body.
 
 \subsection{Branch instructions}
 In CapeVM bytecode, branches do not target an offset as in normal JVM bytecode, but the id of a branch target. These targets are marked with \mycode{BRTARGET} instructions, which do not emit any code, but cause the AOT compiler to collect the address in a temporary table during translation. Once the whole method is translated, this temporary table is used to patch the correct target address into the branch instructions.
 
-Each method announces the number of branch targets that will be used in the method header. Non-taken branches flow into the next instruction because \ref{chk-return-or-goto-at-end-of-method} guarantees they are not the last instruction in a method. To ensure a taken branch will branch to the start of a correct instruction within the method, two checks are needed: the target ID of each branch must be lower than number of branch targets announced in the method header (\ref{chk-brtarget-exists}), and at the end of the method the number of \mycode{BRTARGET} instructions encountered must be equal to the number announced in the header (\ref{chk-all-brtargets-found}). The first guarantees each branch refers to an entry in the temporary table, while the second guarantees all entries are filled with a valid address.
+Each method announces the number of branch targets that will be used in the method header. Non-taken branches flow into the next instruction because \ref{chk-return-or-goto-at-end-of-method} guarantees they are not the last instruction in a method. To ensure a taken branch will branch to the start of a correct instruction within the method, two checks are needed: the target ID of each branch must be lower than number of branch targets announced in the method header (\ref{chk-brtarget-exists}), and at the end of the method the number of \mycode{BRTARGET} instructions encountered must be equal to the number announced in the header (\ref{chk-all-brtargets-found}). The first guarantees each branch refers to an entry within the temporary table, while the second guarantees all entries are filled with a valid address.
 
 \subsection{Method invocation instructions}
 There are three kinds of method invocations.
 
-For lightweight method calls, the implementation of the target method is required to come before any method invoking it, to ensure the address of the target is known at translation time and we can directly generate a \mycode{CALL} to the method. Ensuring this calls to a correct address is therefore trivial: for \mycode{INVOKELIGHT} instructions, the implementation of the target method must already have been generated (\ref{chk-invokelight-target-found}).
+For lightweight method calls, the implementation of the target method is required to come before any method invoking it, to ensure the address of the target is known at translation time and the VM can directly generate a \mycode{CALL} to the method. Ensuring this calls to a correct address is therefore trivial: for \mycode{INVOKELIGHT} instructions, the implementation of the target method must already have been generated (\ref{chk-invokelight-target-found}).
 
 For static calls (\mycode{INVOKESTATIC} and \mycode{INVOKESPECIAL}) the target method is known at translation time, but it may not have been translated yet if the implementation follows later in the infusion. For these instructions, a \mycode{CALL} to the VM's \mycode{callMethod} function is generated, passing the id of the target method as a parameter. At run time this id will be used as an index in the method table to find its implementation. Because the VM receives all the method headers before translating their implementations, it can check at translation time that the method id is known (\ref{chk-invokestatic-target-header-found}). Since the VM will not start an application before all methods are translated, this guarantees that \mycode{callMethod} will find the target at run time.
 
@@ -175,7 +175,7 @@ Local variables are accessed as an offset from the Y register, which is under co
 Local variables are written to using the \mycode{STORE} instructions. Each \mycode{STORE} instruction contains the index of the local variable slot to write to, so the VM only needs to check at translation time that the index of the local is within the range announced in the method header to guarantee it writes to a valid location (\ref{chk-local-variable-slot-exists}).
 
 \subsection{\mycode{PUTSTATIC}}
-Static variables are allocated globally at the start of the application based on number of static variables in the \emph{infusion} header. The \mycode{PUTSTATIC} instruction contains the id of an infusion, and the index of the target static variable slot. At translation time, the VM checks the referenced infusion exists (\ref{chk-static-variable-infusion-exists}), and the index is within the legal range (\ref{chk-static-variable-slot-exists}) for that infusion.
+Static variables are allocated globally before the application is started, based on number of static variables in the \emph{infusion} header. The \mycode{PUTSTATIC} instruction contains the id of an infusion, and the index of the target static variable slot. At translation time, the VM checks the referenced infusion exists (\ref{chk-static-variable-infusion-exists}), and the index is within the legal range (\ref{chk-static-variable-slot-exists}) for that infusion.
 
 \subsection{\mycode{NEW}, \mycode{PUTFIELD} and \mycode{PUTARRAY}}
 \label{sec-safety-heap-access}
@@ -230,23 +230,23 @@ In some cases it may be possible to verify these operations at translation time,
 
 The VM stores the bounds of the heap in two variables: \mycode{heap_lo_bound} and \mycode{heap_hi_bound} as shown in Figure \ref{fig-memlayout}. Each heap access instruction calculates the address to write to in the ATmega's Z register. Just before the write to the heap, the VM inserts a \mycode{CALL} to the \mycode{heapcheck} function shown in Listing \ref{lst-heap-bounds-check}. This function checks the address in Z is within these bounds. If not, it jumps to the \mycode{illegal_access_handler}, allowing the VM to terminate the application. This adds 22 cycles overhead for each array or object write, and 4 bytes code size overhead for the \mycode{CALL} instruction.
 
-The actual write to the heap is often done by an offset from Z using the AVR's \mycode{STD}, or 'store indirect with displacement' instruction, that allows writes to a fixed offset of at most 63 bytes from Z. For example, to write to object fields who's offset within the object is known at translation time, the VM simply loads the object's address into Z and uses \mycode{STD} to write to the correct offset.
+The actual write to the heap is often done by an offset from Z using the ATmega's \mycode{STD}, or 'store indirect with displacement' instruction, that allows writes to a fixed offset of at most 63 bytes from Z. For example, to write to object fields who's offset within the object is known at translation time, the VM simply loads the object's address into Z and uses \mycode{STD} to write to the correct offset.
 
-This means the write target could an address at most 63 bytes above the end of the heap. One way to prevent this is to avoid the \mycode{STD} instruction, and instead use the \mycode{ADIW} instruction to first add the offset to Z and then use the normal \mycode{ST} instruction to store without displacement. However, this would add an overhead of 2 bytes and 2 cycles. Instead we reuse the same small safety margin mentioned in Section \ref{sec-control-flow-safety-return-instructions} for check \ref{chk-no-nativestack-overflow}. Reusing the same margin for both cases is safe because the VM can never write to a heap object and execute a function in the VM or \mycode{libc} at the same time.
+This means the write could target an address at most 63 bytes above the end of the heap. One way to prevent this is to avoid the \mycode{STD} instruction, and instead use the \mycode{ADIW} instruction to first add the offset to Z and then use the normal \mycode{ST} instruction to store without displacement. However, this would add an overhead of 2 bytes and 2 cycles. Instead we reuse the same small safety margin mentioned in Section \ref{sec-control-flow-safety-return-instructions} for check \ref{chk-no-nativestack-overflow}. Reusing the same margin for both cases is safe because the VM can never write to a heap object and execute a function in the VM or \mycode{libc} at the same time.
 
 \paragraph{Alternatives}
 We considered several alternative implementations for \mycode{heapcheck}. Since the \mycode{CALL} and \mycode{RET} instructions are expensive, 7 cycles can be saved by inlining the check instead of calling it. However, this increases the code size overhead from 4 bytes to over 30 bytes, which we consider too high.
 
 If the top and bottom boundaries of the heap are aligned at 256 bytes, this eliminates the need to check the lower byte of the Z register. This saves 6 of the 22 cycles, but wastes RAM since some bytes below and above the heap would have to remain unused. Since RAM is such a scarce resource and the performance gain is limited, we decided against this.
 
-Finally, 8 cycles can be saved by keeping the bounds in registers instead of memory, which removes the need for the \mycode{LDS} instructions. However this reduces the performance of the stack cache since these registers would not be available for stack caching. Which of these affects performance more depends on the code being executed. We evaluate the difference in Section \ref{sec-evaluation-run-time-cost}. Since having the bounds in registers is more complex to implement, thus increasing VM size, we choose to keep the bounds in registers.
+Finally, 8 cycles can be saved by keeping the bounds in registers instead of memory, which removes the need for the \mycode{LDS} instructions. However this reduces the performance of the stack cache since these registers would not be available for stack caching. Which of these affects performance more depends on the code being executed. We evaluate the difference in Section \ref{sec-evaluation-run-time-cost}. Since having the bounds in registers is more complex to implement, thus increasing VM size, we choose to keep the bounds in memory.
 
 \paragraph{Heap corruption}
 Since the garbage collector compacts the heap when it frees any memory, the heap is always split into an in-use part and a free part. A pointer in the VM points to the first free byte. This pointer is moved forward when memory is allocated, and moved backward when the garbage collector compacts the heap.
 
 The in-use part of the heap is made up of chunks, which have a small header indicating their size. The heap access check only verifies a write is to an address within the heap, but not that the address is a correct address within the target object. Code may still corrupt parts of the heap, including these heap headers.
 
-This does not break the safety guarantees since these heap headers are not used until control is returned to the VM. The headers are only used by the garbage collector, so before the garbage collector starts, the VM checks the intergrity of the heap headers (\ref{chk-gc-heap-integrity}), which must form a consistent chain of chunks ending at the first free byte.
+This does not break the safety guarantees since these heap headers are not used until control is returned to the VM. The headers are only used by the garbage collector, so before the garbage collector starts, the VM checks the intergrity of the heap headers (\ref{chk-gc-heap-integrity}), which must form a consistent chain of chunks, ending at the first free byte.
 
 
 
@@ -262,7 +262,7 @@ This does not break the safety guarantees since these heap headers are not used 
     \midrule
     \midrule
     Safety checks added/verified at             & The node                                    & The host \\
-    Protects                                    & The VM                                      & The VM and application \\
+    Protects                                    & The VM                                      & The VM and the application \\
     Protects against malicious code             & Yes                                         & No \\
     Detects certain programming errors          & No, but could be added                      & Yes \\
                                                 & ~~~ at a cost                               & \\
@@ -301,11 +301,9 @@ In addition to safety, \emph{t-kernel} \cite{Gu:2005un, Gu:2006ww} also provides
 \paragraph{OS control and control flow safety}
 OS control is defined as the ability of the OS to take control of the CPU. The authors note that
 
-\begin{displayquote}
-“Traditionally, the CPU control is guaranteed by privilege support and clock interrupts. However, many microcontrollers used by sensor nodes do not have privilege support. The application can disable interrupts and occupy the CPU for an arbitrarily long time.”
-\end{displayquote}
+\begin{displayquote}“Traditionally, the CPU control is guaranteed by privilege support and clock interrupts. However, many microcontrollers used by sensor nodes do not have privilege support. The application can disable interrupts and occupy the CPU for an arbitrarily long time.”\end{displayquote}
 
-To implement its virtual memory features and safety guarantees, \emph{t-kernel} extensively rewrites, or \emph{naturalizes}, the application's binary code at run time, on demand, one 256-byte page at a time. As a result, addresses in the original binary, do not match the physical addresses in the naturalized pages. This is solved by replacing all branching instructions, including calls, returns, etc, with calls back to the kernel, which then looks up the corresponding physical address.
+To implement its virtual memory features and safety guarantees, \emph{t-kernel} extensively rewrites, or \emph{naturalizes}, the application's binary code at run time, on demand, one 256-byte page at a time. As a result, addresses in the original binary do not match the physical addresses in the naturalized pages. This is solved by replacing all branching instructions, including calls, returns, etc, with calls back to the kernel, which then looks up the corresponding physical address.
 
 This causes a slowdown of up to 30x. To reduce this overhead, these calls back to the kernel are replaced with a direct jump after the first transition occurs for forward branches. Backward branches are replaced with code that first increment an 8-bit counter, and calls back to the kernel when this reaches zero. This guarantees the kernel gets back control at least once for every 256 backward branches, without depending on a timer, but at the cost of a slight overhead. Control flow safety is not explicitly discussed, but is guaranteed by the same mechanism. Since each branch targets a virtual address, which is translated to a physical address by the kernel, the kernel can ensure the physical address is correct.
 
@@ -338,11 +336,11 @@ Function returns could also be used to jump to an arbitrary location if the retu
 \paragraph{Memory safety}
 Memory safety in Harbor differs significantly from CapeVM. The entire address space is split into fixed sized blocks, each of which can be assigned to a module. A memory map keeps track of the ownership of each block.
 
-Harbor supports multiple modules, and both the block size and the maximum number of modules are parameters that can be changed. The overhead for storing the memory map is 256 bytes for an 8-byte block size and maximum of 8 modules, which are the defaults used in the paper. Using only 2 modules, which is sufficient to isolate the OS and the application, this is reduced to 128 bytes. Increasing the block size will also reduce the size of the memory map, but at the cost of greater fragmentation.
+Harbor supports multiple modules, and both the block size and the maximum number of modules are parameters that can be changed. The overhead for storing the memory map is 256 bytes for an 8-byte block size and maximum of 8 modules, which are the defaults used in the paper. Using only 2 modules, which is sufficient to isolate the OS from the application, this is reduced to 128 bytes. Increasing the block size will also reduce the size of the memory map, but at the cost of greater fragmentation.
 
 All memory writes are preceded by a call to the \mycode{write_access_check} function, which checks the current module has permission to write to the target address. This imposes a run-time overhead of 65 cycles per write.
 
-CapeVM only needs a run-time check for writes to the heap, while Harbor checks \emph{all} writes, including local variables. This, combined with Harbor's more expensive \mycode{write_access_check} function, suggest its overhead will be significantly larger than CapeVM's.
+CapeVM only needs a run-time check for writes to the heap, while Harbor checks \emph{all} writes, including local variables. This, combined with Harbor's more expensive \mycode{write_access_check} function, suggests its overhead will be significantly larger than CapeVM's.
 
 \paragraph{Verifier}
 Although Harbor's safety checks are added on the host, the correctness of the system only depends on the verifier running on the node. This verifier is a relatively small and simple component.

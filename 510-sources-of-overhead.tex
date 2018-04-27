@@ -11,7 +11,7 @@ The performance and code size of the baseline approach still suffers from a larg
 	\item Method call overhead
 \end{itemize}
 
-We will briefly discuss each source below, before introducing optimisations to reduce it.
+We will briefly discuss each source below, before introducing optimisations to reduce the overhead.
 
 \subsection{Lack of optimisation in \mycode{javac}}
 A first source of overhead comes from the fact that the standard \mycode{javac} compiler does almost no optimisations.  Since the JVM is an abstract machine, there is no clear performance model to optimise for. Run-time performance depends greatly on the target platform and the VM implementation running the bytecode, which are unknown when compiling Java source code to JVM bytecode. The \mycode{javac} compiler simply compiles the code 'as is'. For example, the loop 
@@ -20,9 +20,9 @@ A first source of overhead comes from the fact that the standard \mycode{javac} 
 
 \noindent will evaluate '\mycode{b*c}' on each iteration, while it is clear that the result will be the same every time.
 
-In most environments this is not a problem because the bytecode is usually compiled to native code before execution, and using knowledge of the target platform and the run-time behaviour, a desktop JIT compiler can make much better decisions than \mycode{javac}. However, since our AOT compiler simply replaces each instruction with a native equivalent, this leads to significant overhead in our VM.
+In most environments this is not a problem because the bytecode is often compiled to native code before execution, and using knowledge of the target platform and the run-time behaviour, a desktop JIT compiler can make much better decisions than \mycode{javac}. However, since our AOT compiler simply replaces each instruction with a native equivalent, this leads to significant overhead in our VM.
 
-We do use the ProGuard optimiser \cite{proguard}, but this only does very basic optimisations such as method inlining and dead code removal, and does not cover cases such as the example above.
+We do use the ProGuard optimiser \cite{proguard}, but this only does very basic optimisations such as method inlining and dead code removal, and does not cover cases like the example above.
 
 \subsection{AOT translation overhead}
 \label{sec-overhead-aot-translation}
@@ -45,9 +45,7 @@ A second example is arrays of constant data. Since the JVM has no concept of con
 \subsection{Method call overhead}
 \label{sec-overhead-method-call}
 The final source of overhead comes from method calls. In the JVM, each method has a stack frame (or 'activation frame') which the language specification describes as
-\begin{displayquote}
-"containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked and any other bookkeeping information that may be required by the implementation (stack pointer, programme counter, reference to previous activation frame, and the like)" \cite{Gosling:2014}
-\end{displayquote}
+\begin{displayquote}“containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked and any other bookkeeping information that may be required by the implementation (stack pointer, programme counter, reference to previous activation frame, and the like)” \cite{Gosling:2014}\end{displayquote}
 
 CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-layout}. Initialising this complete structure is significantly more work than a native C function call has to do, which may not need a stack frame at all if all the work can be done in registers. Below we list the steps CapeVM goes through to invoke a Java method:
 

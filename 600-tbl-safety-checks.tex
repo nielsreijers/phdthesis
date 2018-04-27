@@ -26,7 +26,7 @@
         & Branch instructions branch to an index < the number of \mycodetbl{BRTARGET}s announced in the method header. \\
 
     \tcheck{chk-all-brtargets-found}
-        & At the end of each method, we have seen the exact number of \mycodetbl{BRTARGET} instructions announced in the method header. \\
+        & At the end of each method, the number of \mycodetbl{BRTARGET} instructions encountered is equal to the number announced in the method header. \\
 
     \tcheck{chk-invokelight-target-found}
         & The target for an \mycodetbl{INVOKELIGHT} call is already translated, so the target address is known. \\
@@ -35,7 +35,7 @@
         & The target method header for an \mycodetbl{INVOKESTATIC}/\mycodetbl{INVOKESPECIAL} exists. \\
 
     \tcheck{chk-stack-is-empty-after-return} \tnote{a}
-        & After popping the return value, the stack is empty. \\
+        & After popping a method's return value, the stack is empty. \\
 
     \tcheck{chk-sufficient-stack-space-at-invokelight} \tnote{a}
         & At each \mycodetbl{INVOKELIGHT} instruction, the max stack of the caller >= the current stack depth - the number of arguments to the callee + the max stack of the callee. \\
@@ -50,16 +50,16 @@
         & The stack is empty at branches and branch targets. \\
 
     \tcheck{chk-sufficient-locals-at-invokelight}
-        & For each \mycodetbl{INVOKELIGHT}, the total number of variable slots - the number of own variable slots for the caller >= the total variable slots for the callee. \\
+        & For each \mycodetbl{INVOKELIGHT}, the total number of variable slots - the number of own variable slots for the caller >= the total number of variable slots for the callee. \\
 
     \tcheck{chk-local-variable-slot-exists}
-        & The index of the local variable < the number of own variable slots for the current method. \\
+        & The index of each local variable < the number of own variable slots for the current method. \\
 
     \tcheck{chk-static-variable-infusion-exists}
-        & The target infusion of a static variable access exists. \\
+        & The target infusion of each static variable access exists. \\
 
     \tcheck{chk-static-variable-slot-exists}
-        & The index of the static variable < the number of static variable slots for the target infusion. \\
+        & The index of each static variable < the number of static variable slots for the target infusion. \\
 
     \midrule
     & Run-time checks \\
