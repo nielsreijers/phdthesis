@@ -9,7 +9,7 @@ To come back to the research questions stated in Section \ref{sec-introduction-r
 
 	The optimisations introduced by CapeVM do increase the size of the VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node.
 
-	The price to pay for platform independence and a safe execution environment comes in three forms. There is still a performance overhead, but it is at a level that will be acceptable for many applications. The increase in code size however, and the space taken by the VM, do limit the size of applications we can load onto a device. Finally, the overhead in memory usage is a problem for programmes allocating many small objects.
+	The price to pay for platform independence and a safe execution environment comes in three forms. There is still a performance overhead, but it is at a level that will be acceptable for many applications. The increase in code size however, and the space taken by the VM, do limit the size of applications that can be loaded onto a device. Finally, the overhead in memory usage is a problem for programmes allocating many small objects.
 
 	\item[b.]
 	CapeVM's second contribution is providing a safe execution environment. Compared to native binary code, the higher level of abstraction of CapeVM's bytecode allowed us to develop a relatively simple set of safety checks.
@@ -21,7 +21,7 @@ To come back to the research questions stated in Section \ref{sec-introduction-r
 	\item[c.]
 	Regarding the question of whether Java is a suitable language for a sensor node VM, we can conclude some aspects of it are a good match. An advantage of its simple stack-based instruction set is that it can be implemented in a small VM, and while we showed the stack-based architecture introduces significant overhead, most of this overhead is eliminated by our optimisations.
 	
-	However, our benchmarks also exposed several problems that ultimately make standard Java a poor choice. Specifically, the lack of support for constant data, and the inefficient use of memory for programmes containing many small objects meant some benchmarks could not be ported directly from C to Java. We proposed several improvements, and developed an extension to allow constant data to be put in flash memory, but conclude that more work is necessary to come to a more sensor node specific language and make sensor node VMs truly useful in a wide range of real-world projects.
+	However, the benchmarks also exposed several problems that ultimately make standard Java a poor choice. Specifically, the lack of support for constant data, and the inefficient use of memory for programmes containing many small objects meant some benchmarks could not be ported directly from C to Java. We proposed several improvements, and developed an extension to allow constant data to be put in flash memory, but conclude that more work is necessary to come to a more sensor node specific language and make sensor node VMs truly useful in a wide range of real-world projects.
 \end{enumerate}
 
 \input{900-tbl-comparison-to-related-work}

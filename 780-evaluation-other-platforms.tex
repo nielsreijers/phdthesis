@@ -1,17 +1,17 @@
 \section{Expected perfomance on other platforms}
 \label{sec-evaluation-other-platforms}
-Platform independence is one of the main advantages of using a VM. The ATmega family of CPUs is widely used in low power embedded systems, and we implemented our VM for the popular ATmega128 CPU. However, the approach described in this dissertation does not depend on any ATmega specific properties and can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers for stack caching.
+Platform independence is one of the main advantages of using a VM. The ATmega family of CPUs is widely used in low power embedded systems, and we implemented our VM for the popular ATmega128 CPU. However, the techniques described in this dissertation does not depend on any ATmega specific properties and can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers for stack caching.
 
-While it is impossible to determine exactly what the resulting performance would be on different platforms without porting the VM, we present some results here that indicate it is likely to be slightly worse than the results we see on the ATmega.
+While it is impossible to determine exactly what the resulting performance would be on different platforms without porting the VM, this section presents some results that indicate it is likely to be slightly worse than the results seen on the ATmega.
 
 Two important parameters that influence performance are the number of available registers and the size of the registers. Table \ref{tbl-ATmega-msp430-m0-registers} lists these parameters for the ATmega, and two other common families of embedded CPUs, the Texas Instruments MSP430 and ARM Cortex-M0. These CPUs are similar in many ways, including the amount of RAM and flash memory typically available, but differ in the number of registers and word size.
 
 \begin{table}
-\caption{Number or registers and word size for the ATmega, MSP430, and Cortex M0}
+\caption{Number or registers and word size for the ATmega, MSP430, and Cortex-M0}
 \label{tbl-ATmega-msp430-m0-registers}
     \begin{tabular}{lrrr} % NO SIMULATION DATA
     \toprule
-                                           & ATmega       & MSP430     & Cortex M0 \\
+                                           & ATmega       & MSP430     & Cortex-M0 \\
                                            & \cite{Atmel:ATmega128Datasheet, Atmel:AVRInstructionSetManual}
                                            & \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet, TexasInstrumentsIncorporated:MSP430x1xxUsersGuide}
                                            & \cite{ARM:2009vz} \\
@@ -35,13 +35,13 @@ Two important parameters that influence performance are the number of available 
 
 \input{780-tbl-evaluation-cachesize-performance}
 
-The ATmega has 32 8-bit registers available, which are managed as 16 pairs since the VM stores data in 16-bit slots. Looking at the MSP430, it only has 12 registers, but they are 16-bit. 5 register pairs are reserved on the ATmega, leaving 11 pairs available for stack caching. Assuming the same can be achieved by reserving 5 16-bit registers on the MSP430, 7 registers will be available to the stack cache.
+The ATmega has 32 8-bit registers, which are managed as 16 pairs since the VM stores data in 16-bit slots. Looking at the MSP430, it only has 12 registers, but they are 16-bit. 5 register pairs are reserved on the ATmega, leaving 11 pairs available for stack caching. Assuming the same can be achieved by reserving 5 16-bit registers on the MSP430, 7 registers will be available to the stack cache.
 
-To evaluate the effect of a smaller number of registers on the stack cache, all benchmarks were run while restricting the number of registers the cache manage may use. Since the VM needs a minimum of 4 pairs to implement all instructions, we vary the number of register pairs from 4 to 11.
+To evaluate the effect of a smaller number of registers on the stack cache, all benchmarks were run while restricting the number of registers the cache manage may use. Since the VM needs a minimum of 4 pairs to implement all instructions, the number of register pairs is varied from 4 to 11.
 
 The results are shown in Figure \ref{fig-performance-per-opcode-category-per-cachesize} and Table \ref{tbl-performance-per-opcode-category-per-cachesize}. As is common with caching techniques, the first few registers have the most impact, with half of the overhead reduction already realised when adding the first two additional register pairs. Ignoring all other difference for the moment, the effect of reducing the number of register pairs from 11 to 7 is an increase in overhead by 21.4\%, to 88.4\%.
 
-The Cortex M0 has one general purpose register more than the MSP430, and at 8 register pairs the overhead drops to 80.1\%. In addition, the M0's registers are 32-bit, which means in cases where mostly 32-bit values are used, the cache size is effectively doubled since values can be stored in a single register instead of two pairs of 8-bit registers.
+The Cortex-M0 has one general purpose register more than the MSP430, and at 8 register pairs the overhead drops to 80.1\%. In addition, the M0's registers are 32-bit, which means in cases where 32-bit values are used, the cache size is effectively doubled since values can be stored in a single register instead of two pairs of 8-bit registers.
 
 A final interesting thing to note in Figure \ref{fig-performance-per-opcode-category-per-cachesize} is the fact that increasing the cache size mostly reduces the load/store overhead. Using only 4 pairs, stack caching has already removed most of the push/pop overhead, which only drops slightly when more registers are used. However, these extra registers reduce load/store overhead significantly since more registers are available for the markloop optimisation, and using more registers increases the chance that an old, popped value may still be present, allowing popped value caching to eliminate more loads.
 
@@ -67,7 +67,7 @@ Taking \mybench{bubble sort} as an example, both versions do the same number of 
 
 This effect is even clearer for more complex operations like multiplication. 16x16 to 16-bit multiplication can be implemented in a few instructions and only takes 10 cycles on the ATmega. 32x32 to 32-bit multiplication is implemented by calling \mycode{avr-gcc}'s \mycode{__mulsi3} function, and takes 85 to 100 cycles.
 
-Thus, working with 16-bit or 32-bit data on an 8-bit CPU helps the VM's relative performance by introducing a larger common component that both C and AOT compiled versions have to execute. On the MSP430 or Cortex M0, that operate on 16-bit or 32-bit values in a single step, this effect will be reduced or eliminated. The exact impact of this is hard to estimate, but it is likely to be in the order of tens of percents extra overhead.
+Thus, working with 16-bit or 32-bit data on an 8-bit CPU helps the VM's relative performance by introducing a larger common component that both C and AOT compiled versions have to execute. On the MSP430 or Cortex-M0, that operate on 16-bit or 32-bit values in a single step, this effect will be reduced or eliminated. The exact impact of this is hard to estimate, but it is likely to be in the order of tens of percents extra overhead.
 
 In Table \ref{tbl-performance-8-16-32-bit} we see the \mybench{outlier detection} and \mybench{binary search} benchmarks perform worse for 32-bit data compared to 16-bit data. This is due to a mismatch between the infuser and ProGuard. In JVM bytecode, local variables are stored in 32-bit slots. The code generated by \mycode{javac} uses a separate slot for each variable, but ProGuard attempts to reduce memory consumption by mapping multiple variables to the same slot if their live ranges do not overlap. The infuser processes the ProGuard optimised code, as shown in Figure \ref{fig-translation-process}, and replaces the JVM's 32-bit operations by 16-bit versions where possible. In the 32-bit \mybench{outlier detection} benchmark, ProGuard mapped a 32-bit and 16-bit variable to the same slot, which prevents the infuser from using the cheaper 16-bit operations for this variable. This once again highlights the need for a unified, optimising compiler, combining the tasks of \mycode{javac}, ProGuard and the infuser.
 
