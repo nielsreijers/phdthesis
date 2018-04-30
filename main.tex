@@ -17,11 +17,13 @@
 \usepackage{pdflscape}
 \usepackage{enumitem}
 \usepackage{caption}
+\usepackage{chngcntr}
 \usepackage[outputdir=.texpadtmp]{minted}
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{2 on 1}[a4paper,border shrink=-8mm,landscape]
 \setminted{frame=lines,linenos=true,baselinestretch=1,fontsize=\scriptsize}
 \setmonofont{Courier}
+\counterwithin{listing}{chapter}
 
 %%%%%%%%%%%% MY COMMANDS
 \newcommand{\sccomment}[1] { \emph{ << #1 >> } }
