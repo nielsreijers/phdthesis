@@ -6,7 +6,7 @@ Now that we have good quality bytecode to work with, we can start addressing the
 \label{sec-improved-peephole}
 \input{531-tbl-optimisations-improved-peephole}
 
-Our first optimisation is a small but effective extension to the simple peephole optimiser. Instead of optimising only consecutive push/pop pairs, we can optimise any pair of push/pop instructions if the following holds for the instructions in between:
+The first optimisation is a small but effective extension to the simple peephole optimiser. Instead of optimising only consecutive push/pop pairs, any pair of push/pop instructions can be optimised if the following holds for the instructions in between:
 %\begin{itemize}
 %   \item they contain the same number of \mycode{push} and \mycode{pop} instructions (the \mycode{pop} matches the \mycode{push})
 %   \item they contain no branches
@@ -35,7 +35,7 @@ In this case the pair can be eliminated if Rs == Rd, otherwise it is replaced by
 
 The improved peephole optimiser can remove part of the type 1 overhead, but still many cases remain where it cannot eliminate the push/pop instructions. We use a form of stack caching \cite{Ertl:1995dv} to eliminate most of the remaining push/pop overhead.
 
-Stack caching is not a new technique. It was originally proposed for Forth interpreters in 1995. But the trade-offs involved are very different depending on the scenario it is applied in, and it turns out to be exceptionally well suited for a sensor node AOT compiler:
+Stack caching is not a new technique. It was originally proposed for Forth interpreters in 1995. But the trade-offs involved are very different depending on the scenario it is used in, and it turns out to be exceptionally well suited for a sensor node AOT compiler:
 
 First, the VM in the original paper is an interpreter, which means the stack cache has to be very lightweight, otherwise the overhead from managing it at run time will outweigh the time saved by reducing memory accesses. Since the AOT compiler only needs to keep track of the cache state at translation time, it can afford to spend more time managing the cache. Second, the simplicity of the approach means it requires very little memory: only 11 bytes of RAM and less than 1 KB of code more than the peephole optimiser.
 
@@ -43,9 +43,9 @@ The basic idea of stack caching is to keep the top elements of the stack in regi
 
 In the baseline AOT approach, each bytecode instruction maps to a fixed sequence of native instructions that always use the same registers. Using stack caching, the registers are controlled by a stack cache manager that provides three functions:
 \begin{itemize}
-    \item \mycode{sc_getfree}: Instructions such as load instructions need a free register to load the value into, which will later be pushed onto the stack. If all registers are in use, \mycode{sc_getfree} spills the register that's lowest on the stack to memory by emitting a \mycode{PUSH}, and then returns that register. Thus, the top of the stack is kept in registers, while lower elements may be spilled to memory.
+    \item \mycode{sc_getfreereg}: Instructions such as load instructions need a free register to load the value into, which will later be pushed onto the stack. If all registers are in use, \mycode{sc_getfreereg} spills the register that's lowest on the stack to memory by emitting a \mycode{PUSH}, and then returns that register. Thus, the top of the stack is kept in registers, while lower elements may be spilled to memory.
     \item \mycode{sc_pop}: Pops the top element off the stack and tells the code generator in which register it can be found. If stack elements have previously been spilled to main memory and no  elements are left in registers, \mycode{sc_pop} will emit a real \mycode{POP} instruction to get the value back from memory.
-    \item \mycode{sc_push}: Updates the cache state so the passed register is now at the top of the stack. This should be a register that was previously returned by \mycode{sc_getfree}, or \mycode{sc_pop}.
+    \item \mycode{sc_push}: Updates the cache state so the passed register is now at the top of the stack. This should be a register that was previously returned by \mycode{sc_getfreereg}, or \mycode{sc_pop}.
 \end{itemize}
 
 Using stack caching, code generation is split between the code generator, which emits the instructions that do the actual work, and the cache manager which manages the registers and may emit code to spill stack elements to memory, or to retrieve them again. But as long as enough registers are available, it will only manipulate the cache state.
@@ -64,7 +64,7 @@ This may seem bad for performance, but fortunately the stack is empty at almost 
 
 Stack caching can eliminate most of the push/pop overhead, even when the stack depth increases. We now turn our attention to reducing the overhead resulting from load and store instructions.
 
-A \emph{value tag} is added to each register's cache state to keep track of what value is currently held in the register, after it is popped from the stack. Some bytecode instructions have a value tag associated with them to indicate which value or variable they load, store, or modify. Each tag consist of a tuple (type, datatype, number). For example, the instructions \mycode{ILOAD_0} and \mycode{ISTORE_0}, which load and store the local integer variable with id 0, both have tag LI0, short for (local, int, 0). \mycode{SCONST_1} has tag CS1, or (constant, short, 1), etc. These tags are encoded as a 16-bit value.
+A \emph{value tag} is added to each register's cache state to keep track of what value is currently held in the register, even after it is popped from the stack. Some bytecode instructions have a value tag associated with them to indicate which value or variable they load, store, or modify. Each tag consist of a tuple (type, datatype, number). For example, the instructions \mycode{ILOAD_0} and \mycode{ISTORE_0}, which load and store the local integer variable with id 0, both have tag LI0, short for (local, int, 0). \mycode{SCONST_1} has tag CS1, or (constant, short, 1), etc. These tags are encoded as a 16-bit value.
 
 The cache manager is extended with a \mycode{sc_can_skip} function. This function will examine the type of each instruction, its value tag, and the cache state. If it finds that the instruction loads a value that is already present in a register, it updates the cache state to put that register on the stack, and returns true to tell the main loop to skip code generation for this instruction.
 
@@ -72,7 +72,7 @@ Table \ref{tbl-poppedvaluecaching} shows popped value caching applied to our exa
 
 In bytecode instruction 5, we need to load LS0 again, but now the cache state shows that LS0 is already in R1. This means it does not need to be loaded from memory, but the cache manager can just update the cache state so that R1 is pushed onto the stack. At run time this \mycode{SLOAD_0} will have no cost at all.
 
-There are a few more details to get right. If a value is loaded that's already on the stack, a move is emitted to copy it. When \mycode{sc_getfree} is called, it will try to return a register without a value tag. If none are available, the least recently used register is returned. This is done to maximise the chance we can reuse a value later, since recently used values are more likely to be used again.
+There are a few more details to get right. If a value is loaded that's already on the stack, a move is emitted to copy it. When \mycode{sc_getfreereg} is called, it will try to return a register without a value tag. If none are available, the least recently used register is returned. This is done to maximise the chance we can reuse a value later, since recently used values are more likely to be used again.
 
 \paragraph{Branches} As we do not know the state of the registers if an instruction is reached through a branch, we have to clear all value tags when we pass a \mycode{BRTARGET} instruction, meaning that any new loads will have to come from memory. At branches we can keep the value tags, because if the branch is not taken, the state of the registers in the next instruction is known.
 
@@ -82,7 +82,7 @@ There are a few more details to get right. If a value is loaded that's already o
 
 Popped value caching reduces the type 2 overhead significantly, but the fact that we have to clear the value tags at branch targets means that a significant part of this overhead still remains. This is particularly true for loops, since each iteration often uses the same variables, but the branch to start the next iteration clears those values from the stack cache. This is addressed by the next optimisation.
 
-Again, the infuser is modified to add a new instruction to the bytecode: \mycode{MARKLOOP}. This instruction is used to mark the beginning and end of each innermost loop. \mycode{MARKLOOP} has a larger payload than most bytecode instructions: it contains a list of value tags that will appear in the loop and the number of times each tag appears, sorted in descending order.
+Again, the infuser is modified to add a new instruction to the bytecode: \mycode{MARKLOOP}. This instruction is used to mark the beginning and end of each innermost loop. \mycode{MARKLOOP} has a larger payload than most bytecode instructions: it contains a list of local variables that will appear in the loop and the number of times each variable appears, sorted in descending order.
 
 When the VM encounters the \mycode{MARKLOOP} instruction, it may decide to reserve a number of registers and pin the most frequently used local variables to them. If it does, code is generated to prefetch these variables from memory and store them in registers. While in the loop, loading or storing these pinned variables does not require memory access, but only a manipulation of the cache state and possibly a simple move between registers. However, these registers will no longer be available for normal stack caching. Since 4 register pairs need to be reserved for code generation, at most 7 of the 11 available pairs can be used by mark loops.
 
@@ -90,7 +90,7 @@ Because the only way to enter and leave the loop is through the \mycode{MARKLOOP
 
 In Table \ref{tbl-markloop} the first instruction is now \mycode{MARKLOOP}, which tells the compiler local short variables 0 and 1 will be used. The compiler decides to pin them both to registers 1 and 2. The \mycode{MARKLOOP} instruction also tells the VM whether or not the variables are live, which they are at this point, so the two necessary loads are generated. This is reflected in the cache state. No elements are on the stack yet, but register 1 is pinned to LS0, and register 2 to LS1.
 
-Next, LS0 is loaded. Since it is pinned to register 1, no code is generated, but the cache state is updated to reflect LS0 is now on top of the stack. After loading the constant 1, \mycode{SUSHR} pops both operands destructively. We cannot simply return register 1 since that would corrupt the value of variable LS0, so the second \mycode{sc_pop_destructive} emits a move to a free register and returns that register instead. Since LS0 is pinned, \mycode{SSTORE_0} can also be skipped, but \mycode{sc_can_skip} does need to emit a move back to the pinned register.
+Next, LS0 is loaded. Since it is pinned to register 1, no code is generated, but the cache state is updated to reflect LS0 is now on top of the stack. After loading the constant 1, \mycode{SUSHR} pops both operands destructively. We cannot simply return register 1 since that would corrupt the value of variable LS0, so the second \mycode{sc_pop_destructive} emits a move to a free register and returns that register instead. Since LS0 is pinned, normal code generation for \mycode{SSTORE_0} can also be skipped, but \mycode{sc_can_skip} does need to emit a move back to the pinned register.
 
 The next two loads are straightforward and no code needs to be emitted for them. In the branch instruction the registers are popped non-destructively, so the pinned registers can be used directly.
 
@@ -111,13 +111,13 @@ However, the changes made by Darjeeling are primarily aimed at reducing memory c
 
 Most benchmarks described in Section \ref{sec-evaluation} do bit shifts by a constant number of bits. These appear not only in computation intensive benchmarks, but also as optimised multiplications or divisions by a power of 2, which are common in many programmes.
 
-In JVM bytecode the shift operators take two operands from the stack: the value to shift, and the number of bits to shift by. While this is generic, it is not efficient for constant shifts: the constant first needs to be pushed onto the stack, and the bit shift is implemented as a simple loop which shifts one bit at a time. If the number of bits to shift by is already known, much more efficient code can be generated.
+In JVM bytecode the shift operators take two operands from the stack: the value to shift, and the number of bits to shift by. While this is generic, it is not efficient for constant shifts: the constant first needs to be pushed onto the stack, and the bit shift is implemented as a simple loop which shifts one bit at a time. If the number of bits to shift by is known at compile time, much more efficient code can be generated.
 
 Note that this is different from other arithmetic operations with a constant operand. For operations such as addition, the translation process results in loading the constant and performing the addition, which is similar to what \mycode{avr-gcc} generates in most cases. An addition takes just as long when both operands are variables, as it does when one is a constant. 
 
 The mismatch is in the fact that while the JVM instruction set is more general, with both operands being variable for both bit shifts and other arithmetic operations, the native instruction set can only shift by a single bit. This means that to shift by a number of bits that is unknown until run time, a loop must be generated to shift one bit at a time, which is much slower than the code that can be generated for a shift by a constant number of bits.
 
-We optimise these cases by adding \mycode{_CONST} versions of the bit shift instructions \mycode{ISHL}, \mycode{ISHR}, \mycode{IUSHR}, \mycode{SSHL}, \mycode{SSHR}, and \mycode{SUSHR}. We add a simple scan to the infuser to find constant loads that are immediately followed by a bit shift. For these cases the constant load is removed, and the bit shift instruction, for example \mycode{ISHL}, is replaced by \mycode{ISHL_CONST}, which has a one byte constant operand in the bytecode containing the number of bits to shift by. On the VM side, implementing these six \mycode{_CONST} versions of the bit shift opcodes adds 444 bytes to the VM, but it improves performance, sometimes very significantly, for all but three of the benchmarks.
+These cases are optimised by adding \mycode{_CONST} versions of the bit shift instructions \mycode{ISHL}, \mycode{ISHR}, \mycode{IUSHR}, \mycode{SSHL}, \mycode{SSHR}, and \mycode{SUSHR}. The infuser does a simple scan of the bytecode to find constant loads that are immediately followed by a bit shift. For these cases the constant load is removed, and the bit shift instruction, for example \mycode{ISHL}, is replaced by \mycode{ISHL_CONST}, which has a one byte constant operand in the bytecode containing the number of bits to shift by. On the VM side, implementing these six \mycode{_CONST} versions of the bit shift opcodes adds 444 bytes to the VM, but it improves performance, sometimes very significantly, for all but three of the benchmarks.
 
 Surprisingly, after this was implemented, one benchmark performed better than native C. We found that \mycode{avr-gcc} does not optimise constant shifts in all cases. Since the goal is to examine how close a sensor node VM can come to native performance, it would be unfair to include an optimisation that is not found in the native compiler, but could easily be added. We implemented a version that is close to what \mycode{avr-gcc} does, but never better. The VM only considers cases that are optimised by \mycode{avr-gcc}. For these, first whole byte moves are emitted if the number of bits to shift by is 8 or more, followed by single bit shifts for the remainder.
 
@@ -136,7 +136,7 @@ The \mycode{GETFIELD_*} and \mycode{PUTFIELD_*} instructions are used to access 
 
 This overhead can be avoided if we can be sure of the offset at compile time, which is the case if the compile-time type is marked \mycode{final}. In this case the infuser will replace the \mycode{GETFIELD_A} or \mycode{PUTFIELD_A} opcode with a \mycode{_FIXED} version so the VM knows it is safe to determine the offset at translation time. Conveniently, one of the optimisations ProGuard does, is to mark any class that is not subclassed as \mycode{final}, so most of this is automatic.
 
-\paragraph{Alternative solutions} An alternative is to let go of the split for references and integers for object fields and mix them, so the offsets for reference fields would also be known at compile time. To allow the garbage collector to find the reference fields we could either extend the class descriptors with a bit map indicating the type of each slot, or let the garbage collector scan all classes in the inheritance line of an object.
+\paragraph{Alternative solutions} An alternative is to let go of the split for references and integers for object fields and mix them, so the offsets for reference fields are also known at compile time. To allow the garbage collector to find the reference fields we could either extend the class descriptors with a bit map indicating the type of each slot, or let the garbage collector scan all classes in the inheritance line of an object.
 
 We chose our solution because it is easier to implement and adds only a few bytes to the VM size, while the garbage collector is already one of the most complex components of the VM. Also, we found that almost all classes in our benchmarks could be marked \mycode{final}. Either solution would work, and the alternative could be considered as a more general solution.
 
@@ -148,12 +148,12 @@ Since the split architecture has many advantages in terms of complexity and VM s
 \subsubsection{\mycode{SIMUL} 16-bit to 32-bit multiplication}
 While Darjeeling already introduced 16-bit arithmetic operations, it does not cover the case of multiplying two 16-bit shorts, and storing the result in a 32-bit integer. In this case the infuser emits \mycode{S2I} instructions to convert the operands to two 32-bit integers, and then uses the normal \mycode{IMUL} instruction for full 32-bit multiplication. On an 8-bit device, this is significantly more expensive than 16x16 to 32-bit multiplication.
 
-We added a new opcode, \mycode{SIMUL}, for this case, which the infuser will emit if it can determine the operands are 16-bit, but the result is used as a 32-bit integer.
+For this case a new opcode, \mycode{SIMUL}, is added, which the infuser will use if it can determine the operands of a multiplication are 16-bit, but the result is used as a 32-bit integer.
 
-We could add more instructions, for example, \mycode{SIADD} for 16-bit to 32-bit addition, \mycode{BSMUL} for 8-bit to 16-bit multiplication, etc. But there is a trade-off between the added complexity of an optimisation and the performance improvement it yields, and for these cases this is much smaller than for \mycode{SIMUL}.
+More instructions could be added, for example, \mycode{SIADD} for 16-bit to 32-bit addition, \mycode{BSMUL} for 8-bit to 16-bit multiplication, etc. But there is a trade-off between the added complexity of an optimisation and the performance improvement it yields, and for these cases this is much smaller than for \mycode{SIMUL}.
 
 \subsubsection{16-bit array indexes}
-The normal JVM array access instructions (\mycode{IASTORE}, \mycode{IALOAD}, etc) use a 32-bit index. On a sensor node with only a few KB of memory, we never need such large indexes, so the array access instructions were modified to use a 16-bit index. 
+The normal JVM array access instructions (\mycode{IASTORE}, \mycode{IALOAD}, etc) use a 32-bit index. On a sensor node with only a few KB of memory, such large indexes are never needed, so the array access instructions were modified to use a 16-bit index. 
 
 This complements one of the manual optimisations discussed in Section \ref{sec-optimisations-manual-java-source-optimisation}. Using short values as index variables makes operations on the index variable cheaper, while changing the operand of the array access instructions reduces the amount of work the array access instruction needs to do and the number of registers it requires.
 

@@ -20,7 +20,7 @@ A first source of overhead comes from the fact that the standard \mycode{javac} 
 
 \noindent will evaluate '\mycode{b*c}' on each iteration, while it is clear that the result will be the same every time.
 
-In most environments this is not a problem because the bytecode is often compiled to native code before execution, and using knowledge of the target platform and the run-time behaviour, a desktop JIT compiler can make much better decisions than \mycode{javac}. However, since our AOT compiler simply replaces each instruction with a native equivalent, this leads to significant overhead in our VM.
+In most environments this is not a problem because the bytecode is often compiled to native code before execution, and using knowledge of the target platform and the run-time behaviour, a desktop JIT compiler can make much better decisions than \mycode{javac}. However, since our AOT compiler simply replaces each instruction with a native equivalent, this lack of optimisation leads to significant overhead in our VM.
 
 We do use the ProGuard optimiser \cite{proguard}, but this only does very basic optimisations such as method inlining and dead code removal, and does not cover cases like the example above.
 
@@ -62,7 +62,7 @@ CapeVM's stack frame layout was shown in Figure \ref{fig-object-and-stack-frame-
     \item lookup the address of the AOT compiled code
     \item do the actual \mycode{CALL}, which will return any return value in registers R22 and higher
     \item reactivate the old frame: set the VM's active frame pointer back to the caller
-    \item return to the caller with the return value (if any) in R22 and higher
+    \item return to the caller with the return value (if any) in register R22 and higher
   \end{enumerate}
   \item Restore stack pointer and X register.
   \item Push the return value onto the stack (using stack caching this will be free).

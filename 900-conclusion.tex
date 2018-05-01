@@ -5,7 +5,7 @@ To come back to the research questions stated in Section \ref{sec-introduction-r
 
 \begin{enumerate}
 	\item[a.]
-	After identifying the sources of overhead in previous work on ahead-of-time compilers for sensor nodes, we introduced a number of optimisations to reduce the performance overhead by 82\%, and the code size overhead by 61\%, resulting in an average performance overhead of 67\%, and the code size overhead of 77\% compared to native C.
+	After identifying the sources of overhead in previous work on Ahead-of-Time compilers for sensor nodes, we introduced a number of optimisations to reduce the performance overhead by 82\%, and the code size overhead by 61\%, resulting in an average performance overhead of 67\%, and the code size overhead of 77\% compared to native C.
 
 	The optimisations introduced by CapeVM do increase the size of the VM, but the break-even point at which this is compensated for by the smaller code it generates, is well within the range of programme memory typically available on a sensor node.
 
@@ -16,10 +16,10 @@ To come back to the research questions stated in Section \ref{sec-introduction-r
 	
 	This results in a modest overhead in terms of VM size, and because most checks are performed at translation time, the overhead for providing safety is limited to a slowdown of 23\% and a 2\% increase in code size, compared to the unsafe version.
 	
-	Since to the best of our knowledge only two native code approaches exist that provide safety independent of the host, we cannot exclude the possibility that these could be further optimised. Currently however, CapeVM is on-par with or faster than existing systems, and provides platform independence at the same time.
+	Since to the best of our knowledge only two native code systems exist that provide safety independent of the host, we cannot exclude the possibility that these could be further optimised. Currently however, CapeVM is on-par with or faster than existing systems, and provides platform independence at the same time.
 
 	\item[c.]
-	Regarding the question of whether Java is a suitable language for a sensor node VM, we can conclude some aspects of it are a good match. An advantage of its simple stack-based instruction set is that it can be implemented in a small VM, and while we showed the stack-based architecture introduces significant overhead, most of this overhead is eliminated by our optimisations.
+	Regarding the question of whether Java is a suitable language for a sensor node VM, we can conclude some aspects of it are a good match. An advantage of its simple stack-based instruction set is that it can be implemented in a small VM, and while we showed the stack-based architecture introduces significant overhead, most of this overhead is eliminated by CapeVM's optimisations.
 	
 	However, the benchmarks also exposed several problems that ultimately make standard Java a poor choice. Specifically, the lack of support for constant data, and the inefficient use of memory for programmes containing many small objects meant some benchmarks could not be ported directly from C to Java. We proposed several improvements, and developed an extension to allow constant data to be put in flash memory, but conclude that more work is necessary to come to a more sensor node specific language and make sensor node VMs truly useful in a wide range of real-world projects.
 \end{enumerate}

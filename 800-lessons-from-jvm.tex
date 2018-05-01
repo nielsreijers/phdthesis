@@ -1,4 +1,4 @@
-\chapter{Lessons from JVM}
+\chapter[Open issues in resource-constrained JVMs]{Open issues in \\ resource-constrained JVMs}
 
 \input{801-tbl-issues}
 
@@ -95,7 +95,7 @@ Since all the arrays are of fixed length, in C the layout of the whole structure
 
 There are two problems with this. First, since the location of these Java objects is not known until run time, there is a performance penalty for having to follow the chain of references. \mybench{MoteTrack} will loop over the signals in the \mycode{rfSignals} array. Starting from this array, Java needs to do 3 lookups to get to the right RSSI value: the address of the current \mycode{RFSignal} object, the address of the \mycode{rssi} array, and then the actual RSSI value. For the C version, all the offsets are known at compile time, so the compiler can generate a much more efficient loop, directly reading from the right locations.
 
-The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes. In addition, the 18 byte arrays have a 3 byte header, the signal array a 4 byte header, and the whole structure contains a total of 39 references, which each take up 2 bytes. In total, the collection of Java objects use $80 + 40*5 + 18*3 + 4 + 39*2 = 416$ bytes.
+The second problem is the added memory usage. The C struct only takes up 80 bytes, all used to store data. The Java version allocates a total of 40 objects, 36 of which are spent on the \mycode{RFSignal} objects and their arrays of RSSI values. Each of these requires a heap header, which takes up 5 bytes. In addition, the 18 byte arrays have a 3 byte header, the signal array a 4 byte header, and the whole structure contains a total of 39 references which each take up 2 bytes. In total, the collection of Java objects use $80 + 40*5 + 18*3 + 4 + 39*2 = 416$ bytes.
 
 Combined with \mybench{MoteTrack}'s other data structures, this is too large to fit in memory, which forced us to refactor the 2 element \mycode{rssi} array into two byte variables stored directly in \mycode{RFSignal}, as explained in Section \ref{sec-evaluation-benchmark-implementation-motetrack}. This allowed us to run the benchmark, but a RefSignature still takes up 236 bytes, and reading an RSSI value still takes two lookups instead of one.
 
@@ -125,19 +125,19 @@ While seemingly a small annoyance, in more complex code that frequently uses of 
 \paragraph{Possible solutions}
 %If we want to have an efficient sensor node VM, both from a performance and memory usage perspective, better support for data types smaller than 32-bit integers is necessary.
 
-We argue that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, we may implement this as new datatypes: declaring variable \mycode{a} as \mycode{unchecked short} would implictly narrow to short when needed, so \mycode{a=b+c;} would not need an explicit cast, while it would if \mycode{a} is declared as a normal \mycode{short}.
+We argue that C-style automatic narrowing conversions would make most sensor node code more readable, but to leave the option of Java's default behaviour open, this may be implemented as new datatypes: declaring variable \mycode{a} as \mycode{unchecked short} would implictly narrow to short when needed, so \mycode{a=b+c;} would not need an explicit cast, while it would if \mycode{a} is declared as a normal \mycode{short}.
 
 
 
 
 \section{Simple type definitions}
 \label{sec-typedef}
-When developing code for a sensor node, the limited resources often result in different design patterns compared to desktop software. In normal Java code we usually rely on objects for type safety and keeping code readable and easy to maintain. On sensor nodes, objects are expensive and we frequently make use of shorts and ints for a multitude of different tasks for which we would traditionally use objects.
+When developing code for a sensor node, the limited resources often result design patterns different from desktop software. In normal Java code we usually rely on objects for type safety and keeping code readable and easy to maintain. On sensor nodes, objects are expensive and we frequently make use of shorts and ints for a multitude of different tasks for which we would traditionally use objects.
 
 In these situations we often found that our code would be much easier to maintain if there was a way to name new integer types to explicitly indicate their meaning, instead of using many of \mycode{int} or \mycode{short} variables. Having type checking on these types would add a welcome layer of safety.
 
 \paragraph{Possible solutions}
-At a minimum, we should have a way to define simple aliases for primitive types, similar to C's \mycode{typedef}. A more advanced option that fits more naturally with Java, would be to have a strict \mycode{typedef} which also does type checking, so that a value of one user defined integer type cannot be accidentally assigned to a variable of another type, without an explicit cast.
+At a minimum, there should be a way to define simple aliases for primitive types, similar to C's \mycode{typedef}. A more advanced option that fits more naturally with Java, would be to have a strict \mycode{typedef} which also does type checking, so that a value of one user defined integer type cannot be accidentally assigned to a variable of another type, without an explicit cast.
 
 
 
@@ -153,7 +153,7 @@ Java method calls are inherently more expensive than C functions. On the desktop
 
 This macro is called in four places, and implementing it as a lightweight method still slows down the benchmark by 57\%. Tools like Proguard \cite{proguard} can be used to inline small methods or methods that are only called from a single location, but \mycode{MX} is called from multiple places and is larger than Proguard's size threshold. This leaves developers with two unattractive options: either leaving it as a method and accepting the performance penalty, or manually copy-pasting the code, which is error-prone and leads to code that is harder to maintain.
 
-Inlining larger methods called from multiple locations does run the risk of increasing code size. However, the data in Table \ref{tbl-quantitative-results} shows the increase in code size is often modest. In two cases the inlined version is actually smaller. The code generated by the AOT compiler for a lightweight method call is still larger than for most other bytecode instructions, and in \emph{CoreMark}'s case the inlining the \mycode{ee_isdigit} method means the code directly branches on the result of the inlined expression, instead of having to perform an additional branch on the returned boolean value.
+Inlining larger methods called from multiple locations does run the risk of increasing code size. However, the data in Table \ref{tbl-quantitative-results} shows the increase in code size is often modest. In two cases the inlined version is actually smaller. The code generated by the AOT compiler for a lightweight method call is still larger than for most other bytecode instructions, and in \emph{CoreMark}'s case inlining the \mycode{ee_isdigit} method means the code directly branches on the result of the inlined expression, instead of having to perform an additional branch on the returned boolean value.
 
 \paragraph{Possible solutions}
 Developers should be given more control over inlining, which could be achieved by an \mycode{inline} keyword to force the compiler to inline important methods.
@@ -212,9 +212,9 @@ This technique of pulling object creation up the call chain can often be used to
 \paragraph{Possible solutions}
 On desktop JVMs, escape analysis \cite{Choi:1999uw, Goetz:2005uy} is used to determine if an object can be safely allocated on the stack instead of the heap, thus saving both the cost of heap allocation, and the occasional garbage collection run triggered by it.
 
-While the analysis of the bytecode required for this is far too complex for a sensor node, it could be done offline, similar to TakaTuka's offline garbage collector analysis \cite{Aslam:2011thesis}. The bytecode can then be extended by adding special versions of the \mycode{new} opcodes to instruct the VM to place an object in the stack frame instead of the heap. A field should also be added to the method header to tell the VM how much extra space for stack objects needs to be reserved in the stack frame.
+While the analysis of the bytecode required for this is far too complex for a sensor node, it could be done offline, similar to TakaTuka's offline garbage collector analysis \cite{Aslam:2011thesis}. The bytecode can then be extended by adding special versions of the \mycode{new} opcodes to instruct the VM to place an object in the stack frame instead of on the heap. A field should also be added to the method header to tell the VM how much extra space for stack objects needs to be reserved in the stack frame.
 
-There is a risk to doing this automatically. In CapeVM, the split between heap and stack memory is fixed, and both are limited. If the compiler automatically puts all objects that could be on the stack in the stack frame instead of the heap, we may end up with an empty heap, and a stack overflow. Therefore, it is better to leave this optimisation to the developer by also introducing a new keyword at the language level, so developers can explicitly indicate which objects go on the stack and which in the heap. Of course escape analysis is still necessary to check at compile time that this keyword is only used in places where it is legal for the object to be allocated on the stack.
+There is a risk to doing this automatically. In CapeVM, the split between heap and stack memory is fixed, and both are limited. If the compiler automatically puts all objects that could be on the stack in the stack frame instead of on the heap, we may end up with an empty heap, and a stack overflow. Therefore, it is better to leave this optimisation to the developer by also introducing a new keyword at the language level, so developers can explicitly indicate which objects go on the stack and which on the heap. Of course escape analysis is still necessary to check at compile time that this keyword is only used in places where it is legal for the object to be allocated on the stack.
 
 
 

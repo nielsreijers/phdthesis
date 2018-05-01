@@ -4,7 +4,7 @@ As shown in Figure \ref{fig-translation-process}, our current implementation use
 
 In a future version, these three steps should be merged into an 'optimising infuser' which uses all the normal, well-known optimisation techniques to produce better quality bytecode, but at the moment we do not have the resources to build such an optimising infuser.
 
-Since our goal is to determine what level of performance is possible on a sensor node, the Java source were manually optimised to get better quality JVM bytecode from \mycode{javac}. While these changes are not an automatic optimisation we developed, we find it imporant to mention them explicitly and analyse their impact, since many developers may expect these optimisations to happen automatically and without this step it would be impossible to reproduce our results.
+Since our goal is to determine what level of performance is possible on a sensor node, the Java source was manually optimised to get better quality JVM bytecode from \mycode{javac}. While these changes are not an automatic optimisation we developed, we find it imporant to mention them explicitly and analyse their impact, since many developers may expect these optimisations to happen automatically and without this step it would be impossible to reproduce our results.
 
 % We have been careful to limit ourselves to 'fair' optimisations, by which we mean optimisations that an optimising infuser could reasonably be expected to do automatically, given some basic, conservative assumptions about the performance model. 
 
@@ -12,7 +12,7 @@ The most common optimisations that were done are:
 \begin{itemize}
 	\item Store the result of expressions calculated in a loop in a temporary variable, if it is known the result will be the same for each iteration.
 	\item Since array and object field access is relatively expensive and not cached by the mark loop optimisation discussed in Section \ref{sec-optimisation-markloops}, prefer to minimise array and object access by using a temporary local variable, if the value may be used again soon.
-	\item Manually inline \texttt{\#define}s and functions that were inlined by \mycode{avr-gcc}.
+	\item Manually inline \texttt{\#define}s and functions that were inlined by \mycode{avr-gcc} in the C version of the benchmark.
 	\item Use 16-bit variables for array indexes where possible.
 	\item Use bit shifts for multiplication and division by a power of two.
 \end{itemize}
@@ -32,7 +32,7 @@ Manual inlining often results in better code because it may not be necessary to 
 \paragraph{Platform independence}
 Assuming an optimising infuser does raise the question how platform independent the resulting code is. If the infuser has more specific knowledge about the target platform, it can produce better code for that platform, but, while it should still run anywhere, this may not be as efficient on other platforms.
 
-The optimisations described here are based on very conservative assumptions, and are not specific to the ATmega CPU. Therefore, they should work well for most programmes, independent of the hardware it is being run on.
+The optimisations described here are based on very conservative assumptions, and are not specific to the ATmega CPU. Therefore, they should work well for most programmes, independent of the hardware they are running on.
 
 \paragraph{Example} Listing \ref{lst-manual-optimisation} shows an example of these manual optimisations, applied to the \mybench{bubble sort} benchmark. To have a fair comparison, we applied exactly the same optimisations to the C versions of our benchmarks, but here this had little or no effect on the performance.
 

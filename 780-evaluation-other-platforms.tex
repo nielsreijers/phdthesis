@@ -1,6 +1,6 @@
 \section{Expected perfomance on other platforms}
 \label{sec-evaluation-other-platforms}
-Platform independence is one of the main advantages of using a VM. The ATmega family of CPUs is widely used in low power embedded systems, and we implemented our VM for the popular ATmega128 CPU. However, the techniques described in this dissertation does not depend on any ATmega specific properties and can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are the ability to reprogramme its own programme memory, and the availability of a sufficient number of registers for stack caching.
+Platform independence is one of the main advantages of using a VM. The ATmega family of CPUs is widely used in low power embedded systems, and CapeVM was implemented for the popular ATmega128 CPU. However, the techniques described in this dissertation do not depend on any ATmega specific properties and can be applied on other embedded CPU platforms to improve performance and provide a safe execution environment. The main requirements are a node's ability to reprogramme its own programme memory, and the availability of a sufficient number of registers for stack caching.
 
 While it is impossible to determine exactly what the resulting performance would be on different platforms without porting the VM, this section presents some results that indicate it is likely to be slightly worse than the results seen on the ATmega.
 
@@ -26,20 +26,20 @@ Two important parameters that influence performance are the number of available 
 
 \subsection{Number of registers}
 
+\input{780-tbl-evaluation-cachesize-performance}
+
 \begin{figure}
 \centering
 \includegraphics[width=\mygraphsize]{cachesize-performance-per-opcode-category.eps}
-\caption{Performance overhead for different stack cache sizes (in pairs of registers)}
+\caption[Performance overhead for different stack cache sizes]{Performance overhead for different stack cache sizes (in pairs of registers)}
 \label{fig-performance-per-opcode-category-per-cachesize}
 \end{figure}
 
-\input{780-tbl-evaluation-cachesize-performance}
-
-The ATmega has 32 8-bit registers, which are managed as 16 pairs since the VM stores data in 16-bit slots. Looking at the MSP430, it only has 12 registers, but they are 16-bit. 5 register pairs are reserved on the ATmega, leaving 11 pairs available for stack caching. Assuming the same can be achieved by reserving 5 16-bit registers on the MSP430, 7 registers will be available to the stack cache.
+The ATmega has 32 8-bit registers, which are managed as 16 pairs since the VM stores data in 16-bit slots. The MSP430 only has 12 registers, but they are 16-bit. 5 register pairs are reserved on the ATmega, leaving 11 pairs available for stack caching. Assuming the same can be achieved by reserving 5 16-bit registers on the MSP430, 7 registers will be available to the stack cache.
 
 To evaluate the effect of a smaller number of registers on the stack cache, all benchmarks were run while restricting the number of registers the cache manage may use. Since the VM needs a minimum of 4 pairs to implement all instructions, the number of register pairs is varied from 4 to 11.
 
-The results are shown in Figure \ref{fig-performance-per-opcode-category-per-cachesize} and Table \ref{tbl-performance-per-opcode-category-per-cachesize}. As is common with caching techniques, the first few registers have the most impact, with half of the overhead reduction already realised when adding the first two additional register pairs. Ignoring all other difference for the moment, the effect of reducing the number of register pairs from 11 to 7 is an increase in overhead by 21.4\%, to 88.4\%.
+The results are shown in Figure \ref{fig-performance-per-opcode-category-per-cachesize} and Table \ref{tbl-performance-per-opcode-category-per-cachesize}. As is common with caching techniques, the first few registers have the most impact, with half of the extra overhead reduction already realised when adding the first two additional register pairs. Ignoring all other difference for the moment, the effect of reducing the number of register pairs from 11 to 7 is an increase in overhead by 21.4\%, to 88.4\%.
 
 The Cortex-M0 has one general purpose register more than the MSP430, and at 8 register pairs the overhead drops to 80.1\%. In addition, the M0's registers are 32-bit, which means in cases where 32-bit values are used, the cache size is effectively doubled since values can be stored in a single register instead of two pairs of 8-bit registers.
 
@@ -63,7 +63,7 @@ A number of benchmarks can be implemented using different data sizes. As mention
 
 In almost all cases, a smaller data size results in a higher relative overhead. This is because this reduces the time spent in code that is common to both C and AOT versions. For example, the different versions usually do the same number of memory accesses. When operating on 16-bit data, this only takes half as long as for 32-bit data, while the surrounding overhead either stays the same or is reduced by a smaller factor, thus increasing the relative overhead.
 
-Taking \mybench{bubble sort} as an example, both versions do the same number of loads, comparisons, and array stores. \mybench{bubble sort}'s overhead primarily comes from calculating array element locations (see Section \ref{sec-evaluation-bubble-sort}). 32-bit array access takes 17 cycles, 8 of which are spent on the actual load or store. For 16-bit array access this is only 4 out of 11 cycles, which drops further to 2 out of 10 cycles for 8-bit arrays. Thus the relative overhead for accessing smaller elements is higher.
+Taking \mybench{bubble sort} as an example, all three versions do the same number of loads, comparisons, and array stores. \mybench{bubble sort}'s overhead primarily comes from calculating array element locations (see Section \ref{sec-evaluation-bubble-sort}). 32-bit array access takes 17 cycles, 8 of which are spent on the actual load or store. For 16-bit array access this is only 4 out of 11 cycles, which drops further to 2 out of 10 cycles for 8-bit arrays. Thus the relative overhead for accessing smaller elements is higher.
 
 This effect is even clearer for more complex operations like multiplication. 16x16 to 16-bit multiplication can be implemented in a few instructions and only takes 10 cycles on the ATmega. 32x32 to 32-bit multiplication is implemented by calling \mycode{avr-gcc}'s \mycode{__mulsi3} function, and takes 85 to 100 cycles.
 
@@ -71,7 +71,7 @@ Thus, working with 16-bit or 32-bit data on an 8-bit CPU helps the VM's relative
 
 In Table \ref{tbl-performance-8-16-32-bit} we see the \mybench{outlier detection} and \mybench{binary search} benchmarks perform worse for 32-bit data compared to 16-bit data. This is due to a mismatch between the infuser and ProGuard. In JVM bytecode, local variables are stored in 32-bit slots. The code generated by \mycode{javac} uses a separate slot for each variable, but ProGuard attempts to reduce memory consumption by mapping multiple variables to the same slot if their live ranges do not overlap. The infuser processes the ProGuard optimised code, as shown in Figure \ref{fig-translation-process}, and replaces the JVM's 32-bit operations by 16-bit versions where possible. In the 32-bit \mybench{outlier detection} benchmark, ProGuard mapped a 32-bit and 16-bit variable to the same slot, which prevents the infuser from using the cheaper 16-bit operations for this variable. This once again highlights the need for a unified, optimising compiler, combining the tasks of \mycode{javac}, ProGuard and the infuser.
 
-The large difference in performance for \mybench{FFT} is mostly due to bit shifts. The 8-bit version does many shifts of a 16-bit value by exactly 6 bits. The VM simply emits 6 single-bit shifts, while \mycode{avr-gcc} has a special optimised version for this case, which we considered too specific to include in the VM. The 32-bit version spends about half of its time shifting a 32-bit value by 15 bits. The VM and \mycode{avr-gcc} both implement this using the same loop, which again adds a large common factor, thus reducing the relative overhead.
+The large difference in performance for \mybench{FFT} is mostly due to bit shifts. The 8-bit version does many shifts of a 16-bit value by exactly 6 bits. The VM simply emits 6 single-bit shifts, while \mycode{avr-gcc} has a special optimised version for this case, which we considered too specific to include in the VM. The 32-bit version spends about half of its time shifting a 32-bit value by 15 bits. This is one of the cases not optimised by \mycode{avr-gcc}, and both the VM and \mycode{avr-gcc} implement this using the same loop, which again adds a large common factor, thus reducing the relative overhead.
 
 
 %JVM_GETARRAY_I                                                  554880  18.2%  35.3%C      32640  17.0 |    1    24   7.8%  15.8%C 4->4:Int 

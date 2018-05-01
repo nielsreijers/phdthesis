@@ -3,7 +3,7 @@ This chapter presents the state of the art in Internet of Things and sensor netw
 
 \section{Programming WSN and IoT devices}
 
-This challenge of programming IoT devices can be split into two questions:
+The challenge of programming IoT devices can be split into two questions:
 
 \begin{itemize}
     \item How can we build applications at a higher level, coordinating the behaviour of many devices without having to specify the behaviour from each device's individual perspective?
@@ -12,7 +12,7 @@ This challenge of programming IoT devices can be split into two questions:
 
 This dissertation is concerned with the second question, and argues that a virtual machine can be an attractive option in many scenarios. But we will first discuss the higher level question of how to programme WSN/IoT applications and use one of these systems as a motivating example.
 
-Initially, many WSN applications were built directly on top of the hardware or on some minimal operating system such as TinyOS \cite{Levis:2004ws}. This results in applications being programmed from the individual node's perspective, rather than allowing the developer to express globally what he wants from the sensor network, which makes it hard to reason about the global behaviour, especially as the number of devices and tasks increases.
+Initially, many WSN applications were built directly on top of the hardware or on some minimal operating system such as TinyOS \cite{Levis:2004ws}. This results in applications being programmed from the individual node's perspective, rather than allowing the developer to express globally what he wants from the sensor network. This makes it hard to reason about the global behaviour, especially as the number of devices and tasks increases.
 
 Therefore, systems have been developed that make it easier for the developer to control the potentially large number of heterogeneous nodes. Some of these are centralised, where the initiative of the application is with a central host, and devices are loaded with a runtime that allows the host to control them. Other systems are more distributed, where the application is split into components that are deployed onto nodes and from there operate autonomously, only to receive further guidance from the host where necessary.
 
@@ -22,7 +22,7 @@ ADAE \cite{Chang:2010ek}, developed at the IT University of Copenhagen, configur
 
 While in the previous systems applications run on a centralised host and simply control the nodes in the network, in Agilla \cite{Fok:2005bh} programmes are more distributed and consist of software agents that can move around in the network autonomously. While this allows some behaviours to be expressed in a natural way, the paradigm is very different from conventional languages, and the assembly-like instruction set based on the Maté VM \cite{Levis:2002ku} discussed below makes it hard to use.
 
-Cornell's MagnetOS \cite{Liu:2005wsa}, proposes a novel programming model which allows the user to write the application as a single Java application, not explicitly related to individual nodes. The system then automatically partitions the applications into pieces (by default along object boundaries), and places these pieces on nodes in the network in such a way as to minimise energy consumption. However, it requires nodes significantly more powerful than what we expect to find in a typical WSN.
+Cornell's MagnetOS \cite{Liu:2005wsa}, proposes a novel programming model which allows the user to write the application as a single Java application, not explicitly related to individual nodes. The system then automatically partitions the applications into pieces, by default along object boundaries, and places these pieces on nodes in the network in such a way as to minimise energy consumption. However, it requires nodes significantly more powerful than what we expect to find in a typical WSN.
 
 LooCI \cite{Hughes:dg} is a component infrastructure middleware for WSNs with standard support for run-time reconfiguration. The LooCI component model supports dynamic binding and interoperability between different hardware platforms, in their case a typical sensor node based on the ATmega1284P CPU,  and the slightly more powerful Sun SPOT, and different languages, with implementations in C and Java. LooCI defines a list of requirements for WSN middleware, which includes supporting run-time reconfiguration to respond to changing environmental conditions, supporting heterogeneous sets of hardware, good performance, and minimal memory consumption. LooCI currently uses C to programme the smallest devices and Java for the more powerful Sun SPOT. A fast sensor node virtual machine would be a useful addition to allow more flexible and platform independent reprogramming of the smallest devices as well.
 
@@ -34,7 +34,7 @@ A final example that we will look at in more detail at is WuKong \cite{Reijers:2
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{wukong-fbp.png}
-\caption{Example WuKong flow based programme}
+\caption[Example WuKong flow based programme]{Example WuKong flow based programme, source: \cite{Lin:2013dc}}
 \label{fig-wukong-fbp}
 \end{figure}
 
@@ -47,9 +47,9 @@ A node creates WuObjects to represent its hardware components at startup, so the
 
 An WuClass is defined by:
 \begin{itemize}
-    \item Its list of properties.
+    \item A list of properties.
     \item A \mycode{setup()} function, called once when an object is created.
-    \item A \mycode{update()} function, called (i) periodically, for example to sample a sensor, or (ii) when one of the input properties changes value, to compute a new output value or drive an actuator.
+    \item An \mycode{update()} function, called (i) periodically, for example to sample a sensor, or (ii) when one of the input properties changes value, to compute a new output value or drive an actuator.
 \end{itemize}
 
 The \mycode{setup()} and \mycode{update()} functions can be written in either C or Java. A node may have native C implementations built in for a number of commonly used classes from the WuKong standard library, which it will advertise during the discovery phase. If the master cannot find a native implementation of a required class, it may use a Java version instead, which is slower, but more flexible since it can be deployed as part of the application. To support this, the WuKong middleware contains a version of the Darjeeling JVM \cite{Brouwers:2009cj}.
@@ -81,7 +81,7 @@ The smallest official Java standard is the Connected Device Limited Configuratio
 
 Darjeeling \cite{Brouwers:2009cj} from Delft University of Technology runs a modified Java bytecode with only minor restrictions, and supports multiple platforms. Similarly, TakaTuka \cite{Aslam:2008} also runs on both AVR and MSP based sensor nodes, and includes its own debugger. A unique property is TakaTuka's ability to reduce garbage collection cost by static code analysis. Whenever the compiler can determine an object can be safely discarded at a certain point, it annotates the bytecode to tell the VM to do so, thus freeing up memory earlier and reducing the number of times the garbage collector has to run. 
 
-Sun's Squawk VM \cite{Shaylor:2003ws} is significantly larger than Darjeeling and TakaTuka, requiring at least 160 KB of programme memory, but offers full CLDC compliance. The Java Card VM \cite{javacard} runs on more typical sensor node hardware and achieves this by switching to a 16-bit architecture, dropping support for various features, and modifying the instructionset. At the smallest end of the spectrum is NanoVM \cite{Harbaum}, which takes a minimalist approach, trading support for a large number of java opcodes for simplicity and code size. The whole VM fits in the 8K flash of an ATmega8 CPU, leaving 512bytes of EEPROM and 75\% of the CPU's 1K RAM to the application.
+Sun's Squawk VM \cite{Shaylor:2003ws} is significantly larger than Darjeeling and TakaTuka, requiring at least 160 KB of programme memory, but offers full CLDC compliance. The Java Card VM \cite{javacard} runs on more typical sensor node hardware and achieves this by switching to a 16-bit architecture, dropping support for various features, and modifying the instruction set. At the smallest end of the spectrum is NanoVM \cite{Harbaum}, which takes a minimalist approach, trading support for a large number of java opcodes for simplicity and code size. The whole VM fits in the 8K flash of an ATmega8 CPU, leaving 512bytes of EEPROM and 75\% of the CPU's 1K RAM to the application.
 
 \section{Darjeeling}
 Since our VM is based on Darjeeling, we will examine it in more detail in this section.
@@ -110,7 +110,7 @@ Besides statically linking classes, the infuser also makes several changes to th
 
 
 \paragraph{Double-ended stack}
-A second important modification is that Darjeeling splits the operand stack into separate reference and integer stacks. Each stack frame still allocates the same amount of space for its operand stack, but Darjeeling places references on one side and integers on the other, as shown in Figure \ref{fig-darjeeling-split-stack}. At the expense of having to keep track of two operand stack pointers, this reduces the complexity of the garbage collector significantly. When the garbage collector runs, it needs to find the \emph{root set} of all live objects, which includes objects with references on the stack but not stored elsewhere. Since the type of the values on the operand stack changes continuously, it would be hard to determine which values are references and which are integers in a single stack, but using Darjeeling's split stack design, it can simply place all values on the reference stack in the root set. For the same reason, Darjeeling also groups the slots allocated for local, static and instance variables into an integer and reference group.
+A second important modification is that Darjeeling splits the operand stack into separate reference and integer stacks. Each stack frame still allocates the same amount of space for its operand stack, but Darjeeling places references on one side and integers on the other, as shown in Figure \ref{fig-darjeeling-split-stack}. At the expense of having to keep track of two operand stack pointers, this reduces the complexity of the garbage collector significantly. When the garbage collector runs, it needs to find the \emph{root set} of all live objects, which includes objects with references on the stack but not stored elsewhere. Since the type of the values on the operand stack changes continuously, it is hard to determine which values are references and which are integers in a single stack. Using Darjeeling's split stack design, the garbage collector can simply place all values on the reference stack in the root set. For the same reason, Darjeeling also groups the slots allocated for local, static and instance variables into an integer and reference group.
 
 The necessary modifications to the bytecode are taken care of by the infuser. Generic stack instructions such as \mycode{pop} are replaced by specialised versions for the integer and reference stack: \mycode{ipop} and \mycode{apop}.
 
@@ -166,7 +166,7 @@ Their approach is both simple and effective. To translate the JVM bytecode, each
 Table \ref{tbl-ellul-aot-example} shows how a simple statement is translated to native code. The blocks each JVM bytecode instruction translates to are fixed. This simple translation to native code removes the interpreter loop, which is by far the biggest source of overhead in interpreting VMs, but it is clear from the native pseudo code in Table \ref{tbl-ellul-aot-example} that this approach results in many unnecessary push and pop instructions. Since the JVM is a stack-based VM, each instruction first obtains its operands by popping them from the stack and pushes any result back onto it. As a result, over half the instructions are push or pop instructions.
 
 \subsection{Peephole optimisation}
-To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:2012thesis} which does 4 optimisation. For each an example is shown in Table \ref{tbl-ellul-peephole}. The first to are the most important for improving performance: if a push is immediately followed by a pop to the same register, both are removed since they have no net effect. If the source and destination registers differ, the two instructions are replaced by a move. Note that the assembly code shown here is for the MSP430 CPU used in Ellul's work.
+To reduce this overhead, Ellul proposes a simple peephole optimiser \cite{Ellul:2012thesis} which does 4 optimisation. For each an example is shown in Table \ref{tbl-ellul-peephole}. The first two are the most important for improving performance: if a push is immediately followed by a pop to the same register, both are removed since they have no net effect. If the source and destination registers differ, the two instructions are replaced by a move. Note that the assembly code shown here is for the MSP430 CPU used in Ellul's work.
 
 \begin{table}
 \caption{Ellul's peephole optimisations}
@@ -235,7 +235,7 @@ For desktop applications, Wahbe et al. described software fault isolation \cite{
 Two basic methods are described to isolate such code from the main application: code can be compiled to a predefined format with the appropriate checks already in place, after which the system loading the code only verifies the compiled native code adheres to this standard, or the native code can be rewritten at load time, inserting checks at all potentially unsafe writes. Applied to sensor nodes these correspond to options 2a and 2b in Figure \ref{fig-safe-compilation-process} respectively.
 
 
-Since we do not have processes or CPU memory protection on a sensor node, Wahbe's approach provides an attractive alternative. Two systems exist that provide safety for sensor nodes using each of these approaches.
+Since there are no processes or CPU memory protection on a sensor node, Wahbe's approach provides an attractive alternative. Two systems exist that provide safety for sensor nodes using each of these approaches.
 
 \emph{t-kernel} \cite{Gu:2006ww} does more than providing safety. It raises the level of system abstraction for the developer by providing three features typically missing on sensor nodes: preemptive scheduling, virtual memory, and memory protection. It does this by extensive rewriting of the binary code at load time. While \emph{t-kernel} is heavily optimised, the price for this is that programmes still run 50-200\% slower, and code size increases by 500-750\%.
 

@@ -2,7 +2,7 @@
 This chapter will introduce some necessary background knowledge on the target hardware platform, Java and the Java Virtual Machine, and JIT and AOT compilation.
 
 \section{Wireless Sensor Networks and the Internet of Things}
-Both Wireless Sensor Networks and Internet of Things are relatively new research areas. Both consider networks of connected devices that have to cooperate to achieve some goal. There is a large overlap between the two, but there are also key differences.
+Both Wireless Sensor Networks and Internet of Things are relatively new research areas. Both deal with networks of connected devices that have to cooperate to achieve some goal. There is a large overlap between the two, but there are also key differences.
 
 Wireless sensor networks is commonly understood to refer to networks of very resource-constrained devices. They are usually homogeneous, dedicated to a specific application, and in many cases battery powered. On the other hand, Internet of Things applications may contain the same class of resource-constrained devices but mix in more powerful ones as well. They may have a combination of battery- and mains powered devices, and the devices used may be a combination of devices dedicated to a particular task and smart devices that happen to be in the user's environment. One of the main challenges of IoT research is to develop ways to use the capabilities that are present in the smart devices around us to build new and useful applications.
 
@@ -71,7 +71,7 @@ Next, we will briefly introduce the Java virtual machine, and describe some deta
 
 The first public release of Java was in 1995. It consists of two separate but closely related parts: the Java programming language, and the Java virtual machine (JVM): an abstract machine specification, running programmes written in JVM bytecode. Since the release of Java, several other languages have been developed that compile to JVM bytecode and can run on the same virtual machine.
 
-It was quickly adopted by web browsers to run interactive \emph{applets}. Two key properties of Java contributed to this success:
+Java was quickly adopted by web browsers to run interactive \emph{applets}. Two key properties contributed to this success:
 \begin{itemize}
     \item Implementations of the JVM were built for many hardware platforms, so the same applet could be run in any browser, regardless of the hardware it was running on.
     \item It allowed users to safely run applets from untrusted sources since the virtual machine runs them in a 'sandboxed' environment with access to only those system resources explicitly allowed by the user.
@@ -105,7 +105,7 @@ Each JVM bytecode is encoded as a single byte. Some are followed by one or more 
 The JVM stores information in three different places:
 \begin{itemize}
     \item The stack frame: each method's stack frame contains a section for its operand stack and its local variables.
-    \item Global variables: static variables that are allocated globally when a class is loaded (we ignore \mycode{ThreadLocal} variables since they are not supported in our VM).
+    \item Global variables: static variables that are allocated globally when a class is loaded (we ignore \mycode{ThreadLocal} variables since CapeVM does not support threads).
     \item The heap: objects and arrays are stored on the heap, and automatically garbage-collected when no longer used.
 \end{itemize}
 
