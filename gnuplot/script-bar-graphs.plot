@@ -7,7 +7,7 @@ set style fill solid border -1
 set xtics rotate by 45 right
 set ylabel "Overhead (% of native C run time)"
 
-set yrange [-70:350]
+set yrange [-70:400]
 set output "../safety-cost-diff-using-regs.eps"
 plot 'safety-cost-diff-using-regs.dat' using 2:xtic(1) ti col linecolor "#56b5e8", '' u 3 ti col linecolor "#6666ee", '' u 4 ti col linecolor "#cc00000"
 

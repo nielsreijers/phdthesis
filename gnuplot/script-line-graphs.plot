@@ -3,7 +3,7 @@ set datafile separator ","
 
 set grid ytics lc rgb "#bbbbbb" lw 1 lt 1
 set size 1.25, 1
-set key outside
+set key outside box opaque
 
 
 
