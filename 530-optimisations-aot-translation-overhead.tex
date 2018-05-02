@@ -64,7 +64,7 @@ This may seem bad for performance, but fortunately the stack is empty at almost 
 
 Stack caching can eliminate most of the push/pop overhead, even when the stack depth increases. We now turn our attention to reducing the overhead resulting from load and store instructions.
 
-A \emph{value tag} is added to each register's cache state to keep track of what value is currently held in the register, even after it is popped from the stack. Some bytecode instructions have a value tag associated with them to indicate which value or variable they load, store, or modify. Each tag consist of a tuple (type, datatype, number). For example, the instructions \mycode{ILOAD_0} and \mycode{ISTORE_0}, which load and store the local integer variable with id 0, both have tag LI0, short for (local, int, 0). \mycode{SCONST_1} has tag CS1, or (constant, short, 1), etc. These tags are encoded as a 16-bit value.
+A \emph{value tag} is added to each register's cache state to keep track of what value is currently held in the register, even after it is popped from the stack. Some bytecode instructions have a value tag associated with them to indicate which value or variable they load, store, or modify. Each tag consist of a tuple (type, data type, number). For example, the instructions \mycode{ILOAD_0} and \mycode{ISTORE_0}, which load and store the local integer variable with id 0, both have tag LI0, short for (local, int, 0). \mycode{SCONST_1} has tag CS1, or (constant, short, 1), etc. These tags are encoded as a 16-bit value.
 
 The cache manager is extended with a \mycode{sc_can_skip} function. This function will examine the type of each instruction, its value tag, and the cache state. If it finds that the instruction loads a value that is already present in a register, it updates the cache state to put that register on the stack, and returns true to tell the main loop to skip code generation for this instruction.
 
@@ -153,7 +153,7 @@ For this case a new opcode, \mycode{SIMUL}, is added, which the infuser will use
 More instructions could be added, for example, \mycode{SIADD} for 16-bit to 32-bit addition, \mycode{BSMUL} for 8-bit to 16-bit multiplication, etc. But there is a trade-off between the added complexity of an optimisation and the performance improvement it yields, and for these cases this is much smaller than for \mycode{SIMUL}.
 
 \subsubsection{16-bit array indexes}
-The normal JVM array access instructions (\mycode{IASTORE}, \mycode{IALOAD}, etc) use a 32-bit index. On a sensor node with only a few KB of memory, such large indexes are never needed, so the array access instructions were modified to use a 16-bit index. 
+The normal JVM array access instructions (\mycode{IASTORE}, \mycode{IALOAD}, etc.) use a 32-bit index. On a sensor node with only a few KB of memory, such large indexes are never needed, so the array access instructions were modified to use a 16-bit index. 
 
 This complements one of the manual optimisations discussed in Section \ref{sec-optimisations-manual-java-source-optimisation}. Using short values as index variables makes operations on the index variable cheaper, while changing the operand of the array access instructions reduces the amount of work the array access instruction needs to do and the number of registers it requires.
 

@@ -5,7 +5,7 @@ Production of integrated circuits has advanced at a consistent and rapid pace fo
 
 While Moore's law is most commonly associated with improvements in performance, it also allowed us to reduce the size of computers: doing the same thing in ever smaller packages. This trend has not been as smooth as the continuous improvements in performance. While any improvement in performance is a direct advantage, a small reduction in size usually is not. However, it enables revolutions at certain thresholds: moving from room-sized computers to home computers and PCs in every home,  scaling them down further to portable/laptop computers, and eventually handhelds and smart phones. Once established, each of these then benefitted from Moore's law to improve their capabilities, but the truly disruptive moments are when miniaturisation allowed whole new applications areas to emerge.
 
-The term 'ubiquitous computing' was coined by Mark Weiser, predicting in 1991 that computing would move from a dedicated device on the desktop, to devices all around us, from alarm clocks to coffee makers \cite{Weiser:1991wz}. Around the turn of the century, we were able able to scale down useful, working devices to the size of a few millimetres \cite{Warneke:2001ui}. This led to the start of research into Wireless Sensor Networks (WSN): many small and inexpensive sensor nodes, often called 'motes', working together to perform continuous automated sensing tasks.
+The term 'ubiquitous computing' was coined by Mark Weiser, predicting in 1991 that computing would move from a dedicated device on the desktop, to devices all around us, from alarm clocks to coffee makers \cite{Weiser:1991wz}. Around the turn of the century, we were able to scale down useful, working devices to the size of a few millimetres \cite{Warneke:2001ui}. This led to the start of research into Wireless Sensor Networks (WSN): many small and inexpensive sensor nodes, often called 'motes', working together to perform continuous automated sensing tasks.
 
 Many promising WSN applications were proposed, ranging from military applications \cite{Arora:2004}, to precision agriculture \cite{Langendoen:2006un}, habitat monitoring \cite{Mainwaring:2002wb}, and environmental monitoring \cite{WernerAllen:2006ta, Chang:2010ek}. While the applications vary greatly, the hardware platforms used to build WSN applications are all quite similar, and usually very resource-constrained.
 
@@ -19,7 +19,7 @@ What these have in common is that they all revisit classic computer science prob
 
 \section{Internet-of-Things}
 \label{sec-introduction-iot}
-Recently, research into the Internet-of-Things (IoT) focusses on connecting many everyday objects and building smart applications with them. In this vision, similar to Weiser's ubiquitous computing, any object could be connected to the internet, and cooperate to achieve useful goals. For example a house with a smart airconditioning system may use sensors in each room, weather forecast information downloaded from the internet, past data on how the house responds to weather changes, and the user's current location, and combine all this information to conserve energy while making sure the house is at a comfortable temperature when the user gets home.
+Recently, research into the Internet-of-Things (IoT) focuses on connecting many everyday objects and building smart applications with them. In this vision, similar to Weiser's ubiquitous computing, any object could be connected to the internet, and cooperate to achieve useful goals. For example a house with a smart air-conditioning system may use sensors in each room, weather forecast information downloaded from the internet, past data on how the house responds to weather changes, and the user's current location, and combine all this information to conserve energy while making sure the house is at a comfortable temperature when the user gets home.
 
 While IoT and WSN overlap and the two terms are sometimes used interchangeably, an important difference is that in WSN research, applications typically consist of a large number of homogeneous and resource-constrained nodes, where IoT devices come in a wide range, with vastly different performance characteristics, cost, and power requirements.
 
@@ -32,7 +32,7 @@ Thus, many IoT applications are inherently heterogeneous, and as Gu points out \
 
 
 \section{Virtual machines}
-The use of virtual machines has been common in desktop computing for a long time, with Java and .Net being the most well-known examples. There are several advantages to using VMs, the most obvious one being platform independence. Java enables a vast number of different models of Android phones to run the same applications. In a heterogenous environment as IoT applications are expected to be, a VM can significantly ease the deployment of these applications if the same programme can be run on any node, regardless of its hardware platform. A second advantage is that a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device.
+The use of virtual machines has been common in desktop computing for a long time, with Java and .Net being the most well-known examples. There are several advantages to using VMs, the most obvious one being platform independence. Java enables a vast number of different models of Android phones to run the same applications. In a heterogeneous environment as IoT applications are expected to be, a VM can significantly ease the deployment of these applications if the same programme can be run on any node, regardless of its hardware platform. A second advantage is that a VM can offer a safe execution environment, preventing buggy or malicious code from disabling the device.
 
 % A final often mentioned advantage is ease of programming. Many VMs allow the developer to write programmes at a higher level of abstraction than the bare-metal C programming that is still common for sensor nodes. However, it could be argued that this could also be achieved using more high level languages that compile to native code, so the two advantages of VMs that we will focus on in this dissertation are safety and platform independent reprogramming.
 
@@ -47,7 +47,7 @@ The VMs for which we have found concrete performance data are shown in Table \re
 \label{tbl-slowdown-for-sensornode-vms}
     \begin{tabular}{lllr} % NO SIMULATION DATA
     \toprule
-    VM              & Source                           & Platform                   & Performance vs native C \\
+    VM              & Source                           & Platform                   & Performance vs. native C \\
     \midrule
     \midrule
     Darjeeling      & Delft University                 & ATmega128                  & 30x-113x slower \cite{Brouwers:2009cj} \\
@@ -111,13 +111,13 @@ As a second example we consider lossless data compression. Since the radio is of
 
 Most of the traditional algorithms, such as the ones considered by they Barr and Asanovi\'c, are too complex to run on a sensor node, so specialised compression algorithms have been developed for sensor nodes. One such algorithm is LEC \cite{Marcelloni:2009ja}, a simple lossless compression algorithm that can be implemented in very little code and only needs to maintain a few bytes of state. We will use a rough calculation to show why performance is also a concern for the simpler compression algorithms developed for sensor nodes.
 
-Using the power consumption data from the datasheets for the Atmel ATmega128 \cite{Atmel:ATmega128Datasheet} CPU, we estimate the energy per CPU cycle in active mode. Running at 8 Mhz and 2.7V, the ATmega consumes 7.5 mA.
+Using the power consumption data from the datasheets for the Atmel ATmega128 \cite{Atmel:ATmega128Datasheet} CPU, we estimate the energy per CPU cycle in active mode. Running at 8 MHz and 2.7V, the ATmega consumes 7.5 mA.
 
 \begin{equation}
     7.5mA * 2.7V / 8MHz = 2.53nJ / cycle  
 \end{equation}
 
-We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 IEEE 802.15.4 transceiver \cite{Chipcon:CC2420Datasheet}. This radio can transmit at 250 kbps, but the small frame size of the 802.15.4 protocol introduces a relatively large overhead, and Latre\'e et al. calculate a maximum throughput of 163 kpbs \cite{Latre:2006wr}. The CC2420 can also operate at 2.7 V, and consumes between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
+We can do a similar calculation to determine the energy per bit for the Chipcon CC2420 IEEE 802.15.4 transceiver \cite{Chipcon:CC2420Datasheet}. This radio can transmit at 250 kbps, but the small frame size of the 802.15.4 protocol introduces a relatively large overhead, and Latre\'e et al. calculate a maximum throughput of 163 kbps \cite{Latre:2006wr}. The CC2420 can also operate at 2.7 V, and consumes between 8.5 and 17.4 mA depending on transmission power. Using the higher value, so that compression will be more worthwhile, this yields
 
 \begin{equation}
   17.4 mA * 2.7 V / 163 kbps = 288.2 nJ / bit
@@ -221,7 +221,7 @@ To use a VM in a project such as Amulet, it must be able to provide the same lev
 
 \section{Scope}
 \label{sec-introduction-scope}
-Internet-of-Things devices come in a wide range with varying capabilities. The larger IoT platforms are powerful enough to run standard operating systems, tools and languages, and VMs are well established as a good way to programme devices powerful enough to run advanced JIT compilers. This dissertation focusses specifically on small sensor nodes for which no such standards exist. These platforms have the following characteristics:
+Internet-of-Things devices come in a wide range with varying capabilities. The larger IoT platforms are powerful enough to run standard operating systems, tools and languages, and VMs are well established as a good way to programme devices powerful enough to run advanced JIT compilers. This dissertation focuses specifically on small sensor nodes for which no such standards exist. These platforms have the following characteristics:
 \begin{itemize}
     \item Separate data and programme memory: Memory is split into RAM for data, and flash memory for code. While some device can execute code from both RAM and flash \cite{TexasInstrumentsIncorporated:MSP430F1611Datasheet}, others cannot \cite{Atmel:ATmega128Datasheet}.
     \item Very limited memory: Since volatile memory consumes energy even when the CPU is in sleep mode, it is typically restricted to 10 KB of RAM or less. More non-volatile flash memory is available to hold programmes, but at 16 to 256 KB this is still very limited.
@@ -234,7 +234,7 @@ The focus on sensor nodes raises the question of how platform independent CapeVM
 \begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{compilation-process-highlevel.eps}
-\caption{Highlevel overview of the compilation process}
+\caption{High-level overview of the compilation process}
 \label{fig-compilation-process-highlevel}
 \end{figure}
 
@@ -314,7 +314,7 @@ In literature various names are used for our target devices. The word \emph{mote
 %TODO: do we? actually right now neither term is used very often. Maybe drop this, but should be more consistent.
 %The terms \emph{wireless sensor networks}, \emph{cyber-physical systems} and \emph{internet-of-things} are all commonly used to describe sensor node applications. We will use WSN since it is the longer established term, and more clearly focussed on resource-constrained devices, but note that this also covers a large portion of IoT applications.
 
-When reprogramming these nodes, a new programme must be sent to them by a more powerful device. This role is refered to in literature by various names, including \emph{server}, \emph{gateway}, \emph{master}, \emph{controller}, or \emph{host}, depending on the exact design of the network and the way it is reconfigured. For the work in this dissertation these differences are not relevant, and we will use \emph{host} to refer to the source of the code that is uploaded to the sensor node, which is assumed to be a more powerful device with desktop-class processing capabilities.
+When reprogramming these nodes, a new programme must be sent to them by a more powerful device. This role is referred to in literature by various names, including \emph{server}, \emph{gateway}, \emph{master}, \emph{controller}, or \emph{host}, depending on the exact design of the network and the way it is reconfigured. For the work in this dissertation these differences are not relevant, and we will use \emph{host} to refer to the source of the code that is uploaded to the sensor node, which is assumed to be a more powerful device with desktop-class processing capabilities.
 
 Since our VM is an Ahead-of-Time compiler, the Java source code is transformed into native code in two steps. We will use \emph{compile time} to refer to the compilation of Java code to bytecode on the host, and \emph{translation time} to refer to the translation of this bytecode into native code on the device.
 

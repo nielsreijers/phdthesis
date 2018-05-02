@@ -4,7 +4,7 @@ As shown in Figure \ref{fig-translation-process}, our current implementation use
 
 In a future version, these three steps should be merged into an 'optimising infuser' which uses all the normal, well-known optimisation techniques to produce better quality bytecode, but at the moment we do not have the resources to build such an optimising infuser.
 
-Since our goal is to determine what level of performance is possible on a sensor node, the Java source was manually optimised to get better quality JVM bytecode from \mycode{javac}. While these changes are not an automatic optimisation we developed, we find it imporant to mention them explicitly and analyse their impact, since many developers may expect these optimisations to happen automatically and without this step it would be impossible to reproduce our results.
+Since our goal is to determine what level of performance is possible on a sensor node, the Java source was manually optimised to get better quality JVM bytecode from \mycode{javac}. While these changes are not an automatic optimisation we developed, we find it important to mention them explicitly and analyse their impact, since many developers may expect these optimisations to happen automatically and without this step it would be impossible to reproduce our results.
 
 % We have been careful to limit ourselves to 'fair' optimisations, by which we mean optimisations that an optimising infuser could reasonably be expected to do automatically, given some basic, conservative assumptions about the performance model. 
 

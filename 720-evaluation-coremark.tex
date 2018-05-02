@@ -85,4 +85,4 @@ Combined, this improves the performance of \mybench{CoreMark} to only 59\% overh
 
 Similar to \mybench{MoteTrack} in the previous section, these results point out some weaknesses of Java when used as an embedded VM. The lack of cheap function pointers, or a way of allocating small temporary objects or arrays in a method's stack frame means there will be a significant overhead in situations where the optimisations used here cannot be applied. We discuss a way to reduce the cost of temporary objects in future VMs in Section \ref{sec-no-gc}.
 
-In the rest of the evaluation, the manually optimised code is used for all benchmarks. For \mybench{CoreMark} this includes the two non-automatic optimisations. The optimisation to avoid repeatly creating temporary objects was also applied to the \mybench{LEC} and \mybench{MoteTrack} benchmarks.
+In the rest of the evaluation, the manually optimised code is used for all benchmarks. For \mybench{CoreMark} this includes the two non-automatic optimisations. The optimisation to avoid repeatedly creating temporary objects was also applied to the \mybench{LEC} and \mybench{MoteTrack} benchmarks.
