@@ -7,6 +7,8 @@ This chapter we introduce the global design of CapeVM, which is a modified versi
     \item Safety: CapeVM adds a number of translation-time and run-time safety checks to provide a safe, sandboxed execution environment.
 \end{itemize}
 
+\noindent CapeVM's source code is available on GitHub \cite{capevmsource}.
+
 \section{Goals}
 \label{sec-CapeVM-goals}
 Working on resource-constrained devices means we have to make some compromises. Our main goal is to build an AOT compiling VM that generates safe code, performs well, reduces the code size overhead seen in previous work, and fits as many IoT scenarios as possible. This includes scenarios like Amulet, where multiple applications may be running on a single device. When new code is being loaded, the impact on other applications should be as small as possible.
